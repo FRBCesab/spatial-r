@@ -1,0 +1,47 @@
+project:
+  type: book
+
+book:
+  title: "Spatial-r: Tutorials on spatial data analysis in R"
+  author: 
+  - name: "Romain Frelat"
+    orcid: "0000-0002-8631-4398"
+    affiliations: 
+    - name: FRB-CESAB
+      url: "https://www.fondationbiodiversite.fr/en/about-the-foundation/le-cesab/"
+  date: today
+
+  page-footer: 
+    left: "&copy; CC-By [FRB-CESAB](https://www.fondationbiodiversite.fr/en/about-the-foundation/le-cesab/)"
+    center: "Code source available on [{{< fa brands github >}}](https://github.com/FRBCesab/spatial-r)"
+    right: "Built with [Quarto](https://quarto.org/)"
+    border: true
+
+  chapters:
+    - index.qmd
+    - chapters/intro.qmd
+    - part: "Day 1"
+      chapters: 
+      - chapters/intro.qmd
+      - chapters/env-out.qmd
+    - part: "Day 2"
+      chapters:
+      - chapters/summary.qmd
+    - references.qmd
+
+  reader-mode: false
+  search: false
+
+bibliography: references.bib
+
+format:
+  html:
+    theme:
+      - cosmo
+      - brand
+      - css/styles.scss
+    code-copy: true
+    code-line-numbers: false
+
+
+
