@@ -1,7 +1,17 @@
 # Spatial data {.unnumbered}
 
-Please see the presentation (to be updated)
+::: {.callout-note icon=true appearance="simple"}
+
+## An introduction to spatial data
+<br />
+{{< fa brands github >}} &nbsp;**Source:** <https://github.com/FRBCesab/spatial-slides><br/>
+{{< fa globe >}} &nbsp;**Slides:** <https://frbcesab.github.io/spatial-slides/env-data>
+
+:::
+
+
+<br />
 
 <div class="container">
-  <iframe class="responsive-iframe" src="https://biodiversitydata.github.io/data-cleaning"></iframe>
+  <iframe class="responsive-iframe" src="https://frbcesab.github.io/spatial-slides/env-data"></iframe>
 </div>
