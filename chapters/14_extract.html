@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>References – Spatial-r: Tutorials on spatial data analysis in R</title>
+<title>Extract – Spatial-r: Tutorials on spatial data analysis in R</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,44 +20,26 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for citations */
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
-}
-.hanging-indent div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
-}
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
-}
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}</style>
+</style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<link href="./chapters/31_polygons.html" rel="prev">
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-3e8fa383bad517095c2b42029d2b9125.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-e4262a6daaa78b9acfcc7a513cc6cbbb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/quarto-contrib/fontawesome6-0.1.0/all.css" rel="stylesheet">
-<link href="site_libs/quarto-contrib/fontawesome6-0.1.0/latex-fontsize.css" rel="stylesheet">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<link href="../chapters/21_multilayer.html" rel="next">
+<link href="../chapters/13_rasters.html" rel="prev">
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-3e8fa383bad517095c2b42029d2b9125.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-e4262a6daaa78b9acfcc7a513cc6cbbb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/quarto-contrib/fontawesome6-0.1.0/all.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/fontawesome6-0.1.0/latex-fontsize.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "language": {
     "search-no-results-text": "No results",
@@ -86,7 +68,7 @@ div.csl-indent {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./references.html">References</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/11_presentation.html">Day 1</a></li><li class="breadcrumb-item"><a href="../chapters/14_extract.html">Extract</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -98,20 +80,20 @@ div.csl-indent {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">Spatial-r: Tutorials on spatial data analysis in R</a> 
+      <a href="../">Spatial-r: Tutorials on spatial data analysis in R</a> 
     </div>
       </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link">
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Preface</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/01_intro.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/01_intro.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Introduction</span></a>
   </div>
 </li>
@@ -126,25 +108,25 @@ div.csl-indent {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/11_presentation.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/11_presentation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Spatial data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/12_vectors.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/12_vectors.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Vectors</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/13_rasters.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/13_rasters.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Rasters</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/14_extract.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/14_extract.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Extract</span></a>
   </div>
 </li>
@@ -161,13 +143,13 @@ div.csl-indent {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/21_multilayer.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/21_multilayer.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Multi-layer rasters</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/22_interactivemap.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/22_interactivemap.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Interactive maps</span></a>
   </div>
 </li>
@@ -184,7 +166,7 @@ div.csl-indent {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/31_polygons.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/31_polygons.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">More about polygons</span></a>
   </div>
 </li>
@@ -192,7 +174,7 @@ div.csl-indent {
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./references.html" class="sidebar-item-text sidebar-link active">
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">References</span></a>
   </div>
 </li>
@@ -201,15 +183,23 @@ div.csl-indent {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#points-to-polygon" id="toc-points-to-polygon" class="nav-link active" data-scroll-target="#points-to-polygon">Points to polygon</a></li>
+  <li><a href="#points-to-raster" id="toc-points-to-raster" class="nav-link" data-scroll-target="#points-to-raster">Points to raster</a></li>
+  <li><a href="#polygons-to-raster" id="toc-polygons-to-raster" class="nav-link" data-scroll-target="#polygons-to-raster">Polygons to raster</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/11_presentation.html">Day 1</a></li><li class="breadcrumb-item"><a href="../chapters/14_extract.html">Extract</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">References</h1>
+<h1 class="title">Extract</h1>
 </div>
 
 
@@ -226,11 +216,29 @@ div.csl-indent {
 </header>
 
 
-<div id="refs" role="list" style="display: none">
+<p>At the end of this tutorial, you will be know how to:</p>
+<ul>
+<li>extract information from rasters to vectors<br>
+</li>
+<li>use buffers</li>
+</ul>
+<p>Now that we know the basic formats, let’s dive into the most interesting facets: extracting information from different data.</p>
+<section id="points-to-polygon" class="level3">
+<h3 class="anchored" data-anchor-id="points-to-polygon">Points to polygon</h3>
+<p>example with ecoregions</p>
+</section>
+<section id="points-to-raster" class="level3">
+<h3 class="anchored" data-anchor-id="points-to-raster">Points to raster</h3>
+<p>example with numerical values</p>
+<p>example with categories</p>
+</section>
+<section id="polygons-to-raster" class="level3">
+<h3 class="anchored" data-anchor-id="polygons-to-raster">Polygons to raster</h3>
+<p>example with buffer from points</p>
+<p>example with administrative areas</p>
 
-</div>
 
-
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -634,11 +642,14 @@ div.csl-indent {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./chapters/31_polygons.html" class="pagination-link" aria-label="More about polygons">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">More about polygons</span>
+      <a href="../chapters/13_rasters.html" class="pagination-link" aria-label="Rasters">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Rasters</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
+      <a href="../chapters/21_multilayer.html" class="pagination-link" aria-label="Multi-layer rasters">
+        <span class="nav-page-text">Multi-layer rasters</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
   </div>
 </nav>
 </div> <!-- /content -->

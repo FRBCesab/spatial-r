@@ -4,40 +4,96 @@
     "href": "index.html",
     "title": "Spatial-r: Tutorials on spatial data analysis in R",
     "section": "",
-    "text": "Preface\nThis is a Quarto book.\nTo learn more about Quarto books visit https://quarto.org/docs/books.",
+    "text": "Preface\nThis is a collection of tutorials on how to handle spatial data in R.\nIt is made for a two half-day workshop, but you can follow the tutorials on your own pace.\nThe aims of this workshop is to :\n\nFeel more comfortable to work with spatial data\nLoad spatial data in R and visualize it\nExtract information from remote sensing or other fields\nTake advantage of the numerous databases that are available online\n\nThe tutorial targets students and scientists in ecology with previous knowledge of the R software.\n\nR package\nThe tutorials will mostly rely on (terra R-package)[] for most of the spatial data handling.\nR is exceptional due to its diversity, and their exist other package to handle spatial data, sf and stars being also very good resources.\n\n\nKey resources\nThese tutorials has been inspired by brilliant resources online:\n\nHijman R. et al. Spatial Data Science with R and “terra”\n\nPebesma and Bivand Spatial Data Science: With Applications in R\nMoraga P. (2023)Spatial Statistics for Data Science: Theory and Practice with R",
     "crumbs": [
       "Preface"
     ]
   },
   {
-    "objectID": "chapters/intro.html",
-    "href": "chapters/intro.html",
+    "objectID": "chapters/01_intro.html",
+    "href": "chapters/01_intro.html",
     "title": "Introduction",
     "section": "",
-    "text": "This is a book created from markdown and executable code.\nSee Knuth (1984) for additional discussion of literate programming.\n\n\n\n\nKnuth, Donald E. 1984. “Literate Programming.” Comput. J. 27 (2): 97–111. https://doi.org/10.1093/comjnl/27.2.97.",
+    "text": "How to install R and set up environment\n\n\nR packages needed for these tutorials\n\n\nOther resources",
     "crumbs": [
       "Introduction"
     ]
   },
   {
-    "objectID": "chapters/summary.html",
-    "href": "chapters/summary.html",
-    "title": "Summary",
+    "objectID": "chapters/11_presentation.html",
+    "href": "chapters/11_presentation.html",
+    "title": "Spatial data",
     "section": "",
-    "text": "In summary, this book has no content whatsoever.",
+    "text": "Please see the presentation (to be updated)",
     "crumbs": [
-      "Day 2",
-      "Summary"
+      "Day 1",
+      "Spatial data"
     ]
   },
   {
-    "objectID": "references.html",
-    "href": "references.html",
-    "title": "References",
+    "objectID": "chapters/12_vectors.html",
+    "href": "chapters/12_vectors.html",
+    "title": "Vectors",
     "section": "",
-    "text": "Knuth, Donald E. 1984. “Literate Programming.” Comput.\nJ. 27 (2): 97–111. https://doi.org/10.1093/comjnl/27.2.97.",
+    "text": "At the end of this tutorial, you will be know :\n\nwhat is a spatial vector data type\n\nhow to create and modify one\n\nhow to read and write shapefiles or kml files\n\n\nVector types\n\n\nCreation from dataset\nThat’s the most classic\n\n\nModification\n\n\nLoad existing dataset\n\n\nExport the data",
     "crumbs": [
-      "References"
+      "Day 1",
+      "Vectors"
+    ]
+  },
+  {
+    "objectID": "chapters/13_rasters.html",
+    "href": "chapters/13_rasters.html",
+    "title": "Rasters",
+    "section": "",
+    "text": "At the end of this tutorial, you will be know :\n\nwhat is a raster data file\n\nhow to read the most common formats\n\nhow to make operations in rasters",
+    "crumbs": [
+      "Day 1",
+      "Rasters"
+    ]
+  },
+  {
+    "objectID": "chapters/14_extract.html",
+    "href": "chapters/14_extract.html",
+    "title": "Extract",
+    "section": "",
+    "text": "At the end of this tutorial, you will be know how to:\n\nextract information from rasters to vectors\n\nuse buffers\n\nNow that we know the basic formats, let’s dive into the most interesting facets: extracting information from different data.\n\nPoints to polygon\nexample with ecoregions\n\n\nPoints to raster\nexample with numerical values\nexample with categories\n\n\nPolygons to raster\nexample with buffer from points\nexample with administrative areas",
+    "crumbs": [
+      "Day 1",
+      "Extract"
+    ]
+  },
+  {
+    "objectID": "chapters/21_multilayer.html",
+    "href": "chapters/21_multilayer.html",
+    "title": "Multi-layer rasters",
+    "section": "",
+    "text": "At the end of this tutorial, you will be know how to:\n\nhandle multilayer rasters\n\nextract time series or vegetation indices from rasters",
+    "crumbs": [
+      "Day 2",
+      "Multi-layer rasters"
+    ]
+  },
+  {
+    "objectID": "chapters/22_interactivemap.html",
+    "href": "chapters/22_interactivemap.html",
+    "title": "Interactive maps",
+    "section": "",
+    "text": "At the end of this tutorial, you will be know how to:\n\ncreate an interactive map\n\nfew tricks to improve the layout or safeguard the anonymity of your data",
+    "crumbs": [
+      "Day 2",
+      "Interactive maps"
+    ]
+  },
+  {
+    "objectID": "chapters/31_polygons.html",
+    "href": "chapters/31_polygons.html",
+    "title": "More about polygons",
+    "section": "",
+    "text": "At the end of this tutorial, you will be know how to:\n\ncalculate convex hull from points\n\nsimplify heavy polygons",
+    "crumbs": [
+      "Extra",
+      "More about polygons"
     ]
   }
 ]
