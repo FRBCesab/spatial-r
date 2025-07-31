@@ -19,14 +19,20 @@ book:
 
   chapters:
     - index.qmd
-    - chapters/intro.qmd
+    - chapters/01_intro.qmd
     - part: "Day 1"
       chapters: 
-      - chapters/intro.qmd
-      - chapters/env-out.qmd
+      - chapters/11_presentation.qmd
+      - chapters/12_vectors.qmd
+      - chapters/13_rasters.qmd
+      - chapters/14_extract.qmd
     - part: "Day 2"
       chapters:
-      - chapters/summary.qmd
+      - chapters/21_multilayer.qmd
+      - chapters/22_interactivemap.qmd
+    - part: "Extra"
+      chapters:
+      - chapters/31_polygons.qmd
     - references.qmd
 
   reader-mode: false

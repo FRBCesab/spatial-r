@@ -1,5 +1,6 @@
-## Environmental data {.unnumbered}
+# Spatial data {.unnumbered}
 
+Please see the presentation (to be updated)
 
 <div class="container">
   <iframe class="responsive-iframe" src="https://biodiversitydata.github.io/data-cleaning"></iframe>

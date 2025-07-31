@@ -1,0 +1,7 @@
+# Rasters {.unnumbered}
+
+At the end of this tutorial, you will be know :
+
+- what is a raster data file   
+- how to read the most common formats   
+- how to make operations in rasters   

@@ -25,7 +25,10 @@ Tutorials on spatial data analysis in R for ecologists
 
 
 
-
+## technical notes
+```
+quarto publish gh-pages
+```
 
 ## Inspiration
 

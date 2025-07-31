@@ -1,0 +1,20 @@
+# Vectors {.unnumbered}
+
+At the end of this tutorial, you will be know :    
+
+- what is a spatial vector data type   
+- how to create and modify one  
+- how to read and write shapefiles or kml files  
+
+
+### Vector types
+
+
+### Creation from dataset
+That's the most classic 
+
+### Modification
+
+### Load existing dataset
+
+### Export the data

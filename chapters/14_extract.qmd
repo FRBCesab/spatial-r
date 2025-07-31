@@ -1,0 +1,26 @@
+# Extract {.unnumbered}
+
+At the end of this tutorial, you will be know how to: 
+
+- extract information from rasters to vectors  
+- use buffers    
+
+
+Now that we know the basic formats, let's dive into the most interesting facets: extracting information from different data.
+
+
+### Points to polygon
+example with ecoregions
+
+### Points to raster
+example with numerical values
+
+example with categories
+
+### Polygons to raster
+example with buffer from points
+
+example with administrative areas
+
+
+

@@ -1,0 +1,6 @@
+# Multi-layer rasters {.unnumbered}
+
+At the end of this tutorial, you will be know how to:
+
+- handle multilayer rasters   
+- extract time series or vegetation indices from rasters   

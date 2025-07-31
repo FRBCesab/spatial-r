@@ -1,5 +1,28 @@
 # Preface {.unnumbered}
 
-This is a Quarto book.
+This is a collection of tutorials on how to handle spatial data in R.
 
-To learn more about Quarto books visit <https://quarto.org/docs/books>.
+It is made for a two half-day workshop, but you can follow the tutorials on your own pace.
+
+The aims of this workshop is to :  
+
+> Feel more comfortable to work with spatial data   
+> Load spatial data in R and visualize it   
+> Extract information from remote sensing or other fields  
+> Take advantage of the numerous databases that are available online   
+
+
+The tutorial targets students and scientists in ecology with previous knowledge of the [R software](https://cran.r-project.org/).
+
+#### R package
+
+The tutorials will mostly rely on (terra R-package)[] for most of the spatial data handling.  
+R is exceptional due to its diversity, and their exist other package to handle spatial data, sf and stars being also very good resources.  
+
+#### Key resources
+
+These tutorials has been inspired by brilliant resources online:   
+
+- Hijman R. et al. [Spatial Data Science with R and “terra”](https://rspatial.org/)   
+- Pebesma and Bivand [Spatial Data Science: With Applications in R](https://r-spatial.org/book/)
+- Moraga P. (2023)[Spatial Statistics for Data Science: Theory and Practice with R](https://www.paulamoraga.com/book-spatial/)
