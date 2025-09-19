@@ -1,3 +1,11 @@
 /.quarto/
 _book/
 docs/
+
+ressources/
+# ideas/draft for new chapters
+chapters/Ex*
+
+data/gbif_otter_2021_mpl50km.gpkg
+data/BDALTI_class*
+data/MPL_elevation_lulc*

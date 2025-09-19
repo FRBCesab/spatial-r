@@ -3,24 +3,301 @@
 At the end of this tutorial, you will be know how to: 
 
 - extract information from rasters to vectors  
-- use buffers    
+- extract information among vectors
+- use buffers
 
 
-Now that we know the basic formats, let's dive into the most interesting facets: extracting information from different data.
+Now that we know the basic formats (vectors *addref* and raster *addref*), let's dive to the most interesting facet: extracting information from different data types.
 
 
-### Points to polygon
-example with ecoregions
+There is a single key function: `terra::extract()`.
 
-### Points to raster
-example with numerical values
 
-example with categories
+## Load the datasets
 
-### Polygons to raster
+```{r settings}
+library(terra) |> suppressPackageStartupMessages()
+library(mapview)
+library(here) |> suppressPackageStartupMessages()
+```
+
+The basic data is the GBIF otter dataset. We want to characterize the environment where these occurrences happened.
+
+::: {.panel-tabset}
+
+## local
+```{r otter_local}
+otter <- read.csv(here("data", "gbif_otter_2021_mpl50km.csv"))
+```
+
+## online
+```{r otter_online}
+#| eval: false
+otter <- read.csv(
+  "https://github.com/FRBCesab/spatial-r/raw/main/data/gbif_otter_2021_mpl50km.csv"
+)
+```
+
+:::
+
+```{r load_otter}
+# transform into a spatial object
+pt_otter <- vect(
+  otter,
+  geom = c("decimalLongitude", "decimalLatitude"),
+  crs = "EPSG:4326"
+)
+```
+
+
+## Points to polygon
+
+Let's load the administrative borders of the area and extract the commune where the otter were spotted.
+
+
+::: {.panel-tabset}
+
+## local
+```{r commune_local}
+poly_commune <- vect(here("data", "BDCARTO-Commune_mpl50km.gpkg"))
+```
+
+## online
+```{r commune_online}
+#| eval: false
+poly_commune <- vect(
+  "https://github.com/FRBCesab/spatial-r/raw/main/data/BDCARTO-Commune_mpl50km.gpkg"
+)
+```
+
+:::
+
+Before making extraction, it is recommended to plot the data (if not too big), to make sure the projection systems are the same and the extents match. Do not use `mapview` (interactive map) because it will automatically project the data.
+
+```{r}
+plot(poly_commune)
+plot(pt_otter, add = TRUE, col = "red")
+# make sure it is the same projection
+crs(poly_commune) == crs(pt_otter)
+```
+
+Extract the commune
+```{r}
+pt_commune <- extract(poly_commune, pt_otter)
+```
+
+Which commune with most observation?
+```{r}
+sort(table(pt_commune$nom_officiel), decreasing = TRUE)[1:5]
+```
+
+Extra: How many observation per commune?
+```{r}
+barplot(
+  table(table(pt_commune$nom_officiel)),
+  xlab = "number of otter observations",
+  ylab = "number of municipalities"
+)
+
+# if we want to consider all commune in the poly_commune
+# create a new factor with all commune considered
+obs_commune <- factor(
+  pt_commune$nom_officiel,
+  levels = sort(unique(poly_commune$nom_officiel))
+)
+
+barplot(
+  table(table(obs_commune)),
+  xlab = "number of otter observations",
+  ylab = "number of municipalities (log)"
+)
+```
+
+Exercice: Do the same for land use land cover data
+
+
+## Points to raster
+
+Example with numerical values
+
+::: {.panel-tabset}
+
+## local
+```{r rast_local}
+bdalti <- rast(here("data", "BDALTI_mpl50km.tif"))
+```
+
+## online
+```{r rast_online}
+#| eval: false
+bdalti <- rast(
+  "https://github.com/FRBCesab/spatial-r/raw/refs/heads/main/data/BDALTI_mpl50km.tif"
+)
+```
+
+:::
+
+```{r}
+names(bdalti) <- "elevation"
+bdalti
+
+crs(bdalti) == crs(pt_otter)
+```
+
+In this case, the projection are not the same. It is recommended to project the points instead of the raster (much faster).
+```{r}
+pt_2154 <- project(pt_otter, crs(bdalti))
+```
+
+```{r visu_pts_rast}
+plot(bdalti, "elevation")
+plot(pt_2154, add = TRUE, col = "red")
+```
+
+```{r ext_pts_rast}
+pt_alti <- extract(bdalti, pt_2154)
+```
+
+```{r}
+boxplot(pt_alti$elevation, ylab = "elevation (m)")
+
+```
+
+Extra: compare with data from GBIF
+```{r}
+# check with recorded
+plot(
+  pt_alti$elevation,
+  pt_otter$elevation,
+  xlab = "elevation (m) GBIF values",
+  ylab = "elevation (m) BDALTI values",
+  asp = 1
+)
+# add identity line
+abline(a = 0, b = 1)
+```
+
+
+
+## Polygons to raster
 example with buffer from points
-
-example with administrative areas
-
+`zonal` could be faster? and mention `exactextractr` package which is much faster for large dataset.
 
 
+### Create buffer
+```{r}
+poly_otter <- buffer(pt_2154, 1000)
+poly_otter
+```
+
+### Get average elevation
+```{r ext_poly_rast_mean}
+mean_alti <- extract(bdalti, poly_otter, fun = mean)
+
+plot(mean_alti$elevation, pt_alti$elevation)
+```
+
+### Get variation of elevation
+```{r ext_poly_rast_sd}
+sd_alti <- extract(bdalti, poly_otter, fun = sd)
+
+plot(sd_alti$elevation, pt_alti$elevation)
+```
+
+Extra: is variation linked to average slope?
+
+### Get all values
+```{r ext_poly_rast_full}
+full_alti <- extract(bdalti, poly_otter)
+
+# number of pixel per buffer (around 50)
+table(table(full_alti$ID))
+
+med_otter <- tapply(full_alti$elevation, full_alti$ID, median)
+```
+
+
+### With categorical raster
+
+slightly more complicated (but there might exist a faster function)
+```{r}
+bks <- c(0, 1, 5, 10, 50, 100, 500, 1000, 5000)
+alti_class <- classify(bdalti, bks, include.lowest = TRUE, brackets = TRUE)
+
+poly_class <- extract(alti_class, poly_otter, exact = TRUE)
+
+summary_class <- tapply(
+  poly_class$fraction,
+  list(poly_class$ID, poly_class$elevation),
+  sum
+)
+sum_class <- rowSums(summary_class, na.rm = TRUE)
+boxplot(sum_class)
+perc_class <- summary_class / sum_class * 100
+perc_class[is.na(perc_class)] <- 0
+head(perc_class)
+```
+
+## Polygons to polygons
+
+the land use per point or per buffer
+
+::: {.panel-tabset}
+
+## local
+```{r poly_local}
+landuse <- vect(here("data", "BDCARTO-LULC_mpl50km.shp"))
+```
+
+## online
+```{r poly_online}
+#| eval: false
+landuse <- vect(
+  "https://github.com/FRBCesab/spatial-r/raw/refs/heads/main/data/BDCARTO-LULC_mpl50km.shp"
+)
+```
+
+:::
+
+
+
+In this case, faster to project the buffer point than the polygons
+
+```{r}
+# project the buffer
+poly_4326 <- project(poly_otter, crs(landuse))
+
+#make sure land use and buffer are in the same projection
+plot(landuse, "nature")
+plot(poly_4326, add = TRUE, col = "red")
+
+full_lulc <- intersect(landuse, poly_4326)
+# visualize the intersection
+mapview(full_lulc, z = "nature")
+```
+
+```{r}
+full_lulc$area_km2 <- expanse(full_lulc) * 0.000001
+
+occ <- tapply(full_lulc$area_km2, list(full_lulc$key, full_lulc$nature), sum)
+#replace NA by 0
+occ[is.na(occ)] <- 0
+
+sum_occ <- rowSums(occ)
+summary(sum_occ)
+
+poly_4326$overlay_area <- sum_occ
+
+perc_occ <- occ / sum_occ * 100
+head(perc_occ)
+
+# add information in the spatial vector
+pt_res <- cbind(pt_otter, perc_occ)
+mapview(pt_res, z = "Forêt", layer.name = "% foret")
+
+
+pt_lulc <- extract(landuse, pt_otter)
+pt_res$LULC <- pt_lulc$nature
+
+boxplot(pt_res$Forêt ~ pt_res$LULC, horizontal = TRUE, las = 1, ylab = "")
+```

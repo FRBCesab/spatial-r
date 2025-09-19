@@ -2,7 +2,53 @@
 
 ### How to install R and set up environment
 
+
+
 ### R packages needed for these tutorials
 
-### Other resources
+We will mostly use terra and mapview as a starter.
+Fancier maps can be created with mapsf and tmap (*ref tutorials*)
+
+
+### Download needed dataset
+
+```{r}
+#| eval: false
+# set data directory
+datadir <- here::here("data")
+if (!dir.exists(datadir)) {
+  dir.create(
+    path = datadir,
+    showWarnings = FALSE,
+    recursive = TRUE
+  )
+}
+
+url_git <- "https://github.com/FRBCesab/spatial-r/raw/refs/heads/main/data"
+
+# download GBIF data
+file1 <- "gbif_otter_2021_mpl50km.csv"
+download.file(file.path(url_git, file1), file.path(datadir, file1), mode = "wb")
+
+# download elevation data
+file2 <- "BDALTI_mpl50km.tif"
+download.file(file.path(url_git, file2), file.path(datadir, file2), mode = "wb")
+
+# download administrative borders
+file3 <- "BDCARTO-Commune_mpl50km.gpkg"
+download.file(file.path(url_git, file3), file.path(datadir, file3), mode = "wb")
+
+# download rivers
+file4 <- "BDCARTO-River_mpl50km.gpkg"
+download.file(file.path(url_git, file4), file.path(datadir, file4), mode = "wb")
+
+# download land cover
+file5 <- "BDCARTO-LULC_mpl50km"
+shpext <- c("dbf", "prj", "shp", "shx")
+url_shp <- file.path(url_git, paste(file5, shpext, sep = "."))
+dir_shp <- file.path(datadir, paste(file5, shpext, sep = "."))
+for (i in seq_along(shpext)) {
+  download.file(url_shp[i], dir_shp[i], mode = "wb")
+}
+```
 

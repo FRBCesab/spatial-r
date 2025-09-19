@@ -1,0 +1,295 @@
+# Create a toy dataset from GBIF and IGN data {.unnumbered}
+
+This is a small practical example on how get data from GBIF and IGN based on a geographical area.
+For this tutorial, we will need `sf`, `mapview`, `happign`, and `rgbif` packages.
+
+```{r setting}
+library(sf) |> suppressPackageStartupMessages()
+library(mapview) |> suppressPackageStartupMessages()
+library(rgbif)
+library(happign) |> suppressPackageStartupMessages()
+```
+
+
+## 1. Set the spatial extent
+
+For this example, we will focus on an area around FRB-CESAB in Montpellier. So we will need to   
+(1) find the coordinates of FRB-CESAB
+(2) create a buffer area
+
+
+### Get coordinates from an address
+
+This task is called geocoding. Among other resource, we recommend the package `rgeoservices` (if in France, based on french IGN services) or the package `tidygeocoder` using Open Street Map data.
+
+::: {.panel-tabset}
+## rgeoservices
+```{r rgeoservices}
+#| eval: false
+#| 
+cesab <- rgeoservices::gs_get_coordinates(
+  query = "5 rue de l’École de médecine, 34000 MONTPELLIER",
+  index = "address"
+)
+```
+
+## tidygeocoder
+```{r tidygeocoder}
+#| eval: false
+#| 
+cesab <- tidygeocoder::geocode(
+  data.frame(x = "5 rue de l’École de médecine, 34000 MONTPELLIER"),
+  address = "x",
+  method = "osm"
+)
+# for compatibility with other solutions, rename the columns
+names(cesab) <- c("x", "latitude", "longitude")
+```
+
+## manual
+```{r manual}
+# for such a simple case, it's easier to get coordinates from GoogleMap
+# https://maps.app.goo.gl/woqBZSs63zSjHUsS9
+cesab <- data.frame(
+  "latitude" = 43.61269208391402,
+  "longitude" = 3.8733758693843585
+)
+```
+:::
+
+
+### Create a spatial object from coordinates
+
+We will use the function `sf::st_as_sf()` with the names of the columns for the longitude (x), the latitude (y) and the Coordinate Reference System (CRS) which is [EPSG:4326](https://epsg.io/4326).
+
+
+```{r sf_point}
+# create st_point
+pt_cesab <- st_as_sf(
+  cesab,
+  coords = c("longitude", "latitude"),
+  crs = 4326
+)
+```
+
+### Create a buffer from points
+
+We want a buffer zone of 50km around the FRB-Cesab. Because GBIF only accept rectangle buffer, we will take the square that include the circular buffer.
+
+```{r buffer}
+buffer_size <- 50000 # in m because data are in EPSG 4326
+
+# create a round buffer zone
+b_circle <- st_buffer(pt_cesab, buffer_size)
+
+# transform to square because occ_search() needs rectangle
+b_square <- st_bbox(b_circle) |> st_as_sfc()
+```
+
+We can visualize the spatial data created with mapview:
+```{r map_buffer}
+mapview(b_square, alpha.regions = 0, lwd = 3) +
+  mapview(b_circle, alpha.regions = 0.1, lwd = 0) +
+  mapview(pt_cesab)
+
+```
+
+
+# 2. Get the occurrences from GBIF
+
+### Number of occurences
+A good way is to start with the function 'occ_count()' to know how many records fits our criteria.
+You can add `;` for multiple values and `,` for a range.
+
+Let's look at how many otter, genet and badger where seen in the period 2021-2024 around Montpellier.
+
+```{r gbif_count}
+occ_count(
+  geometry = st_as_text(b_square),
+  year = "2021,2024",
+  scientificName = "Lutra lutra (Linnaeus, 1758); Genetta genetta (Linnaeus, 1758); Meles meles (Linnaeus, 1758)"
+)
+```
+
+
+### Data download
+If the dataset is small (<100.000 records), then we can use the function `occ_search()`. Else we would need to use the function `occ_download()` and register in GBIF. For the sake of downloading a small toy dataset, this is not needed.
+
+```{r gbif_dwl}
+# download the data
+gbif_otter <- occ_search(
+  geometry = st_as_text(b_square),
+  year = "2021",
+  scientificName = "Lutra lutra (Linnaeus, 1758)"
+)
+```
+
+Let's select the most relevant columns from GBIF data for our toy data.
+
+```{r gbif_clean}
+keep <- c(
+  "key",
+  "institutionCode",
+  "species",
+  "occurrenceStatus",
+  "eventDate",
+  "year",
+  "month",
+  "day",
+  "decimalLongitude",
+  "decimalLatitude",
+  "elevation",
+  "identificationVerificationStatus",
+  "identifier",
+  "datasetKey"
+)
+
+df1 <- gbif_otter$data[, keep]
+
+df1$institutionCode <- ifelse(
+  is.na(df1$institutionCode),
+  "UAR PatriNat",
+  "iNaturalist"
+)
+
+# based on gbif_citation()
+# get readable dataset information
+info <- c(
+  "50c9509d-22c7-4a22-a47d-8c48425ef4a7" = "iNaturalist Research-grade Observations",
+  "c32f3129-a4dc-4e36-86d4-a35cc5cfb04d" = "LIGNE NOUVELLE MONTPELLIER PERPIGNAN DUP PHASE 1 - Inventaire non protocolé Mammifères",
+  "256b9877-cef3-4e8e-84e1-f23299c49655" = "UAR PatriNat - opportunistic data Faune-France",
+  "c4101a28-b24a-4fd3-afa7-8e4abe0d9035" = "PNA Loutre-Lutra_lutra_donnees_Ecologistes_Euziere_2016-2022",
+  "57f29bc2-9fbf-4db1-bbec-d812d9ca4b08" = "UAR PatriNat - Atlas de la Biodiversité Communale-Pièges-photo",
+  "7d95137d-4dbe-41ff-9569-a890c84abd6b" = "UAR PatriNat - opportunistic data SICEN Occitanie",
+  "221e96c0-973a-4867-83dd-6354eeaf799f" = "UAR PatriNat - Louboutin Bastien",
+  "2ad3a5c7-3399-434e-a8ab-c4fe62f9f3af" = "UAR PatriNat - 2022_LPO PACA_7",
+  "62c656b7-9614-49c3-a179-842be7908725" = "UAR PatriNat - GCLR, Thierry ALIGNAN",
+  "d2f5c9cd-b746-4e3a-9aaa-c4188e5b0231" = "PNA Loutre-Lutra_lutra_donnees_Ecologistes_Euziere_2016-2021",
+  "240e848b-47bc-40a3-a44c-6e745901d2d0" = "UAR PatriNat - CardObs",
+  "3ae9f5c3-0196-4c9d-a2d5-2cceb3a9f2ae" = "UAR PatriNat - Cosmi Julien",
+  "7249e238-802e-4295-a218-c2845a7c020f" = "UAR PatriNat - GCLR, Antonin WILMART"
+)
+
+df1$provider <- as.character(info[df1$datasetKey])
+
+# avoid duplicated data if same date and coordinates
+col_uid <- c("eventDate", "decimalLongitude",
+  "decimalLatitude")
+# table(duplicated(df1[, col_uid]))
+df1 <- df1[!duplicated(df1[, col_uid]), ]
+```
+
+
+### Visualize the data
+  
+Let's create a spatial `sf` object, with coordinates
+```{r sf_gbif}
+df1_sf <- st_as_sf(
+  df1,
+  coords = c("decimalLongitude", "decimalLatitude"),
+  crs = 4326
+)
+```
+
+```{r map_gbif}
+mapview(df1_sf) +
+  mapview(b_square, alpha.regions = 0, lwd = 3)
+```
+
+### Export
+We can export the dataset as csv file
+
+```{r out_gbif}
+write.csv(
+  df1,
+  file = here::here("data", "gbif_otter_2021_mpl50km.csv"),
+  row.names = FALSE
+)
+```
+
+
+# 3. Get data from IGN
+
+<!--
+After tests:
+- It doesn't help to transform shapefile in EPGS:2154.
+- It makes extraction smaller to use pt instead of b_square
+-->
+
+The package `happign` provides a great interface to download [French spatial data from IGN](https://geoservices.ign.fr/catalogue) using protocols such as Web Map Service (WMS) for raster and Web Feature Service (WFS) for vectors.  
+
+To make sure to have data not on the verge, it mi
+```{r large_box}
+extra <- 0.1 #extra margin in degree
+large_ext <- st_bbox(df1_sf) + extra *c(rep(-1,2), rep(1,2))
+large_box <- large_ext |> st_bbox() |> st_as_sfc()
+# mapview(df1_sf) +
+#   mapview(large_box, alpha.regions = 0, lwd = 3)
+```
+
+### Elevation
+We will use the function `get_wms_raster()`. For quick testing, it is recommended to use interactive = TRUE. In our case we want `altimetrie` data from BD ALTI at 25m resolution. 
+In our case, we will download it at 250m resolution to make it smaller.
+
+
+```{r get_elevation}
+#| eval: false
+#|
+# To explore the options:
+# get_apikeys()
+# metadata_table <- get_layers_metadata("wms-r", "altimetrie") # all layers for altimetrie wms
+# layer <- metadata_table[2, 1] # ELEVATION.ELEVATIONGRIDCOVERAGE
+
+# Downloading digital elevation model values not image
+mnt_2154 <- get_wms_raster(
+  large_box,
+  "ELEVATION.ELEVATIONGRIDCOVERAGE",
+  res = 250,
+  crs = 2154,
+  rgb = FALSE,
+  filename = here::here("data", "BDALTI_mpl50km.tif"),
+  overwrite = TRUE
+)
+```
+
+### Commune
+
+We will use the function `get_wfs()`. For quick testing, it is recommended to use interactive = TRUE or list all layers available with `get_layers_metadata("wfs")`. 
+
+We will download the latest definition of commune
+It would be recommended to use `ADMINEXPRESS-COG.LATEST:commune` if you are not limited in file size.
+
+```{r get_commune}
+#| eval: false
+# To explore the options:
+# meta <- get_layers_metadata("wfs")
+# meta$Name[grep("commune", meta$Name)]
+adm <- get_wfs(
+  large_box,
+  "BDCARTO_V5:commune",
+  filename = here::here("data", "BDCARTO-Commune_mpl50km.gpkg"),
+  overwrite = TRUE
+)
+```
+
+### Land cover from BD CARTO
+
+```{r}
+#| eval: false
+landcover <- get_wfs(large_box, "BDCARTO_V5:occupation_du_sol")
+landcover <- st_crop(landcover, b_square)
+# as shapefile
+write_sf(landcover, here::here("data", "BDCARTO-LULC_mpl50km.shp"))
+```
+
+### River from BD CARTO
+For river, there are more precise information in BDTOPO (`BDTOPO_V3:cours_d_eau` and `BDTOPO_V3:troncon_hydrographique`), but for the sake of lightweight dataset we use BDCARTO.
+
+```{r}
+#| eval: false
+river <- get_wfs(large_box, "BDCARTO_V5:cours_d_eau") 
+ #"BDTOPO_V3:cours_d_eau" same but heavier
+river <- st_crop(river, b_square)
+# as GeoPackage
+write_sf(river, here::here("data", "BDCARTO-River_mpl50km.gpkg"))
+```

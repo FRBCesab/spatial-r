@@ -32,7 +32,7 @@ book:
       - chapters/22_interactivemap.qmd
     - part: "Extra"
       chapters:
-      - chapters/31_polygons.qmd
+      - chapters/31_toydata_mpl.qmd
     - references.qmd
 
   reader-mode: false
@@ -49,5 +49,6 @@ format:
     code-copy: true
     code-line-numbers: false
 
-
+execute:
+  freeze: auto
 

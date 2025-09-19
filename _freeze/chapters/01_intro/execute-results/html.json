@@ -1,0 +1,17 @@
+{
+  "hash": "d5a7f8abedef428543442bf75e7e5da9",
+  "result": {
+    "engine": "knitr",
+    "markdown": "# Introduction {.unnumbered}\n\n### How to install R and set up environment\n\n\n\n### R packages needed for these tutorials\n\nWe will mostly use terra and mapview as a starter.\nFancier maps can be created with mapsf and tmap (*ref tutorials*)\n\n\n### Download needed dataset\n\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# set data directory\ndatadir <- here::here(\"data\")\nif (!dir.exists(datadir)) {\n  dir.create(\n    path = datadir,\n    showWarnings = FALSE,\n    recursive = TRUE\n  )\n}\n\nurl_git <- \"https://github.com/FRBCesab/spatial-r/raw/refs/heads/main/data\"\n\n# download GBIF data\nfile1 <- \"gbif_otter_2021_mpl50km.csv\"\ndownload.file(file.path(url_git, file1), file.path(datadir, file1), mode = \"wb\")\n\n# download elevation data\nfile2 <- \"BDALTI_mpl50km.tif\"\ndownload.file(file.path(url_git, file2), file.path(datadir, file2), mode = \"wb\")\n\n# download administrative borders\nfile3 <- \"BDCARTO-Commune_mpl50km.gpkg\"\ndownload.file(file.path(url_git, file3), file.path(datadir, file3), mode = \"wb\")\n\n# download rivers\nfile4 <- \"BDCARTO-River_mpl50km.gpkg\"\ndownload.file(file.path(url_git, file4), file.path(datadir, file4), mode = \"wb\")\n\n# download land cover\nfile5 <- \"BDCARTO-LULC_mpl50km\"\nshpext <- c(\"dbf\", \"prj\", \"shp\", \"shx\")\nurl_shp <- file.path(url_git, paste(file5, shpext, sep = \".\"))\ndir_shp <- file.path(datadir, paste(file5, shpext, sep = \".\"))\nfor (i in seq_along(shpext)) {\n  download.file(url_shp[i], dir_shp[i], mode = \"wb\")\n}\n```\n:::\n",
+    "supporting": [
+      "01_intro_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

@@ -1,6 +1,0 @@
-# More about polygons {.unnumbered}
-
-At the end of this tutorial, you will be know how to:
-
-- calculate convex hull from points   
-- simplify heavy polygons    
