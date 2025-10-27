@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.24">
+<meta name="generator" content="quarto-1.8.25">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Romain Frelat">
-<meta name="dcterms.date" content="2025-09-19">
+<meta name="dcterms.date" content="2025-10-27">
 
 <title>Spatial-r: Tutorials on spatial data analysis in R</title>
 <style>
@@ -36,10 +36,10 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-3078d9348410f514cc0570d96940468d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-316ab2a0fb9fc244f2649bdfbf8216d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-de2d73d8e818e61a5ce6918c4a3e7093.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-a1cb7ae048fbcda6038fe19a909d85c1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/quarto-contrib/fontawesome6-0.1.0/all.css" rel="stylesheet">
 <link href="site_libs/quarto-contrib/fontawesome6-0.1.0/latex-fontsize.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
@@ -227,7 +227,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">September 19, 2025</p>
+      <p class="date">October 27, 2025</p>
     </div>
   </div>
   
@@ -264,20 +264,24 @@ R is exceptional due to its diversity, and their exist other package to handle s
 </li>
 <li>Pebesma and Bivand <a href="https://r-spatial.org/book/">Spatial Data Science: With Applications in R</a></li>
 <li>Moraga P. (2023)<a href="https://www.paulamoraga.com/book-spatial/">Spatial Statistics for Data Science: Theory and Practice with R</a></li>
-<li>Lovelace, Nowosad, and Muenchow (2025) <a href="https://r.geocompx.org/">Book on geographic data with R</a></li>
+<li>Lovelace, Nowosad, and Muenchow (2025) <a href="https://r.geocompx.org/">Book on geographic data with R</a><br>
+</li>
+<li>Gimond M. (2025) <a href="https://mgimond.github.io/Spatial/index.html">Intro to GIS and Spatial Analysis</a><br>
+</li>
+<li>Slingsby J. (2025) <a href="https://www.ecologi.st/spatial-r/">A minimal introduction to GIS in R</a></li>
 </ul>
 </section>
 <section id="preliminary-program" class="level4">
 <h4 class="anchored" data-anchor-id="preliminary-program">Preliminary program</h4>
 <p><strong>Day 1</strong><br>
 - lesson1 : INTRODUCTION GIS, vector vs raster view, projection system (CRS)<br>
-- tuto1 : VECTOR: create points and polygons; map and project spatial objects, calculate distance and areas<br>
+- tuto1 : VECTOR: create points, lines and polygons; map and project spatial objects, calculate distance and areas<br>
 - tuto2 : RASTER: load and download rasters, change their resolutions, map etc<br>
 - tuto3 : EXTRACT: how to mix them: raster and points, raster and buffer, raster and polygons, projection raster&gt;polygon</p>
 <p><strong>Day 2</strong><br>
-- lesson2 : INTRODUCTION GIS, vector vs raster view, projection system (CRS)<br>
+- lesson2 : Getting GIS datasets, multilayer climate data, vegetation indices?<br>
 - tuto4 : STACK: how to load and manipulate multilayer rasters (e.g.&nbsp;remote sensing), thresholding multi day, and multi spectral<br>
-- tuto5 : COMBINE MULTI-SOURCE DATA - reprojecting rasters, tips and tricks<br>
+- tuto5 : COMBINE MULTI-SOURCE DATA - reprojecting rasters, tips and tricks =&gt; making grid or commune?<br>
 - tuto6 : INTERACTIVE maps with leaflet, mapview, or tmap</p>
 <p><strong>Extra</strong>:<br>
 - tutoE1 : POLYGON: calculate convex hull, simplify geometries, aggregate, union, etc… spatial influence<br>

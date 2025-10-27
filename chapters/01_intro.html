@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.24">
+<meta name="generator" content="quarto-1.8.25">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -70,10 +70,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-3078d9348410f514cc0570d96940468d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-316ab2a0fb9fc244f2649bdfbf8216d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-de2d73d8e818e61a5ce6918c4a3e7093.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-a1cb7ae048fbcda6038fe19a909d85c1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="../site_libs/quarto-contrib/fontawesome6-0.1.0/all.css" rel="stylesheet">
 <link href="../site_libs/quarto-contrib/fontawesome6-0.1.0/latex-fontsize.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
@@ -226,8 +226,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#how-to-install-r-and-set-up-environment" id="toc-how-to-install-r-and-set-up-environment" class="nav-link active" data-scroll-target="#how-to-install-r-and-set-up-environment">How to install R and set up environment</a></li>
+  <li><a href="#how-to-install-r-and-set-up-environment" id="toc-how-to-install-r-and-set-up-environment" class="nav-link active" data-scroll-target="#how-to-install-r-and-set-up-environment">How to install R and set up environment</a>
+  <ul class="collapse">
   <li><a href="#r-packages-needed-for-these-tutorials" id="toc-r-packages-needed-for-these-tutorials" class="nav-link" data-scroll-target="#r-packages-needed-for-these-tutorials">R packages needed for these tutorials</a></li>
+  </ul></li>
   <li><a href="#download-needed-dataset" id="toc-download-needed-dataset" class="nav-link" data-scroll-target="#download-needed-dataset">Download needed dataset</a></li>
   </ul>
 </nav>
@@ -254,52 +256,67 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="how-to-install-r-and-set-up-environment" class="level3">
-<h3 class="anchored" data-anchor-id="how-to-install-r-and-set-up-environment">How to install R and set up environment</h3>
-</section>
+<section id="how-to-install-r-and-set-up-environment" class="level2">
+<h2 class="anchored" data-anchor-id="how-to-install-r-and-set-up-environment">How to install R and set up environment</h2>
+<p>Refer to <a href="https://frbcesab.github.io/rsetup/" class="uri">https://frbcesab.github.io/rsetup/</a></p>
 <section id="r-packages-needed-for-these-tutorials" class="level3">
 <h3 class="anchored" data-anchor-id="r-packages-needed-for-these-tutorials">R packages needed for these tutorials</h3>
-<p>We will mostly use terra and mapview as a starter. Fancier maps can be created with mapsf and tmap (<em>ref tutorials</em>)</p>
-</section>
-<section id="download-needed-dataset" class="level3">
-<h3 class="anchored" data-anchor-id="download-needed-dataset">Download needed dataset</h3>
+<p>We will mostly use <code>terra</code> and <code>mapview</code> as a starter. Fancier maps can be created with mapsf and tmap (<em>ref tutorials</em>)</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set data directory</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>datadir <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data"</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">dir.exists</span>(datadir)) {</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dir.create</span>(</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">path =</span> datadir,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">showWarnings =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">recursive =</span> <span class="cn">TRUE</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>url_git <span class="ot">&lt;-</span> <span class="st">"https://github.com/FRBCesab/spatial-r/raw/refs/heads/main/data"</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># download GBIF data</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>file1 <span class="ot">&lt;-</span> <span class="st">"gbif_otter_2021_mpl50km.csv"</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(<span class="fu">file.path</span>(url_git, file1), <span class="fu">file.path</span>(datadir, file1), <span class="at">mode =</span> <span class="st">"wb"</span>)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># download elevation data</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>file2 <span class="ot">&lt;-</span> <span class="st">"BDALTI_mpl50km.tif"</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(<span class="fu">file.path</span>(url_git, file2), <span class="fu">file.path</span>(datadir, file2), <span class="at">mode =</span> <span class="st">"wb"</span>)</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># download administrative borders</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>file3 <span class="ot">&lt;-</span> <span class="st">"BDCARTO-Commune_mpl50km.gpkg"</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(<span class="fu">file.path</span>(url_git, file3), <span class="fu">file.path</span>(datadir, file3), <span class="at">mode =</span> <span class="st">"wb"</span>)</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co"># download rivers</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>file4 <span class="ot">&lt;-</span> <span class="st">"BDCARTO-River_mpl50km.gpkg"</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(<span class="fu">file.path</span>(url_git, file4), <span class="fu">file.path</span>(datadir, file4), <span class="at">mode =</span> <span class="st">"wb"</span>)</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="co"># download land cover</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>file5 <span class="ot">&lt;-</span> <span class="st">"BDCARTO-LULC_mpl50km"</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>shpext <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"dbf"</span>, <span class="st">"prj"</span>, <span class="st">"shp"</span>, <span class="st">"shx"</span>)</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>url_shp <span class="ot">&lt;-</span> <span class="fu">file.path</span>(url_git, <span class="fu">paste</span>(file5, shpext, <span class="at">sep =</span> <span class="st">"."</span>))</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>dir_shp <span class="ot">&lt;-</span> <span class="fu">file.path</span>(datadir, <span class="fu">paste</span>(file5, shpext, <span class="at">sep =</span> <span class="st">"."</span>))</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(shpext)) {</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">download.file</span>(url_shp[i], dir_shp[i], <span class="at">mode =</span> <span class="st">"wb"</span>)</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>needed_packages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"terra"</span>, <span class="st">"sp"</span>, <span class="st">"mapview"</span>, <span class="st">"mapsf"</span>, <span class="st">"tmap"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>check_and_install <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(x, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) {</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">install.packages</span>(x)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">invisible</span>(<span class="fu">lapply</span>(needed_packages, check_and_install))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="download-needed-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="download-needed-dataset">Download needed dataset</h2>
+<p>As an toy dataset, the tutorials rely on observed occurrence of otter in 2021 around Montpellier, France. These dataset were downloaded directly from R, see the <a href="https://frbcesab.github.io/spatial-r/chapters/31_toydata_mpl.html">tutorial on creating a toy dataset from GBIF and IGN</a> for more details.</p>
+<p>You can run the following command to download the dataset (total size : 9Mb).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set data directory</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>datadir <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">dir.exists</span>(datadir)) {</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dir.create</span>(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">path =</span> datadir,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">showWarnings =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">recursive =</span> <span class="cn">TRUE</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># download base url</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>url_git <span class="ot">&lt;-</span> <span class="st">"https://github.com/FRBCesab/spatial-r/raw/refs/heads/main/data"</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># download GBIF data (20kb)</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>file1 <span class="ot">&lt;-</span> <span class="st">"gbif_otter_2021_mpl50km.csv"</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(<span class="fu">file.path</span>(url_git, file1), <span class="fu">file.path</span>(datadir, file1), <span class="at">mode =</span> <span class="st">"wb"</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co"># download elevation data (500kb)</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>file2 <span class="ot">&lt;-</span> <span class="st">"BDALTI_mpl50km.tif"</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(<span class="fu">file.path</span>(url_git, file2), <span class="fu">file.path</span>(datadir, file2), <span class="at">mode =</span> <span class="st">"wb"</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co"># download administrative borders (2.5Mb)</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>file3 <span class="ot">&lt;-</span> <span class="st">"BDCARTO-Commune_mpl50km.gpkg"</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(<span class="fu">file.path</span>(url_git, file3), <span class="fu">file.path</span>(datadir, file3), <span class="at">mode =</span> <span class="st">"wb"</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co"># download rivers (2Mb)</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>file4 <span class="ot">&lt;-</span> <span class="st">"BDCARTO-River_mpl50km.gpkg"</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(<span class="fu">file.path</span>(url_git, file4), <span class="fu">file.path</span>(datadir, file4), <span class="at">mode =</span> <span class="st">"wb"</span>)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="co"># download land cover (3.7Mb)</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>file5 <span class="ot">&lt;-</span> <span class="st">"BDCARTO-LULC_mpl50km"</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>shpext <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"dbf"</span>, <span class="st">"prj"</span>, <span class="st">"shp"</span>, <span class="st">"shx"</span>)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>url_shp <span class="ot">&lt;-</span> <span class="fu">file.path</span>(url_git, <span class="fu">paste</span>(file5, shpext, <span class="at">sep =</span> <span class="st">"."</span>))</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>dir_shp <span class="ot">&lt;-</span> <span class="fu">file.path</span>(datadir, <span class="fu">paste</span>(file5, shpext, <span class="at">sep =</span> <span class="st">"."</span>))</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(shpext)) {</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">download.file</span>(url_shp[i], dir_shp[i], <span class="at">mode =</span> <span class="st">"wb"</span>)</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 
