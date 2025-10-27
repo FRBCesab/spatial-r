@@ -1,17 +1,33 @@
 # Introduction {.unnumbered}
 
-### How to install R and set up environment
+## How to install R and set up environment
 
+Refer to <https://frbcesab.github.io/rsetup/>
 
 
 ### R packages needed for these tutorials
 
-We will mostly use terra and mapview as a starter.
+We will mostly use `terra` and `mapview` as a starter.
 Fancier maps can be created with mapsf and tmap (*ref tutorials*)
 
+```{r}
+#| label: install packages
+needed_packages <- c("terra", "sp", "mapview", "mapsf", "tmap")
 
-### Download needed dataset
+check_and_install <- function(x) {
+  if (!requireNamespace(x, quietly = TRUE)) {
+    install.packages(x)
+  }
+}
 
+invisible(lapply(needed_packages, check_and_install))
+```
+
+## Download needed dataset
+
+As an toy dataset, the tutorials rely on observed occurrence of otter in 2021 around Montpellier, France. These dataset were downloaded directly from R, see the [tutorial on creating a toy dataset from GBIF and IGN](https://frbcesab.github.io/spatial-r/chapters/31_toydata_mpl.html) for more details.
+
+You can run the following command to download the dataset (total size : 9Mb).
 ```{r}
 #| eval: false
 # set data directory
@@ -24,25 +40,26 @@ if (!dir.exists(datadir)) {
   )
 }
 
+# download base url
 url_git <- "https://github.com/FRBCesab/spatial-r/raw/refs/heads/main/data"
 
-# download GBIF data
+# download GBIF data (20kb)
 file1 <- "gbif_otter_2021_mpl50km.csv"
 download.file(file.path(url_git, file1), file.path(datadir, file1), mode = "wb")
 
-# download elevation data
+# download elevation data (500kb)
 file2 <- "BDALTI_mpl50km.tif"
 download.file(file.path(url_git, file2), file.path(datadir, file2), mode = "wb")
 
-# download administrative borders
+# download administrative borders (2.5Mb)
 file3 <- "BDCARTO-Commune_mpl50km.gpkg"
 download.file(file.path(url_git, file3), file.path(datadir, file3), mode = "wb")
 
-# download rivers
+# download rivers (2Mb)
 file4 <- "BDCARTO-River_mpl50km.gpkg"
 download.file(file.path(url_git, file4), file.path(datadir, file4), mode = "wb")
 
-# download land cover
+# download land cover (3.7Mb)
 file5 <- "BDCARTO-LULC_mpl50km"
 shpext <- c("dbf", "prj", "shp", "shx")
 url_shp <- file.path(url_git, paste(file5, shpext, sep = "."))

@@ -8,6 +8,7 @@ library(sf) |> suppressPackageStartupMessages()
 library(mapview) |> suppressPackageStartupMessages()
 library(rgbif)
 library(happign) |> suppressPackageStartupMessages()
+library(terra)|> suppressPackageStartupMessages()
 ```
 
 
@@ -84,6 +85,8 @@ b_circle <- st_buffer(pt_cesab, buffer_size)
 
 # transform to square because occ_search() needs rectangle
 b_square <- st_bbox(b_circle) |> st_as_sfc()
+
+ext(vect(pt_cesab)) + 50000
 ```
 
 We can visualize the spatial data created with mapview:
@@ -292,4 +295,56 @@ river <- get_wfs(large_box, "BDCARTO_V5:cours_d_eau")
 river <- st_crop(river, b_square)
 # as GeoPackage
 write_sf(river, here::here("data", "BDCARTO-River_mpl50km.gpkg"))
+```
+
+# 4. Get climate data
+
+
+### CHELSA
+
+[Chelsa](https://www.chelsa-climate.org/) is a good source of climate data at world scale with 1km spatial resolution.
+To avoid downloading all files by end
+
+```{r}
+#| eval: false
+url_monthlytas <- "https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/monthly/tas/YYYY/CHELSA_tas_MM_YYYY_V.2.1.tif"
+
+startdate <- as.Date("2015-01-01")
+enddate <- as.Date("2021-12-31")
+dseq <- seq.Date(startdate, enddate, by = "month")
+
+replace_MMYYYY <- function(x, u0) {
+  u1 <- gsub("MM", format(x, "%m"), u0)
+  u2 <- gsub("YYYY", format(x, "%Y"), u1)
+  return(u2)
+}
+
+url_list <- sapply(dseq, replace_MMYYYY, url_monthlytas)
+
+# add GDAL Virtual File Systems
+full_url <- paste0("/vsicurl/", url_list)
+
+# is much faster with 'vsicurl' (no need to download all data)
+chelsa_tas <- terra::rast(full_url)
+# crop to the extent of intest
+crop_tas <- terra::crop(chelsa_tas, large_box)
+# export
+writeRaster(crop_tas, here::here("data", "CHELSA_monthly_tas_2015_2021.tif"))
+```
+
+
+### E-Obs or ERA5 dataset
+[E-obs](https://surfobs.climate.copernicus.eu/dataaccess/access_eobs.php) is a good source of daily weather for Europe, at 0.1 degree resolution (~10km).
+For our example, we download files for [chunks of 15 years](https://surfobs.climate.copernicus.eu/dataaccess/access_eobs_chunks.php).
+
+```{r}
+#| eval: false
+# RR: daily precipitation sum
+url_eobs <- "https://knmi-ecad-assets-prd.s3.amazonaws.com/ensembles/data/Grid_0.1deg_reg_ensemble/rr_ens_mean_0.1deg_reg_2011-2024_v31.0e.nc"
+# get the full dataset
+prec_eobs <- terra::rast(url_eobs)
+# crop to the extent of intest
+crop_prec <- terra::crop(prec_eobs, large_box)
+# export
+writeRaster(crop_prec, here::here("data", "EOBS_daily_rr_2011_2024.nc"))
 ```

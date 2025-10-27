@@ -210,7 +210,7 @@ writeVector(pt_terra, here("data", "gbif_otter_2021_mpl50km.gpkg"))
 ```
 
 ## sf
-In `sf`, the function is `sf::write_sf()`.
+In `sf`, the function is `sf::write_sf()` or `sf::st_write`. (**why two options?**)
 
 ```{r sf_export}
 #| eval: false
