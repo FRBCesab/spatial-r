@@ -1,0 +1,17 @@
+# Introduction to GIS {.unnumbered}
+
+::: {.callout-note icon=true appearance="simple"}
+
+## An introduction to GIS
+<br />
+{{< fa brands github >}} &nbsp;**Source:** <https://github.com/FRBCesab/spatial-slides><br/>
+{{< fa globe >}} &nbsp;**Slides:** <https://frbcesab.github.io/spatial-slides/intro-GIS>
+
+:::
+
+
+<br />
+
+<div class="container">
+  <iframe class="responsive-iframe" src="https://frbcesab.github.io/spatial-slides/intro-GIS"></iframe>
+</div>
