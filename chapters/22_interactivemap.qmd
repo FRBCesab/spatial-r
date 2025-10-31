@@ -1,8 +1,0 @@
-# Interactive maps {.unnumbered}
-
-At the end of this tutorial, you will be know how to:    
-
-- create an interactive map  
-- few tricks to improve the layout or safeguard the anonymity of your data  
-
-ONLY MAPVIEW, which is based on leaflet 

@@ -6,6 +6,12 @@ ressources/
 # ideas/draft for new chapters
 chapters/Ex*
 
-data/gbif_otter_2021_mpl50km.gpkg
+# old chapters
+chapters/old_*
+
+# data/gbif_otter_2021_mpl50km.gpkg => make easier to have it
 data/BDALTI_class*
 data/MPL_elevation_lulc*
+data/*_old.nc*
+
+todo.txt

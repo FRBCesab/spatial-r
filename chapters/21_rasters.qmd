@@ -1,0 +1,233 @@
+# Rasters {.unnumbered}
+
+At the end of this tutorial, you will be know :
+
+- what is a raster data file   
+- how to read the most common formats   
+- how to make operations in rasters   
+
+
+:::{.callout-important title="Summary"}
+This tutorial explore how to handle **rasters** in R with `terra` package:
+
+- read a spatial object with (`terra::rast()`)  
+- calculate length of lines with (`sf::st_length()`)
+- calculate distance to the nearest point with (`sf::st_distance()`)
+There is a single key function: `terra::extract()` - not quite.
+:::
+
+:::{.callout-tip title="The ecologist mind"}
+Elevation is a key geographical variable that strongly define habitats. At what elevation were the otter observed?
+To answer this question, we will need to discover another type of spatial data: **rasters**.
+:::
+
+## Introduction
+
+Raster spatial data are also called gridded dataset, or matrices.
+
+The most commun file types are: *addrefslide*   
+ - GeoTIFF (.tif) 
+ - netCDF (.nc), ... 
+ - ASCII Grid (.asc)
+
+For working with rasters, the recommended R-package is `terra`.
+
+
+## Setup
+
+<details>
+<summary> Follow the setup instructions if you haven't followed the tutorial on [points](https://frbcesab.github.io/spatial-r/chapters/11_points.html)</summary>
+
+If haven't done it already, please follow the [setup instructions](https://frbcesab.github.io/spatial-r/chapters/01_setup.html). Let's start with loading the required packages.
+
+```{r setting}
+suppressPackageStartupMessages({
+  library(mapview)
+  library(here)
+  library(sf)
+  library(terra)
+  library(exactextractr)
+})
+```
+
+::: {.panel-tabset}
+
+## local
+```{r otter_local}
+pt_otter <- vect(here("data", "gbif_otter_2021_mpl50km.gpkg"))
+```
+
+## online
+```{r otter_online}
+#| eval: false
+pt_otter <- vect(
+  "https://github.com/FRBCesab/spatial-r/raw/main/data/gbif_otter_2021_mpl50km.gpkg"
+)
+```
+
+:::
+
+
+## Load raster from a geotiff file
+
+For this example, we will load the elevation data for the area of interest from [IGN data BD ALTI](https://geoservices.ign.fr/bdalti) which was aggregated at 250m resolution (instead of its original resolution of 25m). *Note that the rough resolution of this dataset is perfect for our learning purpose. Yet for real analyses, you might want to consider finer spatial data.* 
+
+::: {.panel-tabset}
+
+## local
+```{r rast_local}
+bdalti <- rast(here("data", "BDALTI_mpl50km.tif"))
+```
+
+## online
+```{r rast_online}
+#| eval: false
+bdalti <- rast(
+  "https://github.com/FRBCesab/spatial-r/raw/refs/heads/main/data/BDALTI_mpl50km.tif"
+)
+```
+
+:::
+
+## Handling rasters
+
+```{r rast_summary}
+bdalti
+
+# get the dimension: dim()
+dim(bdalti) # number of x, y and z dimensions
+
+# check the projection system : crs()
+crs(bdalti, describe = TRUE)
+
+# get the extent : ext()
+ext(bdalti)
+
+# get the name of the layer
+names(bdalti)
+# rename the layer (for simplicity)
+names(bdalti) <- "elevation"
+
+# get all the values : values()
+# use only for small raster, else it takes large amount of time and memory
+boxplot(values(bdalti), ylab = "elevation (m)")
+# mean elevation in our study area
+mean(values(bdalti))
+```
+
+## Visualization
+
+::: {.panel-tabset}
+
+## interactive
+```{r rast_visint}
+mapview(bdalti)
+```
+
+## static
+```{r rast_vistat}
+plot(bdalti)
+```
+
+:::
+
+### Set NA values
+Let's imagine we want to remove the sea and all values below 0
+
+*or should we mask?*
+
+```{r rast_NA}
+# make sure values are between 0 and 2000 m
+alti <- clamp(bdalti, 0, 2000, values = TRUE)
+# set values with elevation 0 as NA (remove the sea)
+NAflag(alti) <- 0
+plot(alti)
+# mean elevation in our study area (excluding sea)
+mean(values(alti), na.rm = TRUE)
+```
+
+
+## Points to raster
+
+Example with numerical values
+
+
+```{r}
+crs(bdalti) == crs(pt_otter)
+```
+
+In this case, the projection are not the same. It is recommended to project the points instead of the raster (much faster).
+```{r}
+pt_2154 <- project(pt_otter, crs(bdalti))
+```
+
+```{r visu_pts_rast}
+plot(bdalti, "elevation")
+plot(pt_2154, add = TRUE, col = "red")
+```
+
+```{r ext_pts_rast}
+pt_alti <- extract(bdalti, pt_2154)
+```
+
+```{r}
+boxplot(pt_alti$elevation, ylab = "elevation (m)")
+```
+
+Extra: compare with data from GBIF
+```{r}
+# check with recorded
+plot(
+  pt_alti$elevation,
+  pt_otter$elevation,
+  xlab = "elevation (m) GBIF values",
+  ylab = "elevation (m) BDALTI values",
+  asp = 1
+)
+# add identity line
+abline(a = 0, b = 1)
+```
+
+
+
+## Polygons to raster
+
+## Polygons to raster
+example with buffer from points
+`zonal` could be faster? and mention `exactextractr` package which is much faster for large dataset.
+
+
+### Create buffer
+
+```{r}
+poly_otter <- buffer(pt_2154, 1000)
+```
+
+### Get average elevation
+```{r ext_poly_rast_mean}
+mean_alti <- extract(bdalti, poly_otter, fun = mean)
+
+plot(mean_alti$elevation, pt_alti$elevation)
+```
+
+### Get variation of elevation
+```{r ext_poly_rast_sd}
+sd_alti <- extract(bdalti, poly_otter, fun = sd)
+
+plot(sd_alti$elevation, pt_alti$elevation)
+```
+
+Extra: is variation linked to average slope?
+
+### Get all values
+```{r ext_poly_rast_full}
+full_alti <- extract(bdalti, poly_otter)
+
+# number of pixel per buffer (around 50)
+table(table(full_alti$ID))
+
+med_otter <- tapply(full_alti$elevation, full_alti$ID, median)
+```
+
+
+

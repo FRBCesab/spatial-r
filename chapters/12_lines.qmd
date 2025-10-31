@@ -1,0 +1,268 @@
+# Lines {.unnumbered}
+
+:::{.callout-important title="Summary"}
+This tutorial explore how to handle **spatial lines** in R with `terra` package:
+
+- read a spatial object with (`terra::vect()`)  
+- calculate length of lines with (`terra::perim()`)
+- calculate distance to the nearest point with (`sf::st_distance()`)
+:::
+
+:::{.callout-tip title="The ecologist mind"}
+Otter lives around rivers, but how far from the rivers were they observed? 
+To answer this question, we will need to discover another type of vector: **lines**.
+:::
+
+## Setup
+
+<details>
+<summary> Follow the setup instructions if you haven't followed the tutorial on [points](https://frbcesab.github.io/spatial-r/chapters/11_points.html)</summary>
+
+If haven't done it already, please follow the [setup instructions](https://frbcesab.github.io/spatial-r/chapters/01_setup.html). Let's start with loading the required packages.
+
+```{r setting}
+suppressPackageStartupMessages({
+  library(mapview)
+  library(here)
+  library(sf)
+  library(terra)
+})
+```
+
+::: {.panel-tabset}
+
+## local
+```{r otter_local}
+pt_otter <- vect(here("data", "gbif_otter_2021_mpl50km.gpkg"))
+```
+
+## online
+```{r otter_online}
+#| eval: false
+pt_otter <- vect(
+  "https://github.com/FRBCesab/spatial-r/raw/main/data/gbif_otter_2021_mpl50km.gpkg"
+)
+```
+
+:::
+
+</details>
+
+
+## Load lines from a geopackage file
+
+Lines are made of multiple points. It is possible to create lines directly from coordinates but, in practice, it often comes from an existing spatial dataset. For our example, we will load rivers for the area of interest from [IGN data BD CARTO](https://geoservices.ign.fr/bdcarto).
+
+*Note that dataset has rough resolution (BD TOPO would be more suited for real analysis), but it's perfect for our illustration and learning purpose.* 
+
+You can load all vector dataset in R with the function `sf::st_read()`. It can read many different formats. *Another function `sf::read_sf()` is also available and return a similar spatial object but with a `tibble` instead of a `data.frame` as attribute table.*
+
+::: {.panel-tabset}
+
+## terra
+```{r line_terra}
+river <- vect(here("data", "BDCARTO-River_mpl50km.gpkg"))
+```
+
+## sf
+```{r line_sf}
+river_sf <- st_read(here("data", "BDCARTO-River_mpl50km.gpkg"))
+```
+
+## online
+```{r line_online}
+#| eval: false
+river <- vect(
+  "https://github.com/FRBCesab/spatial-r/raw/refs/heads/main/data/BDCARTO-River_mpl50km.gpkg"
+)
+```
+
+:::
+
+:::{.callout-note title="Your turn"}
+1. How many different lines of river was loaded?
+2. What is the coordinate reference system (CRS) of the loaded river data?
+3. How can you get the name of the all the river stretches?
+:::
+
+<details>
+<summary>Click to see the answer</summary>
+
+1. There was ```r nrow(river)``` lines in the dataset. You can access it with `dim(river)`, `nrow(river)` or just by typing `river` in the console.  
+2. The coordinates are in ```r crs(river, describe = TRUE)$name``` (EPSG ```r crs(river, describe = TRUE)$code```). You can access this information with `crs(river, describe = TRUE)` (or in `sf` with `st_crs(river_sf)`).
+3. The column that stored the name of river stretches is `toponyme`. You could identify it with `head(river)` or `names(river)`. There are ```r sum(is.na(river$toponyme))``` river stretches without names (`table(is.na(river$toponyme))`).
+
+</details>
+
+
+
+## Calculate length of lines
+
+::: {.panel-tabset}
+
+## terra
+
+The function [`terra::perim()`](https://search.r-project.org/CRAN/refmans/terra/html/perim.html) While calculating distance and length, **be careful with projection systems**. Some are not suited to calculate distance. The package `terra` recommends the calculation of distances in lat/long to get more accurate results (considering the geodesic distance, so accounting for Earth's curvature).
+
+```{r line_length}
+# calculate the length of rivers (in km)
+river$length_km <- perim(river) / 1000
+```
+
+## sf
+
+The function [`sf::st_length()`](https://search.r-project.org/CRAN/refmans/sf/html/geos_measures.html) calculate the length of lines. While calculating distance and length, **be careful with projection systems**. Some are not suited to calculate distance.It is recommended to use equidistant projections or use local projection system  (if your study area is small).   
+
+```{r line_length_sf}
+# calculate the length of rivers (in km)
+river_sf$length_km <- st_length(river_sf) / 1000
+```
+
+:::
+
+```{r boxplot_length}
+# see the distribution of river length
+boxplot(river$length_km, ylab = "length (km)")
+```
+
+:::{.callout-note title="Your turn"}
+- Which is the longest river in our dataset?  
+:::
+
+<details>
+<summary>Click to see the answer</summary>
+
+```{r ex1}
+# get the name of the longest river
+river$toponyme[which.max(river$length_km)]
+```
+
+</details>
+
+
+## Map multiple layers
+
+Let's map the river and their length, as well as position of the otter observations.
+
+::: {.panel-tabset}
+
+## interactive
+
+You can combine multiple layers in mapview with a `+`. 
+
+```{r mapview_line}
+mapview(river, zcol = "length_km") +
+  mapview(pt_otter, col.regions = "red", color = NA)
+```
+
+## terra
+
+```{r mapterra_line}
+plot(river, y = "length_km")
+plot(pt_otter, add = TRUE)
+```
+
+## sf
+
+```{r mapsf_line}
+plot(river_sf["length_km"], reset = FALSE, axes = TRUE)
+plot(pt_otter, add = TRUE)
+```
+
+:::{.callout-warning}
+If you want to overlay multiple spatial object with base plot from `sf`, don't forget to use the argument `reset=FALSE`.
+:::
+
+:::
+
+
+
+## Calculate the distance to the closest line
+
+:::{.callout-tip title="The ecologist mind"}
+At which distance from a river were the otter observed?
+:::
+
+This question is addressed by the function [`terra::nearest()`](https://search.r-project.org/CRAN/refmans/terra/html/nearby.html).  
+
+Before comparing two spatial objects, it is recommended to plot the data (if not too big) and make sure the projection systems are the same and the extents match. In this case, do not use `mapview` (interactive map) because it will automatically project your data.
+
+```{r check_crs}
+# make sure the spatial objects have the same projection
+st_crs(river) == st_crs(pt_otter)
+```
+
+### Find the closest river
+
+::: {.panel-tabset}
+## terra
+```{r which_nearest}
+# Step 1: Find index of nearest line for each point
+nearest_river <- nearest(pt_otter, river)
+```
+
+## sf
+
+In sf, this is a two-step process: (1) find the closest river [`sf::st_nearest_feature()`](https://search.r-project.org/CRAN/refmans/sf/html/st_nearest_feature.html) and (2) calculate the distance between points and their closest river [`sf::st_distance()`](https://search.r-project.org/CRAN/refmans/sf/html/geos_measures.html).  
+
+```{r which_nearest_sf}
+# Step 1: Find index of nearest line for each point
+nearest_sf <- st_nearest_feature(st_as_sf(pt_otter), river_sf)
+```
+
+The object `nearest_river` is a vector containing the index of the closest river for each otter  observation.
+
+```{r dist_nearest_sf}
+# Step 2: Calculate distance only to the nearest line
+nearest_distances <- st_distance(
+  st_as_sf(pt_otter),
+  river_sf[nearest_sf, ],
+  by_element = TRUE
+)
+```
+
+::: 
+
+```{r boxplot_nearestdist}
+boxplot(nearest_distances, ylab = "distance to river (m)")
+# should check out discrepancy
+# plot(nearest_distances, nearest_river$distance)
+```
+
+:::{.callout-note title="Your turn"}
+1. Which are the rivers with most sights of otter? **answer doesn't work anymore**
+2. Make a map with the distance to river and visually check the coherence of the calculation.
+3. (Reflexion) How can you explain the large distances?
+:::
+
+<details>
+<summary>Click to see the answer 1</summary>
+
+```{r ex2}
+#| eval: false
+table(river$toponyme[nearest_river]) |>
+  sort(decreasing = TRUE) |>
+  head(5)
+```
+
+</details>
+
+<details>
+<summary>Click to see the answer 2</summary>
+
+```{r ex3}
+#| eval: false
+
+# add the distance to river to the spatial object
+pt_otter$dist_river <- nearest_distances
+
+# make an interactive map
+mapview(river) +
+  mapview(pt_otter, z = "dist_river")
+
+# or static map
+plot(st_geometry(river))
+plot(pt_otter[, "dist_river"], add = TRUE, pch = 16)
+```
+
+</details>

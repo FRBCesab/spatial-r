@@ -4,11 +4,14 @@ This is a small practical example on how get data from GBIF and IGN based on a g
 For this tutorial, we will need `sf`, `mapview`, `happign`, and `rgbif` packages.
 
 ```{r setting}
-library(sf) |> suppressPackageStartupMessages()
-library(mapview) |> suppressPackageStartupMessages()
-library(rgbif)
-library(happign) |> suppressPackageStartupMessages()
-library(terra)|> suppressPackageStartupMessages()
+suppressPackageStartupMessages({
+  library(happign)
+  library(here)
+  library(mapview)
+  library(rgbif)
+  library(sf)
+  library(terra)
+})
 ```
 
 
@@ -27,7 +30,7 @@ This task is called geocoding. Among other resource, we recommend the package `r
 ## rgeoservices
 ```{r rgeoservices}
 #| eval: false
-#| 
+#|
 cesab <- rgeoservices::gs_get_coordinates(
   query = "5 rue de l’École de médecine, 34000 MONTPELLIER",
   index = "address"
@@ -37,7 +40,7 @@ cesab <- rgeoservices::gs_get_coordinates(
 ## tidygeocoder
 ```{r tidygeocoder}
 #| eval: false
-#| 
+#|
 cesab <- tidygeocoder::geocode(
   data.frame(x = "5 rue de l’École de médecine, 34000 MONTPELLIER"),
   address = "x",
@@ -48,6 +51,7 @@ names(cesab) <- c("x", "latitude", "longitude")
 ```
 
 ## manual
+
 ```{r manual}
 # for such a simple case, it's easier to get coordinates from GoogleMap
 # https://maps.app.goo.gl/woqBZSs63zSjHUsS9
@@ -56,6 +60,7 @@ cesab <- data.frame(
   "longitude" = 3.8733758693843585
 )
 ```
+
 :::
 
 
@@ -85,8 +90,6 @@ b_circle <- st_buffer(pt_cesab, buffer_size)
 
 # transform to square because occ_search() needs rectangle
 b_square <- st_bbox(b_circle) |> st_as_sfc()
-
-ext(vect(pt_cesab)) + 50000
 ```
 
 We can visualize the spatial data created with mapview:
@@ -155,29 +158,8 @@ df1$institutionCode <- ifelse(
   "iNaturalist"
 )
 
-# based on gbif_citation()
-# get readable dataset information
-info <- c(
-  "50c9509d-22c7-4a22-a47d-8c48425ef4a7" = "iNaturalist Research-grade Observations",
-  "c32f3129-a4dc-4e36-86d4-a35cc5cfb04d" = "LIGNE NOUVELLE MONTPELLIER PERPIGNAN DUP PHASE 1 - Inventaire non protocolé Mammifères",
-  "256b9877-cef3-4e8e-84e1-f23299c49655" = "UAR PatriNat - opportunistic data Faune-France",
-  "c4101a28-b24a-4fd3-afa7-8e4abe0d9035" = "PNA Loutre-Lutra_lutra_donnees_Ecologistes_Euziere_2016-2022",
-  "57f29bc2-9fbf-4db1-bbec-d812d9ca4b08" = "UAR PatriNat - Atlas de la Biodiversité Communale-Pièges-photo",
-  "7d95137d-4dbe-41ff-9569-a890c84abd6b" = "UAR PatriNat - opportunistic data SICEN Occitanie",
-  "221e96c0-973a-4867-83dd-6354eeaf799f" = "UAR PatriNat - Louboutin Bastien",
-  "2ad3a5c7-3399-434e-a8ab-c4fe62f9f3af" = "UAR PatriNat - 2022_LPO PACA_7",
-  "62c656b7-9614-49c3-a179-842be7908725" = "UAR PatriNat - GCLR, Thierry ALIGNAN",
-  "d2f5c9cd-b746-4e3a-9aaa-c4188e5b0231" = "PNA Loutre-Lutra_lutra_donnees_Ecologistes_Euziere_2016-2021",
-  "240e848b-47bc-40a3-a44c-6e745901d2d0" = "UAR PatriNat - CardObs",
-  "3ae9f5c3-0196-4c9d-a2d5-2cceb3a9f2ae" = "UAR PatriNat - Cosmi Julien",
-  "7249e238-802e-4295-a218-c2845a7c020f" = "UAR PatriNat - GCLR, Antonin WILMART"
-)
-
-df1$provider <- as.character(info[df1$datasetKey])
-
 # avoid duplicated data if same date and coordinates
-col_uid <- c("eventDate", "decimalLongitude",
-  "decimalLatitude")
+col_uid <- c("eventDate", "decimalLongitude", "decimalLatitude")
 # table(duplicated(df1[, col_uid]))
 df1 <- df1[!duplicated(df1[, col_uid]), ]
 ```
@@ -202,32 +184,33 @@ mapview(df1_sf) +
 ### Export
 We can export the dataset as csv file
 
-```{r out_gbif}
+```{r outcsv_gbif}
 write.csv(
   df1,
-  file = here::here("data", "gbif_otter_2021_mpl50km.csv"),
+  file = here("data", "gbif_otter_2021_mpl50km.csv"),
   row.names = FALSE
 )
 ```
 
+Or as geopackage file:
+
+```{r outgpkg_gbif}
+st_write(
+  df1_sf,
+  here("data", "gbif_otter_2021_mpl50km.gpkg"),
+  append = FALSE
+)
+```
 
 # 3. Get data from IGN
-
-<!--
-After tests:
-- It doesn't help to transform shapefile in EPGS:2154.
-- It makes extraction smaller to use pt instead of b_square
--->
 
 The package `happign` provides a great interface to download [French spatial data from IGN](https://geoservices.ign.fr/catalogue) using protocols such as Web Map Service (WMS) for raster and Web Feature Service (WFS) for vectors.  
 
 To make sure to have data not on the verge, it mi
 ```{r large_box}
 extra <- 0.1 #extra margin in degree
-large_ext <- st_bbox(df1_sf) + extra *c(rep(-1,2), rep(1,2))
+large_ext <- st_bbox(df1_sf) + extra * c(rep(-1, 2), rep(1, 2))
 large_box <- large_ext |> st_bbox() |> st_as_sfc()
-# mapview(df1_sf) +
-#   mapview(large_box, alpha.regions = 0, lwd = 3)
 ```
 
 ### Elevation
@@ -255,6 +238,21 @@ mnt_2154 <- get_wms_raster(
 )
 ```
 
+```{r load_elevation}
+#| echo: false
+mnt_2154 <- rast(here::here("data", "BDALTI_mpl50km.tif"))
+```
+
+```{r map_elevation}
+plot(mnt_2154)
+vect(df1_sf) |> project(crs(mnt_2154)) |> plot(add = TRUE)
+
+# or interactively:
+# mapview(mnt_2154) +
+#   mapview(df1_sf)
+```
+
+<!--
 ### Commune
 
 We will use the function `get_wfs()`. For quick testing, it is recommended to use interactive = TRUE or list all layers available with `get_layers_metadata("wfs")`. 
@@ -274,38 +272,63 @@ adm <- get_wfs(
   overwrite = TRUE
 )
 ```
+-->
+
 
 ### Land cover from BD CARTO
 
-```{r}
+```{r  get_landcover}
 #| eval: false
 landcover <- get_wfs(large_box, "BDCARTO_V5:occupation_du_sol")
-landcover <- st_crop(landcover, b_square)
+landcover <- st_crop(landcover, large_box)
 # as shapefile
-write_sf(landcover, here::here("data", "BDCARTO-LULC_mpl50km.shp"))
+st_write(landcover, here::here("data", "BDCARTO-LULC_mpl50km.shp"))
+```
+
+```{r load_landcover}
+#| echo: false
+landcover <- vect(here::here("data", "BDCARTO-LULC_mpl50km.shp"))
+```
+
+```{r map_landcover}
+plot(landcover["nature"], reset = FALSE, border = FALSE)
+plot(st_geometry(df1_sf), add = TRUE)
+# or interactive map:
+# mapview(landcover, zcol="nature") +
+#  mapview(df1_sf)
 ```
 
 ### River from BD CARTO
 For river, there are more precise information in BDTOPO (`BDTOPO_V3:cours_d_eau` and `BDTOPO_V3:troncon_hydrographique`), but for the sake of lightweight dataset we use BDCARTO.
 
-```{r}
+```{r get_river}
 #| eval: false
-river <- get_wfs(large_box, "BDCARTO_V5:cours_d_eau") 
- #"BDTOPO_V3:cours_d_eau" same but heavier
-river <- st_crop(river, b_square)
+river <- get_wfs(large_box, "BDCARTO_V5:cours_d_eau")
+#"BDTOPO_V3:cours_d_eau" same but heavier
+river <- st_crop(river, large_box)
 # as GeoPackage
-write_sf(river, here::here("data", "BDCARTO-River_mpl50km.gpkg"))
+st_write(river, here::here("data", "BDCARTO-River_mpl50km.gpkg"))
 ```
 
-# 4. Get climate data
+```{r load_river}
+#| echo: false
+river <- st_read(here::here("data", "BDCARTO-River_mpl50km.gpkg"))
+```
 
+```{r map_river}
+plot(st_geometry(river), reset = FALSE, col = "blue", axes = TRUE)
+plot(st_geometry(df1_sf), add = TRUE, col = "red")
+# or interactively
+# mapview(river) +
+#   mapview(df1_sf)
+```
 
-### CHELSA
+# 4. Get climate data from Chelsa
 
-[Chelsa](https://www.chelsa-climate.org/) is a good source of climate data at world scale with 1km spatial resolution.
-To avoid downloading all files by end
+[Chelsa](https://www.chelsa-climate.org/) is a good source of climate data at world scale with 1km spatial resolution. 
+To download multiple files on a selected region, we can use the following home-made R-script:  
 
-```{r}
+```{r get_temperature}
 #| eval: false
 url_monthlytas <- "https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/monthly/tas/YYYY/CHELSA_tas_MM_YYYY_V.2.1.tif"
 
@@ -332,7 +355,19 @@ crop_tas <- terra::crop(chelsa_tas, large_box)
 writeRaster(crop_tas, here::here("data", "CHELSA_monthly_tas_2015_2021.tif"))
 ```
 
+```{r load_temperature}
+#| echo: false
+crop_tas <- rast(here::here("data", "CHELSA_monthly_tas_2015_2021.tif"))
+```
 
+```{r map_temperature}
+plot(crop_tas, y = grep("_2021_", names(crop_tas)), fun = function() {
+  points(vect(df1_sf), pch = 16)
+})
+```
+
+
+<!--
 ### E-Obs or ERA5 dataset
 [E-obs](https://surfobs.climate.copernicus.eu/dataaccess/access_eobs.php) is a good source of daily weather for Europe, at 0.1 degree resolution (~10km).
 For our example, we download files for [chunks of 15 years](https://surfobs.climate.copernicus.eu/dataaccess/access_eobs_chunks.php).
@@ -348,3 +383,6 @@ crop_prec <- terra::crop(prec_eobs, large_box)
 # export
 writeRaster(crop_prec, here::here("data", "EOBS_daily_rr_2011_2024.nc"))
 ```
+
+-->
+

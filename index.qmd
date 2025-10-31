@@ -1,55 +1,59 @@
-# Preface {.unnumbered}
+# Introduction {.unnumbered}
 
-This is a collection of tutorials on how to handle spatial data in R.
+This is a collection of tutorials on how to handle spatial data in R. The tutorials target students and scientists in ecology with previous knowledge of the [R software](https://cran.r-project.org/).
 
-It is made for a two half-day workshop, but you can follow the tutorials on your own pace.
-
-The aims of this workshop is to :  
-
-> Feel more comfortable to work with spatial data   
-> Load spatial data in R and visualize it   
-> Extract information from remote sensing or other fields  
-> Take advantage of the numerous databases that are available online   
+The core tutorial was developed for a two half-day workshop, but you can follow the tutorials at your own pace.
 
 
-The tutorial targets students and scientists in ecology with previous knowledge of the [R software](https://cran.r-project.org/).
-
-#### R package
-
-The tutorials will mostly rely on (terra R-package)[] for most of the spatial data handling.  
-R is exceptional due to its diversity, and their exist other package to handle spatial data, sf and stars being also very good resources.  
-
-#### Key resources
-
-These tutorials has been inspired by brilliant resources online:   
-
-- Hijman R. et al. [Spatial Data Science with R and “terra”](https://rspatial.org/)   
-- Pebesma and Bivand [Spatial Data Science: With Applications in R](https://r-spatial.org/book/)
-- Moraga P. (2023)[Spatial Statistics for Data Science: Theory and Practice with R](https://www.paulamoraga.com/book-spatial/)
-- Lovelace, Nowosad, and Muenchow (2025) [Book on geographic data with R](https://r.geocompx.org/)  
-- Gimond M. (2025) [Intro to GIS and Spatial Analysis](https://mgimond.github.io/Spatial/index.html)  
-- Slingsby J. (2025) [A minimal introduction to GIS in R](https://www.ecologi.st/spatial-r/)
+:::{.callout-tip title="The ecologist mind"}
+In these tutorials, we characterize the habitat of otter that were observed in 2021 around Montpellier, France. This small toy case study is not relevant ecologically but provides a good opportunity to tackle multiple challenges with handling and collecting spatial data. 
+:::
 
 
-#### Preliminary program
+### R packages
 
-**Day 1**  
-- lesson1 : INTRODUCTION GIS, vector vs raster view, projection system (CRS)   
-- tuto1 : VECTOR: create points, lines and polygons; map and project spatial objects, calculate distance and areas   
-- tuto2 : RASTER: load and download rasters, change their resolutions, map etc   
-- tuto3 : EXTRACT: how to mix them: raster and points, raster and buffer, raster and polygons, projection raster>polygon  
-
-**Day 2**  
-- lesson2 : Getting GIS datasets, multilayer climate data, vegetation indices?    
-- tuto4 : STACK: how to load and manipulate multilayer rasters (e.g. remote sensing), thresholding multi day, and multi spectral   
-- tuto5 : COMBINE MULTI-SOURCE DATA - reprojecting rasters, tips and tricks => making grid or commune?    
-- tuto6 : INTERACTIVE maps with leaflet, mapview, or tmap   
+The tutorials rely mostly on [`terra` R-package](https://rspatial.github.io/terra/index.html) as it was specifically developed to tackle all challenges faced by ecologists, agronomists or biologists when using spatial data.  
+R has an exceptional diversity of users and packages, and this is especially true with the dynamic community around spatial data. Another popular package for handling spatial data is `sf` (and `stars`).   
 
 
-**Extra**:  
+### Workshop program
+
+**Half day 1: Vectors**  
+
+- [Introduction to GIS](https://frbcesab.github.io/spatial-r/chapters/02_presentation_gis.html): differences between vectors and rasters, short overview of coordinate reference system (CRS)
+- [Points](https://frbcesab.github.io/spatial-r/chapters/11_points.html): Understand otter field observations as spatial points
+- [Lines](https://frbcesab.github.io/spatial-r/chapters/12_lines.html): Add infomation about river networks    
+- [Polygons](https://frbcesab.github.io/spatial-r/chapters/13_polygons.html): Complete with land cover information as spatial polygons.  
+
+**Half day 2: Rasters**    
+- [raster](https://frbcesab.github.io/spatial-r/chapters/13_polygons.html): Discover what is a raster and get the elevation profile from field observation 
+- [multi layer](https://frbcesab.github.io/spatial-r/chapters/22_multilayer.html): Trace back montly climate information at the field sites. 
+ 
+
+### Other tutorials
+
+- [Toydata](https://frbcesab.github.io/spatial-r/chapters/31_toydata_mpl.html): how to get data from GBIF, IGN and CHELSA to create a toy dataset for the workshop?
+
+**To be created**:  
+- mapview
+- mapsf
+- tmap
 - tutoE1 : POLYGON: calculate convex hull, simplify geometries, aggregate, union, etc... spatial influence  
 - tutoE2 : get data from WMS or WFS  
 - tutoE3 : spatial autocorrelation - how to measure it, what to do about it? spatial regression model, local regression  
 - tutoE4 : Krigging and interpolation  
 - tutoE5 : remote sensing, landsat and modis  
 - tutoE6 : GoogleEarthEngine, what it is and how to use it (mostly out of R)
+
+### Other resources
+
+These tutorials were inspired by brilliant online ressources, thanks to all of them:     
+
+- Hijman R. et al. [Spatial Data Science with R and “terra”](https://rspatial.org/)   
+- Pebesma and Bivand [Spatial Data Science: With Applications in R](https://r-spatial.org/book/)
+- Moraga P. (2023)[Spatial Statistics for Data Science: Theory and Practice with R](https://www.paulamoraga.com/book-spatial/)
+- Lovelace, Nowosad, and Muenchow (2025) [Geocomputation with R](https://r.geocompx.org/)  
+- Gimond M. (2025) [Intro to GIS and Spatial Analysis](https://mgimond.github.io/Spatial/index.html)  
+- Slingsby J. (2025) [A minimal introduction to GIS in R](https://www.ecologi.st/spatial-r/)
+- Giraud, T. et Pecout, H. (2025). [Géomatique et cartographie avec R](https://rgeocarto.github.io/) [fr]
+

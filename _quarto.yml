@@ -10,7 +10,7 @@ book:
     - name: FRB-CESAB
       url: "https://www.fondationbiodiversite.fr/en/about-the-foundation/le-cesab/"
   date: today
-
+  
   page-footer: 
     left: "&copy; CC-By [FRB-CESAB](https://www.fondationbiodiversite.fr/en/about-the-foundation/le-cesab/)"
     center: "Code source available on [{{< fa brands github >}}](https://github.com/FRBCesab/spatial-r)"
@@ -19,25 +19,25 @@ book:
 
   chapters:
     - index.qmd
-    - chapters/01_intro.qmd
-    - part: "Half-day 1"
+    - chapters/01_setup.qmd
+    - chapters/02_presentation_gis.qmd
+    - part: "Vectors"
       chapters: 
-      - chapters/10_presentation_gis.qmd
-      - chapters/11_vectors.qmd
-      - chapters/12_rasters.qmd
-      - chapters/13_extract.qmd
-    - part: "Half-day 2"
+      #- chapters/10_vectors.qmd
+      - chapters/11_points.qmd
+      - chapters/12_lines.qmd
+      - chapters/13_polygons.qmd
+    - part: "Rasters"
       chapters:
-      - chapters/20_presentation_data.qmd
-      - chapters/21_multilayer.qmd
-      - chapters/22_interactivemap.qmd
+      - chapters/21_rasters.qmd
+      - chapters/22_multilayer.qmd
     - part: "Extra"
       chapters:
       - chapters/31_toydata_mpl.qmd
     - references.qmd
 
   reader-mode: false
-  search: false
+  search: true
 
 bibliography: references.bib
 

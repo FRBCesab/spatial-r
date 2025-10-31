@@ -1,0 +1,329 @@
+# Tips and tricks {.unnumbered}
+
+This is a collection of small tricks that can save you lot of time and headache, yet too short for a proper tutorial.
+
+Naviguate on the right side to find the interesting topic for you. 
+Could also take the format of a FAQ.
+
+
+## Issues with `sf`
+
+
+### make_valid
+
+### use_s2 FALSE
+
+```{r}
+sf_use_s2(FALSE)
+```
+
+
+## Issue of conversion between `sf` and `terra`
+
+### the simple case
+
+
+### terra can not handle GEOMETRYCOLLECTION
+
+use `st_cast` and `st_collection_extract()`:
+
+```{r}
+g2 <- st_cast(g1, "GEOMETRYCOLLECTION")
+grid <- st_collection_extract(g2, "POLYGON")
+```
+
+
+
+oldies
+
+### Projection
+
+There are different coordinate reference systems in which coordinates can be expressed (e.g. different unit). While manipulating multiple datasets from different sources, it is important to make sure they are all in the same coordinate system. If it is not the case, then you will need make projection to convert the projection system. *addrefslide*   
+
+For example, in France, the preferred projection system by IGN is Lambert 93 ([EPSG:2154](https://epsg.io/2154)).As an exercise, let's project our points to EPSG:2154.
+
+
+::: {.panel-tabset}
+
+## terra
+In `terra`, the key function is `terra::project()`.
+```{r terra_proj}
+# projection
+pt_2154_terra <- project(pt_terra, "EPSG:2154")
+# see the differences in the bounding box
+# extent in lat/long
+ext(pt_terra)
+# new extent in Lambert-93
+ext(pt_2154_terra)
+```
+
+## sf
+In `sf`, the key function is `sf::st_transform()`.
+```{r sf_proj}
+#projection
+pt_2154_sf <- st_transform(pt_sf, crs = "EPSG:2154")
+# see the differences in the bounding box
+# extent in lat/long
+st_bbox(pt_sf)
+# new extent in Lambert-93
+st_bbox(pt_2154_sf)
+```
+
+:::
+
+
+### Conversion between sf and terra 
+
+It is confusing to have two dominant packages `terra` and `sf` having similar functionalities. Luckily, the conversion between these two format is easy.
+
+::: {.panel-tabset}
+
+## from terra to sp
+To convert a `terra` vector into `sf`, the function is `sf::st_as_sf()`.
+
+```{r terra_to_sf}
+#| eval: false
+pt_sf <- st_as_sf(pt_terra)
+```
+
+## from sf to terra
+To convert a `sf` feature into `terra`, the function is `terra::vect()`.
+Be careful that non-homogeneous features (mix of points, lines and polygons) can't be converted as a terra `SpatVector` object. Only homogeneous points, line or polygons can be converted into `terra` geometry. 
+
+```{r sf_to_terra}
+#| eval: false
+pt_terra <- vect(pt_sf)
+```
+
+:::
+
+### Handling spatial vectors
+
+```{r line_summary}
+# get the number of objects, and the number of attributes
+dim(river)
+# get the projection system
+crs(river, describe = TRUE)
+# see a subset of the data
+head(river, 3)
+```
+
+
+
+# Raster
+
+### Raster algebra
+
+All kind of mathematical operations are possible. For instance square root transformation.
+
+```{r rast_algebra}
+sqrt_alti <- sqrt(alti)
+
+plot(sqrt_alti)
+```
+
+
+### Calculate slope
+
+For elevation raster, there is a function that can compute multiple terrain characteristics (such as slope, roughness indicators or flow direction):  `terra::terrain()`.
+
+```{r rast_slope}
+slope <- terrain(alti, v = "slope")
+plot(slope)
+```
+
+
+### Vectorization
+
+Rasters can be vectorize as contour (isoline), the output will be lines.
+```{r rast_line}
+alti_iso = as.contour(bdalti, levels = bks)
+plot(alti_iso, "level")
+```
+
+Rasters containing classes can be vectorize as polygons.
+```{r rast_poly}
+alti_vect = as.polygons(as.numeric(alti_class))
+plot(alti_vect, "elevation")
+```
+
+### Downsample
+
+In same case, it might be interesting to degrade the spatial resolution and aggregate values of neighbouring pixel. This can be done with `terra::aggregate()`
+
+```{r rast_downsample}
+low_alti <- aggregate(bdalti, 10)
+plot(low_alti)
+```
+
+What is the resolution of the newly aggregated raster? In which unit?
+
+
+### Projection
+
+In the case of extracting values from raster to vector, it is recommended to project the vectors to match the projection of the rasters. 
+But in some case, it might be useful to project a raster, for instance if you have multiple rasters and want to have a common projection system.
+
+```{r rast_proj}
+alti_4326 <- project(bdalti, "EPSG:4326")
+alti_4326
+# remove negative values
+alti_4326 <- clamp(alti_4326, 0, 2000)
+# plot the projected raster
+plot(alti_4326)
+```
+
+It appear tiled because of the projection. What is the resolution of the newly projected raster? In which unit?
+
+## From polygons to raster
+
+### Load the land use dataset
+
+::: {.panel-tabset}
+
+## local
+```{r poly_local}
+landuse <- vect(here("data", "BDCARTO-LULC_mpl50km.shp"))
+```
+
+## online
+```{r poly_online}
+#| eval: false
+landuse <- vect(
+  "https://github.com/FRBCesab/spatial-r/raw/refs/heads/main/data/BDCARTO-LULC_mpl50km.shp"
+)
+```
+
+:::
+
+### Handling spatial vectors
+
+```{r poly_summary}
+# get the number of objects, and the number of attributes
+dim(landuse)
+# get the projection system
+crs(landuse, describe = TRUE)
+# see a subset of the data
+head(landuse, 3)
+# see the distribution of land cover classes (number of polygons)
+table(landuse$nature)
+```
+
+### Rasterization
+To rasterize polygons, we need to set the grid of the raster. How to set the grid depends on the objective of the subsequent analysis. In our case, there can be multiple solutions:    
+
+- Rasterization with native grid and set resolution (if no other rasters are present in the analysis)
+- Rasterization with grid from BD_ALTI in Lambert 93 (if all analysis will be carried out in Lambert-93)
+- Rasterization with grid from BD_ALTI in lat/long (why would you do that?)
+
+
+::: {.panel-tabset}
+
+## native
+Rasterization with native grid and set resolution
+```{r}
+# create a grid with resolution 0.001 degree
+grd_lulc <- rast(landuse, res = 0.001)
+grd_lulc # no value, only grid
+hasValues(grd_lulc)
+lulc_rast_0001 <- rasterize(landuse, grd_lulc, "nature")
+lulc_rast_0001
+hasValues(lulc_rast_0001)
+plot(lulc_rast_0001)
+```
+
+## EPSG:4326
+Rasterization with the grid of BD alti in 4326
+```{r}
+lulc_rast_4326 <- rasterize(landuse, alti_4326, "nature")
+lulc_rast_4326
+plot(lulc_rast_4326)
+```
+
+## EPSG:2154
+Rasterization with the grid in Lambert 93
+```{r}
+# need to project the polygon first
+landuse_2154 <- project(landuse, crs(bdalti))
+lulc_rast_2154 <- rasterize(landuse_2154, bdalti, "nature")
+lulc_rast_2154
+plot(lulc_rast_2154)
+```
+
+:::
+
+## Extra : Multi layers raster
+
+In some case, it is convenient to have all raster in a single file, and following the same grid.
+For instance, then we can make mathematical operations between different layers. (*addref day2*)
+
+### Combining multiple rasters
+
+When two rasters follow the same grid, they can be combine with `c()`
+```{r}
+# merge the two information (same grid)
+mpl <- c(bdalti, lulc_rast_2154)
+names(mpl)[2] <- "landuse"
+dim(mpl)
+plot(mpl)
+```
+
+It can also be saved as geotiff.
+```{r multirast_export}
+#| eval: false
+writeRaster(mpl, filename = here("data", "MPL_elevation_lulc.tif"))
+```
+
+
+### Resampling
+
+In most cases, the grid among multiple raster do not match. In that case you need to decide which resolution to keep. 
+
+As an example, BDalti (lambert-93, 250m resolution), and Landuse (lat/long, 0.001 resolution). We want all data in lat/long, 0.001 resolution
+
+```{r}
+alti_0001 <- resample(alti_4326, lulc_rast_0001, "bilinear")
+plot(alti_0001, "elevation")
+
+mpl_4326 <- c(alti_0001, lulc_rast_0001)
+dim(mpl_4326)
+plot(mpl_4326)
+```
+
+
+### Other extra:
+
+calculate distance (*extra_distpoint*)
+
+
+
+
+### Classify values
+
+If large file, might be good to save the output.
+```{r rast_classify}
+# set the breaks of the class
+bks <- c(-1, 1, 5, 10, 50, 100, 500, 1000, 5000)
+# classify values
+alti_class <- classify(bdalti, bks, include.lowest = TRUE, brackets = TRUE)
+# get how many pixel per class
+table(values(alti_class))
+# the raster is a factor
+is.factor(alti_class)
+# see the labels of the class
+levels(alti_class)
+
+# visualize the elevation class
+plot(alti_class)
+```
+
+### Export raster in Geotiff
+
+```{r rast_export}
+#| eval: false
+writeRaster(alti_class, filename = here("data", "BDALTI_class.tif"))
+```
+
+When exporting as geotiff, it keeps an additional file with extension `.tif.aux.xml` that store the information of labels of the levels.
+
+
