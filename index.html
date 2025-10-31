@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Romain Frelat">
-<meta name="dcterms.date" content="2025-10-27">
+<meta name="dcterms.date" content="2025-10-31">
 
 <title>Spatial-r: Tutorials on spatial data analysis in R</title>
 <style>
@@ -27,8 +27,12 @@ ul.task-list li input[type="checkbox"] {
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
-<link href="./chapters/01_intro.html" rel="next">
 <script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./chapters/01_setup.html" rel="next">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
@@ -43,6 +47,18 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-contrib/fontawesome6-0.1.0/all.css" rel="stylesheet">
 <link href="site_libs/quarto-contrib/fontawesome6-0.1.0/latex-fontsize.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -70,9 +86,12 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Preface</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Introduction</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
     </div>
   </nav>
 </header>
@@ -87,24 +106,35 @@ ul.task-list li input[type="checkbox"] {
       <a href="./">Spatial-r: Tutorials on spatial data analysis in R</a> 
     </div>
       </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Preface</span></a>
+ <span class="menu-text">Introduction</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/01_intro.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Introduction</span></a>
+  <a href="./chapters/01_setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Setup</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapters/02_presentation_gis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction to GIS</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
- <span class="menu-text">Half-day 1</span></a>
+ <span class="menu-text">Vectors</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -112,26 +142,20 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/10_presentation_gis.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Introduction to GIS</span></a>
+  <a href="./chapters/11_points.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Points</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/11_vectors.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Vectors</span></a>
+  <a href="./chapters/12_lines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lines</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/12_rasters.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Rasters</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./chapters/13_extract.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Extract</span></a>
+  <a href="./chapters/13_polygons.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Polygons</span></a>
   </div>
 </li>
       </ul>
@@ -139,7 +163,7 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Half-day 2</span></a>
+ <span class="menu-text">Rasters</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -147,20 +171,14 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/20_presentation_data.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Introduction to spatial data</span></a>
+  <a href="./chapters/21_rasters.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Rasters</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./chapters/21_multilayer.html" class="sidebar-item-text sidebar-link">
+  <a href="./chapters/22_multilayer.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Multi-layer rasters</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./chapters/22_interactivemap.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Interactive maps</span></a>
   </div>
 </li>
       </ul>
@@ -198,7 +216,13 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#preface" id="toc-preface" class="nav-link active" data-scroll-target="#preface">Preface</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
+  <ul class="collapse">
+  <li><a href="#r-packages" id="toc-r-packages" class="nav-link" data-scroll-target="#r-packages">R packages</a></li>
+  <li><a href="#workshop-program" id="toc-workshop-program" class="nav-link" data-scroll-target="#workshop-program">Workshop program</a></li>
+  <li><a href="#other-tutorials" id="toc-other-tutorials" class="nav-link" data-scroll-target="#other-tutorials">Other tutorials</a></li>
+  <li><a href="#other-resources" id="toc-other-resources" class="nav-link" data-scroll-target="#other-resources">Other resources</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -233,7 +257,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">October 27, 2025</p>
+      <p class="date">October 31, 2025</p>
     </div>
   </div>
   
@@ -245,57 +269,69 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="preface" class="level1 unnumbered">
-<h1 class="unnumbered">Preface</h1>
-<p>This is a collection of tutorials on how to handle spatial data in R.</p>
-<p>It is made for a two half-day workshop, but you can follow the tutorials on your own pace.</p>
-<p>The aims of this workshop is to :</p>
-<blockquote class="blockquote">
-<p>Feel more comfortable to work with spatial data<br>
-Load spatial data in R and visualize it<br>
-Extract information from remote sensing or other fields<br>
-Take advantage of the numerous databases that are available online</p>
-</blockquote>
-<p>The tutorial targets students and scientists in ecology with previous knowledge of the <a href="https://cran.r-project.org/">R software</a>.</p>
-<section id="r-package" class="level4">
-<h4 class="anchored" data-anchor-id="r-package">R package</h4>
-<p>The tutorials will mostly rely on (terra R-package)[] for most of the spatial data handling.<br>
-R is exceptional due to its diversity, and their exist other package to handle spatial data, sf and stars being also very good resources.</p>
+<section id="introduction" class="level1 unnumbered">
+<h1 class="unnumbered">Introduction</h1>
+<p>This is a collection of tutorials on how to handle spatial data in R. The tutorials target students and scientists in ecology with previous knowledge of the <a href="https://cran.r-project.org/">R software</a>.</p>
+<p>The core tutorial was developed for a two half-day workshop, but you can follow the tutorials at your own pace.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="The ecologist mind">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>The ecologist mind
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In these tutorials, we characterize the habitat of otter that were observed in 2021 around Montpellier, France. This small toy case study is not relevant ecologically but provides a good opportunity to tackle multiple challenges with handling and collecting spatial data.</p>
+</div>
+</div>
+<section id="r-packages" class="level3">
+<h3 class="anchored" data-anchor-id="r-packages">R packages</h3>
+<p>The tutorials rely mostly on <a href="https://rspatial.github.io/terra/index.html"><code>terra</code> R-package</a> as it was specifically developed to tackle all challenges faced by ecologists, agronomists or biologists when using spatial data.<br>
+R has an exceptional diversity of users and packages, and this is especially true with the dynamic community around spatial data. Another popular package for handling spatial data is <code>sf</code> (and <code>stars</code>).</p>
 </section>
-<section id="key-resources" class="level4">
-<h4 class="anchored" data-anchor-id="key-resources">Key resources</h4>
-<p>These tutorials has been inspired by brilliant resources online:</p>
+<section id="workshop-program" class="level3">
+<h3 class="anchored" data-anchor-id="workshop-program">Workshop program</h3>
+<p><strong>Half day 1: Vectors</strong></p>
 <ul>
-<li>Hijman R. et al.&nbsp;<a href="https://rspatial.org/">Spatial Data Science with R and “terra”</a><br>
+<li><a href="https://frbcesab.github.io/spatial-r/chapters/02_presentation_gis.html">Introduction to GIS</a>: differences between vectors and rasters, short overview of coordinate reference system (CRS)</li>
+<li><a href="https://frbcesab.github.io/spatial-r/chapters/11_points.html">Points</a>: Understand otter field observations as spatial points</li>
+<li><a href="https://frbcesab.github.io/spatial-r/chapters/12_lines.html">Lines</a>: Add infomation about river networks<br>
 </li>
-<li>Pebesma and Bivand <a href="https://r-spatial.org/book/">Spatial Data Science: With Applications in R</a></li>
-<li>Moraga P. (2023)<a href="https://www.paulamoraga.com/book-spatial/">Spatial Statistics for Data Science: Theory and Practice with R</a></li>
-<li>Lovelace, Nowosad, and Muenchow (2025) <a href="https://r.geocompx.org/">Book on geographic data with R</a><br>
-</li>
-<li>Gimond M. (2025) <a href="https://mgimond.github.io/Spatial/index.html">Intro to GIS and Spatial Analysis</a><br>
-</li>
-<li>Slingsby J. (2025) <a href="https://www.ecologi.st/spatial-r/">A minimal introduction to GIS in R</a></li>
+<li><a href="https://frbcesab.github.io/spatial-r/chapters/13_polygons.html">Polygons</a>: Complete with land cover information as spatial polygons.</li>
 </ul>
+<p><strong>Half day 2: Rasters</strong><br>
+- <a href="https://frbcesab.github.io/spatial-r/chapters/13_polygons.html">raster</a>: Discover what is a raster and get the elevation profile from field observation - <a href="https://frbcesab.github.io/spatial-r/chapters/22_multilayer.html">multi layer</a>: Trace back montly climate information at the field sites.</p>
 </section>
-<section id="preliminary-program" class="level4">
-<h4 class="anchored" data-anchor-id="preliminary-program">Preliminary program</h4>
-<p><strong>Day 1</strong><br>
-- lesson1 : INTRODUCTION GIS, vector vs raster view, projection system (CRS)<br>
-- tuto1 : VECTOR: create points, lines and polygons; map and project spatial objects, calculate distance and areas<br>
-- tuto2 : RASTER: load and download rasters, change their resolutions, map etc<br>
-- tuto3 : EXTRACT: how to mix them: raster and points, raster and buffer, raster and polygons, projection raster&gt;polygon</p>
-<p><strong>Day 2</strong><br>
-- lesson2 : Getting GIS datasets, multilayer climate data, vegetation indices?<br>
-- tuto4 : STACK: how to load and manipulate multilayer rasters (e.g.&nbsp;remote sensing), thresholding multi day, and multi spectral<br>
-- tuto5 : COMBINE MULTI-SOURCE DATA - reprojecting rasters, tips and tricks =&gt; making grid or commune?<br>
-- tuto6 : INTERACTIVE maps with leaflet, mapview, or tmap</p>
-<p><strong>Extra</strong>:<br>
-- tutoE1 : POLYGON: calculate convex hull, simplify geometries, aggregate, union, etc… spatial influence<br>
+<section id="other-tutorials" class="level3">
+<h3 class="anchored" data-anchor-id="other-tutorials">Other tutorials</h3>
+<ul>
+<li><a href="https://frbcesab.github.io/spatial-r/chapters/31_toydata_mpl.html">Toydata</a>: how to get data from GBIF, IGN and CHELSA to create a toy dataset for the workshop?</li>
+</ul>
+<p><strong>To be created</strong>:<br>
+- mapview - mapsf - tmap - tutoE1 : POLYGON: calculate convex hull, simplify geometries, aggregate, union, etc… spatial influence<br>
 - tutoE2 : get data from WMS or WFS<br>
 - tutoE3 : spatial autocorrelation - how to measure it, what to do about it? spatial regression model, local regression<br>
 - tutoE4 : Krigging and interpolation<br>
 - tutoE5 : remote sensing, landsat and modis<br>
 - tutoE6 : GoogleEarthEngine, what it is and how to use it (mostly out of R)</p>
+</section>
+<section id="other-resources" class="level3">
+<h3 class="anchored" data-anchor-id="other-resources">Other resources</h3>
+<p>These tutorials were inspired by brilliant online ressources, thanks to all of them:</p>
+<ul>
+<li>Hijman R. et al.&nbsp;<a href="https://rspatial.org/">Spatial Data Science with R and “terra”</a><br>
+</li>
+<li>Pebesma and Bivand <a href="https://r-spatial.org/book/">Spatial Data Science: With Applications in R</a></li>
+<li>Moraga P. (2023)<a href="https://www.paulamoraga.com/book-spatial/">Spatial Statistics for Data Science: Theory and Practice with R</a></li>
+<li>Lovelace, Nowosad, and Muenchow (2025) <a href="https://r.geocompx.org/">Geocomputation with R</a><br>
+</li>
+<li>Gimond M. (2025) <a href="https://mgimond.github.io/Spatial/index.html">Intro to GIS and Spatial Analysis</a><br>
+</li>
+<li>Slingsby J. (2025) <a href="https://www.ecologi.st/spatial-r/">A minimal introduction to GIS in R</a></li>
+<li>Giraud, T. et Pecout, H. (2025). <a href="https://rgeocarto.github.io/">Géomatique et cartographie avec R</a> [fr]</li>
+</ul>
 
 
 </section>
@@ -706,8 +742,8 @@ R is exceptional due to its diversity, and their exist other package to handle s
   <div class="nav-page nav-page-previous">
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./chapters/01_intro.html" class="pagination-link" aria-label="Introduction">
-        <span class="nav-page-text">Introduction</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./chapters/01_setup.html" class="pagination-link" aria-label="Setup">
+        <span class="nav-page-text">Setup</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
