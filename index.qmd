@@ -10,31 +10,27 @@ In these tutorials, we characterize the habitat of otter that were observed in 2
 :::
 
 
-### R packages
-
-The tutorials rely mostly on [`terra` R-package](https://rspatial.github.io/terra/index.html) as it was specifically developed to tackle all challenges faced by ecologists, agronomists or biologists when using spatial data.  
-R has an exceptional diversity of users and packages, and this is especially true with the dynamic community around spatial data. Another popular package for handling spatial data is `sf` (and `stars`).   
-
-
 ### Workshop program
 
-**Half day 1: Vectors**  
+- [Introduction to GIS](https://frbcesab.github.io/spatial-r/chapters/02_presentation_gis.html): vectors vs rasters, coordinate reference system (CRS), R as a GIS tool
 
-- [Introduction to GIS](https://frbcesab.github.io/spatial-r/chapters/02_presentation_gis.html): differences between vectors and rasters, short overview of coordinate reference system (CRS)
-- [Points](https://frbcesab.github.io/spatial-r/chapters/11_points.html): Understand otter field observations as spatial points
-- [Lines](https://frbcesab.github.io/spatial-r/chapters/12_lines.html): Add infomation about river networks    
-- [Polygons](https://frbcesab.github.io/spatial-r/chapters/13_polygons.html): Complete with land cover information as spatial polygons.  
+### Half day 1: Vectors  
 
-**Half day 2: Rasters**    
-- [raster](https://frbcesab.github.io/spatial-r/chapters/13_polygons.html): Discover what is a raster and get the elevation profile from field observation 
-- [multi layer](https://frbcesab.github.io/spatial-r/chapters/22_multilayer.html): Trace back montly climate information at the field sites. 
+- [Points](https://frbcesab.github.io/spatial-r/chapters/11_points.html): Transform otter field observations as spatial points
+- [Lines](https://frbcesab.github.io/spatial-r/chapters/12_lines.html): Calculate distance from points to nearest lines (river networks)    
+- [Polygons](https://frbcesab.github.io/spatial-r/chapters/13_polygons.html): Characterize land cover using spatial polygons.  
+
+#### Half day 2: Rasters  
+
+- [raster](https://frbcesab.github.io/spatial-r/chapters/13_polygons.html): Discover what is a raster and get the elevation profile from field observation  
+- [multi layer](https://frbcesab.github.io/spatial-r/chapters/22_multilayer.html): Track monthly climate information at the field sites. 
  
+#### Other tutorials
 
-### Other tutorials
-
-- [Toydata](https://frbcesab.github.io/spatial-r/chapters/31_toydata_mpl.html): how to get data from GBIF, IGN and CHELSA to create a toy dataset for the workshop?
+- [Toydata](https://frbcesab.github.io/spatial-r/chapters/31_toydata_mpl.html): how to get data from GBIF, IGN and CHELSA to create the toy dataset for the workshop.
 
 **To be created**:  
+
 - mapview
 - mapsf
 - tmap
@@ -44,6 +40,12 @@ R has an exceptional diversity of users and packages, and this is especially tru
 - tutoE4 : Krigging and interpolation  
 - tutoE5 : remote sensing, landsat and modis  
 - tutoE6 : GoogleEarthEngine, what it is and how to use it (mostly out of R)
+
+
+### R packages
+
+The tutorials rely mostly on [`terra` R-package](https://rspatial.github.io/terra/index.html) as it was specifically developed to tackle challenges faced by ecologists, agronomists and biologists when using spatial data.  
+R has an exceptional diversity of users and packages, and this is especially true with the dynamic community in spatial analysis. Another popular package for handling spatial data is `sf` (and `stars`).   
 
 ### Other resources
 
@@ -56,4 +58,5 @@ These tutorials were inspired by brilliant online ressources, thanks to all of t
 - Gimond M. (2025) [Intro to GIS and Spatial Analysis](https://mgimond.github.io/Spatial/index.html)  
 - Slingsby J. (2025) [A minimal introduction to GIS in R](https://www.ecologi.st/spatial-r/)
 - Giraud, T. et Pecout, H. (2025). [Géomatique et cartographie avec R](https://rgeocarto.github.io/) [fr]
+
 

@@ -13,5 +13,5 @@ chapters/old_*
 data/BDALTI_class*
 data/MPL_elevation_lulc*
 data/*_old.nc*
-
+data/gadm/
 todo.txt

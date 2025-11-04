@@ -31,6 +31,7 @@ book:
       chapters:
       - chapters/21_rasters.qmd
       - chapters/22_multilayer.qmd
+      - chapters/23_grid.qmd
     - part: "Extra"
       chapters:
       - chapters/31_toydata_mpl.qmd

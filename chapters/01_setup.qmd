@@ -2,8 +2,7 @@
 
 ## How to install R and set up a working environment
 
-The tutorials rely on R, so you will need R installed and ideally a
-Please have a look at the tutorial on how to setup a working environment for scientific computing with R:
+The tutorials rely on R, so you need to have [R installed](https://cran.r-project.org/) on your computer and ideally an Integrated Development Environment (IDE), for instance [RStudio](https://posit.co/downloads/), [Visual Studio Code](https://code.visualstudio.com/download) or [Positron](https://posit.co/products/ide/positron/).  Please have a look at the tutorial on how to setup a working environment for scientific computing with R:
 <https://frbcesab.github.io/rsetup/>
 
 

@@ -42,9 +42,9 @@ otter <- read.csv(here("data", "gbif_otter_2021_mpl50km.csv"))
 ## online
 ```{r otter}
 #| eval: false
-otter <- read.csv(
-  "https://github.com/FRBCesab/spatial-r/raw/main/data/gbif_otter_2021_mpl50km.csv"
-)
+
+url_github <- "https://github.com/FRBCesab/spatial-r/raw/main/data/"
+pt_otter <- vect(paste0(url_github, "gbif_otter_2021_mpl50km.csv"))
 ```
 
 :::

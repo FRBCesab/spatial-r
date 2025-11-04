@@ -1,15 +1,19 @@
 # Multi-layer rasters {.unnumbered}
 
-At the end of this tutorial, you will be know how to:
+:::{.callout-important title="Summary"}
+This tutorial explore how to handle **multi-layer rasters** in R with `terra` package:
 
-- handle multilayer rasters   
-- extract time series or vegetation indices from rasters   
+- import a multi-layer rasters with [`terra::rast()`](https://search.r-project.org/CRAN/refmans/terra/html/rast.html)   
+- extract information from rasters on points or polygons with [`terra::extract()`](https://search.r-project.org/CRAN/refmans/terra/html/extract.html)
+
+:::
+
+:::{.callout-tip title="The ecologist mind"}
+How are otters influenced by climate? It would be ineresting to get the climate at the time of the observations of otter. 
+To answer this question, we will need to discover another type of spatial data: **multi-layer rasters**.
+:::
 
 
-## File format
-
-You could get anything among netCDF, grid, tif.
-All can be read with `terra::rast()`
 
 ## Setup
 
@@ -24,13 +28,13 @@ Let's start with loading the required packages.
 suppressPackageStartupMessages({
   library(mapview)
   library(here)
-  library(sf)
   library(terra)
-  library(exactextractr)
+  # library(sf)
+  # library(exactextractr)
 })
 ```
 
-And the needed dataset (observations of otter in 2021 around Montpellier, France).
+Now load the observations of otters recorded in 2021 within a 50km buffer from Montpellier, France.  
 
 ::: {.panel-tabset}
 
@@ -49,57 +53,224 @@ pt_otter <- vect(
 
 :::
 
+</details>
 
-## Monthly climate with CHELSA
 
-```{r}
-meantemp <- rast(here("data", "CHELSA_monthly_tas_2015_2021.tif"))
-meantemp
+## Load monthly climate with CHELSA
 
-# shorten names
-time_chelsa <- substr(names(meantemp), 12, 18)
-names(meantemp) <- time_chelsa
+We will use the monthly average temperature data from [CHELSA](https://www.chelsa-climate.org/) which has a spatial resolution of 1km. To see how we created the data for our case study, have a look at [this tutorial](https://frbcesab.github.io/spatial-r/chapters/31_toydata_mpl.html#get-climate-data-from-chelsa).   
+
+### Import
+
+The function to read *most kind of* raster file is [`terra::rast()`](https://search.r-project.org/CRAN/refmans/terra/html/rast.html)
+
+::: {.panel-tabset}
+
+## local
+```{r rast_local}
+temperature <- rast(here("data", "CHELSA_monthly_tas_2015_2021.tif"))
 ```
 
-```{r}
-pt_temp <- extract(meantemp, pt_otter, ID = FALSE)
+## online
+```{r rast_online}
+#| eval: false
+url_github <- "https://github.com/FRBCesab/spatial-r/raw/main/data/"
+temperature <- rast(paste0(url_github, "CHELSA_monthly_tas_2015_2021.tif"))
+```
+
+:::
+
+:::{.callout-note title="Your turn"}
+1. What are the dimensions of the loaded temperature raster?
+2. What is the resolution of rasters? In which unit? Why?
+3. How can we get the name of the different layers?
+:::
+
+<details>
+<summary>Click to see the answer</summary>
+
+1. There are ```r nrow(temperature)```  rows,  ```r ncol(temperature)``` columns and ```r nlyr(temperature)``` layers in the raster. You can access it with `dim(temperature)` or just by typing `temperature` in the console.   
+2. The spatial resolution of raster is ```r round(res(temperature),4)``` decimal degrees (equal to ```r res(temperature)[1]*60*60``` arc seconds). The resolution is expressed in degrees because the projection system is ```r crs(temperature, describe = TRUE)$name``` (EPSG ```r crs(temperature, describe = TRUE)$code```). You can access these information with `res(temperature)` and `crs(temperature, describe = TRUE)`.   
+3. To access the name of the layers, type `names(temperature)`, they corresponds to monthly averaged temperature.
+</details>
+
+### Rename
+To simplify the next steps, we will rename the layers with only their corresponding month and year.
+
+```{r rast_rename}
+# shorten names
+time_chelsa <- substr(names(temperature), 12, 18)
+names(temperature) <- time_chelsa
+```
+
+### Visualize
+
+Let's visualize the monthly temperature of 2021 
+```{r rast_map}
+# select the layers of 2021
+in_2021 <- grep("2021", time_chelsa)
+# plot the 2021 temperature layers
+plot(temperature, in_2021)
+```
+
+
+:::{.callout-note title="Your turn"}
+- what is the unit of the temperature values?
+- mask the sea from the temperature raster. *addref to raster tutorial*
+:::
+
+<details>
+<summary>Click to see the answer 1</summary>
+The temperature are expressed in Kelvin, as indicated in the [documentation of Chelsa-monthly dataset](https://www.chelsa-climate.org/datasets/chelsa_monthly) 
+</details>
+
+<details>
+<summary>Click to see the answer 2</summary>
+
+```{r mask_sea}
+# get the border of the country (level = 0)
+france_border <- geodata::gadm("FRA", level = 0, path = here("data"))
+
+# mask (=set to NA) the pixels that are not in the polygon
+temperature <- mask(temperature, france_border)
+
+plot(temperature, in_2021)
+```
+
+</details>
+
+### Transform in degree Celsius
+
+We can make algebra operations in rasters. For instance, we can transform Kelvin to degree celsius.
+
+```{r rast_transform}
+temp_C <- temperature - 273.15
+# plot the 2021 temperature layers
+plot(temp_C, in_2021)
+```
+
+## Extract information on points
+
+Same as with simple raster, the function [`terra::extract()`](https://search.r-project.org/CRAN/refmans/terra/html/extract.html) will get the temperature values of all months at the location of the observations.
+
+```{r extract_pt}
+pt_temp <- extract(temp_C, pt_otter, ID = FALSE)
+dim(pt_temp)
 summary(unlist(pt_temp))
 ```
 
-```{r}
-# transform to degree celsius
-pt_tempC <- pt_temp - 273.15
+The extracted temperature (in `pt_temp`) are stored in a data.frame with rows corresponding to the otter observations, and column corresponding to the month.
 
-# plot
-boxplot(pt_tempC, las = 2, ylab = "Temperature (*C)")
+We can see the seasonal variation of the temperature with a simple `boxplot()`
+
+```{r boxplot_temp}
+# plot the seasonal variation of the mean temperature
+boxplot(pt_temp, las = 2, ylab = "Temperature (*C)")
 ```
 
-```{r}
-mean_temp <- apply(pt_tempC, 1, mean, na.rm = TRUE)
+### Average temperature
+
+With all these monthly temperature values, we can calculate the average of monthly temperature for the period 2015-2021. 
+
+```{r mean_temp}
+mean_temp <- apply(pt_temp, 1, mean, na.rm = TRUE)
+# distribution of average values
 summary(mean_temp)
+# attach the temperature as an attribute
 pt_otter$mean_temp <- mean_temp
+
+# let's map the average temperature
 plot(pt_otter, "mean_temp")
+plot(france_border, add = TRUE)
 ```
 
-```{r}
-cv_temp <- apply(pt_tempC, 1, sd, na.rm = TRUE) / mean_temp
+### Seasonal variations
+
+Another interesting indicators is the seasonality of monthly temperature measured as the coefficient of variation. 
+```{r cv_temp}
+cv_temp <- apply(pt_temp, 1, sd, na.rm = TRUE) / mean_temp
 summary(cv_temp)
 pt_otter$cv_temp <- cv_temp
 plot(pt_otter, "cv_temp")
+plot(france_border, add = TRUE)
 ```
 
-```{r}
-# too old school
-# pt_otter$month2 <- ifelse(pt_otter$month<10, paste0("0",pt_otter$month), pt_otter$month)
-# pt_otter$time <- paste(pt_otter$month2, pt_otter$year, sep="_")
-# better :
+Observations made closer to the sea have warmer climate and lower seasonal variations in temperature.
+
+
+### Temperature at the time of observation
+
+We need to identify which temperature layer correspond to the time of the observations. For this we will use the date formatting in R. Make sure to have a look at the documentations of [`as.Date()`](https://search.r-project.org/R/refmans/base/html/as.Date.html) and [`strptime()`](https://search.r-project.org/R/refmans/base/html/strptime.html) if you want more details. 
+
+```{r transform_date}
 pt_otter$time <- as.Date(pt_otter$eventDate) |> format("%m_%Y")
 
 table(pt_otter$time)
-# get temperature at the month of observation
-xy <- cbind(1:nrow(pt_otter), match(pt_otter$time, names(pt_tempC)))
-pt_otter$temp_obs <- pt_tempC[xy]
-summary(pt_otter$temp_obs)
-plot(pt_otter, "temp_obs")
 ```
 
+Now that we have the same format for the name of the temperature layer and the time of the observations, we can get the temperature value at the time of observation.
+
+```{r match_temp}
+# get temperature at the month of observation
+t_obs <- match(pt_otter$time, names(pt_temp))
+xy <- cbind(1:nrow(pt_otter), t_obs)
+pt_otter$temp_obs <- pt_temp[xy]
+summary(pt_otter$temp_obs)
+
+plot(pt_otter, "temp_obs")
+plot(france_border, add = TRUE)
+```
+
+
+:::{.callout-note title="Your turn"}
+2. Extracting values for 1km buffer around the observation. Repeat what we learnt for a single raster, but with the temperature raster.
+1. (advanced) Get the range of monhly temperature within the 12 months before the observation.
+:::
+
+<details>
+<summary>Click to see the answer 1 </summary>
+Temperature are slow changing variables, so no real need for buffer, but this is a good exercice.
+
+```{r extract_buffer}
+# create buffers
+poly_otter <- buffer(pt_otter, 1000) # buffer of 1km
+# no need to project because everything is in WGS84
+# extract values for each layer
+mean_buffer_temp <- extract(
+  temp_C,
+  poly_otter,
+  fun = mean,
+  exact = TRUE,
+  ID = FALSE
+)
+boxplot(mean_buffer_temp, las = 2, ylab = "Temperature (*C)")
+```
+
+</details>
+
+<details>
+<summary>Click to see the answer 2 </summary>
+
+
+```{r extract_12m}
+# we start again from the matching time
+t_obs <- match(pt_otter$time, names(pt_temp))
+# then we want to get 11 month before the observation
+t_past <- t_obs - 11 # ideally check if not negative
+
+# calculate the difference of min-max value within he time period
+temp_past12m <- sapply(1:nrow(pt_temp), function(i) {
+  diff(range(pt_temp[i, t_past[i]:t_obs[i]]))
+})
+
+summary(temp_past12m)
+
+# attach to the attribute table
+pt_otter$temp_range_12m <- temp_past12m
+
+# visualize the results
+plot(pt_otter, "temp_range_12m")
+plot(france_border, add = TRUE)
+```
+
+</details>

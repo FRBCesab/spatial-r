@@ -1,0 +1,149 @@
+# Grid {.unnumbered}
+
+:::{.callout-important title="Summary"}
+This tutorial explore how to make a grid and transform observations into a grid with `terra` package:
+
+- import a multi-layer rasters with [`terra::rast()`](https://search.r-project.org/CRAN/refmans/terra/html/rast.html)   
+- extract information from rasters on points or polygons with [`terra::extract()`](https://search.r-project.org/CRAN/refmans/terra/html/extract.html)
+
+:::
+
+:::{.callout-tip title="The ecologist mind"}
+If we want to make some modeling, it can be needed to regroup observations into a grid.
+:::
+
+
+## Setup
+
+<details>
+<summary> Follow the setup instructions if you haven't followed previous tutorials</summary>
+
+If haven't done it already, please follow the [setup instructions](https://frbcesab.github.io/spatial-r/chapters/01_setup.html).    
+
+Let's start with loading the required packages.
+
+```{r setting}
+suppressPackageStartupMessages({
+  library(mapview)
+  library(here)
+  library(terra)
+  # library(sf)
+  # library(exactextractr)
+})
+```
+
+Now load all the datasets attached to the observations of otters recorded in 2021 within a 50km buffer from Montpellier, France.  
+
+```{r data_local}
+pt_otter <- vect(here("data", "gbif_otter_2021_mpl50km.gpkg"))
+river <- vect(here("data", "BDCARTO-River_mpl50km.gpkg"))
+landuse <- vect(here("data", "BDCARTO-LULC_mpl50km.shp"))
+bdalti <- rast(here("data", "BDALTI_mpl50km.tif"))
+temperature <- rast(here("data", "CHELSA_monthly_tas_2015_2021.tif"))
+```
+
+</details>
+
+## Create a grid
+
+Key issue : which resolution? which projection?
+resolution depends on your dataset, extent, and ecological question
+projection depends on the dataset
+
+Let's start from our observation.
+```{r make_grid}
+pt_2154 <- project(pt_otter, "EPSG:2154")
+res <- 5000 # 1km grid
+grid <- rast(pt_2154, res = res)
+grid
+```
+
+## Points to grid
+
+the argument `fun=count` set that it calculate the number of points
+the argument `background=0` set that f there is no point, the vale will be 0, instead of NA by default
+```{r grid_nobs}
+grid_nobs <- rasterize(pt_2154, grid, fun = "count", background = 0)
+
+plot(grid_nobs)
+```
+
+## Lines to grid   
+
+length of rivers
+
+```{r grid_river}
+river_2154 <- project(river, "EPSG:2154")
+
+grid_river <- rasterizeGeom(river_2154, grid, fun = "length")
+plot(grid_river)
+```
+
+
+## Polygon to grid
+
+percentage of forest
+
+```{r grid_forest}
+# select only the forest
+forest <- landuse[landuse$nature == "Forêt"]
+# project the polygons
+forest_2154 <- project(forest, "EPSG:2154")
+# rasterize
+grid_forest <- rasterize(forest_2154, grid, cover = TRUE, background = 0)
+
+plot(grid_forest)
+```
+
+## Resample raster
+
+### Elevation
+
+```{r grid_alti}
+grid_alti <- resample(bdalti, grid, "bilinear")
+plot(grid_alti)
+```
+
+### Temperature
+
+```{r grid_temp}
+#calculate the average temperature in 2021
+in_2021 <- grep("2021", names(temperature))
+monthly_temp <- subset(temperature, in_2021)
+annual_temp <- mean(monthly_temp, na.rm = TRUE)
+# project (that's one of the only occasion when projection of raster)
+temp_2154 <- project(annual_temp, "EPSG:2154")
+grid_temp <- resample(temp_2154, grid, "bilinear")
+plot(grid_temp)
+```
+
+## Merge all together
+
+Ignoring all concept of spatial bias or anything else
+```{r merge}
+out <- c(grid_nobs, grid_river, grid_forest, grid_alti, grid_temp)
+
+names(out) <- c("nobs", "river_m", "forest", "elevation_m", "temperature_K")
+
+plot(out)
+```
+
+```{r mask}
+france_border <- geodata::gadm("FRA", level = 0, path = here("data"))
+# project the coast in Lambert-93
+france_2154 <- project(france_border, crs(bdalti))
+# mask (=set to NA) the pixels that are not in the polygon
+out_masked <- mask(out, france_2154)
+plot(out_masked)
+```
+
+```{r anova}
+df <- data.frame(out_masked)
+
+m1 <- lm(nobs ~ river_m + forest + elevation_m + temperature_K, data = df)
+anova(m1)
+```
+
+:::{.callout-note title="Your turn"}
+Does the spatial resolution has en effect on the results? Repeat the same process with a grid of 500m, 1km, or 10km resolution and compare the results. 
+:::
