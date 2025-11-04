@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Romain Frelat">
-<meta name="dcterms.date" content="2025-10-31">
+<meta name="dcterms.date" content="2025-11-04">
 
 <title>Spatial-r: Tutorials on spatial data analysis in R</title>
 <style>
@@ -181,6 +181,12 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Multi-layer rasters</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./chapters/23_grid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Grid</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -218,9 +224,9 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
   <ul class="collapse">
-  <li><a href="#r-packages" id="toc-r-packages" class="nav-link" data-scroll-target="#r-packages">R packages</a></li>
   <li><a href="#workshop-program" id="toc-workshop-program" class="nav-link" data-scroll-target="#workshop-program">Workshop program</a></li>
-  <li><a href="#other-tutorials" id="toc-other-tutorials" class="nav-link" data-scroll-target="#other-tutorials">Other tutorials</a></li>
+  <li><a href="#half-day-1-vectors" id="toc-half-day-1-vectors" class="nav-link" data-scroll-target="#half-day-1-vectors">Half day 1: Vectors</a></li>
+  <li><a href="#r-packages" id="toc-r-packages" class="nav-link" data-scroll-target="#r-packages">R packages</a></li>
   <li><a href="#other-resources" id="toc-other-resources" class="nav-link" data-scroll-target="#other-resources">Other resources</a></li>
   </ul></li>
   </ul>
@@ -257,7 +263,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">October 31, 2025</p>
+      <p class="date">November 4, 2025</p>
     </div>
   </div>
   
@@ -286,36 +292,56 @@ ul.task-list li input[type="checkbox"] {
 <p>In these tutorials, we characterize the habitat of otter that were observed in 2021 around Montpellier, France. This small toy case study is not relevant ecologically but provides a good opportunity to tackle multiple challenges with handling and collecting spatial data.</p>
 </div>
 </div>
-<section id="r-packages" class="level3">
-<h3 class="anchored" data-anchor-id="r-packages">R packages</h3>
-<p>The tutorials rely mostly on <a href="https://rspatial.github.io/terra/index.html"><code>terra</code> R-package</a> as it was specifically developed to tackle all challenges faced by ecologists, agronomists or biologists when using spatial data.<br>
-R has an exceptional diversity of users and packages, and this is especially true with the dynamic community around spatial data. Another popular package for handling spatial data is <code>sf</code> (and <code>stars</code>).</p>
-</section>
 <section id="workshop-program" class="level3">
 <h3 class="anchored" data-anchor-id="workshop-program">Workshop program</h3>
-<p><strong>Half day 1: Vectors</strong></p>
 <ul>
-<li><a href="https://frbcesab.github.io/spatial-r/chapters/02_presentation_gis.html">Introduction to GIS</a>: differences between vectors and rasters, short overview of coordinate reference system (CRS)</li>
-<li><a href="https://frbcesab.github.io/spatial-r/chapters/11_points.html">Points</a>: Understand otter field observations as spatial points</li>
-<li><a href="https://frbcesab.github.io/spatial-r/chapters/12_lines.html">Lines</a>: Add infomation about river networks<br>
-</li>
-<li><a href="https://frbcesab.github.io/spatial-r/chapters/13_polygons.html">Polygons</a>: Complete with land cover information as spatial polygons.</li>
+<li><a href="https://frbcesab.github.io/spatial-r/chapters/02_presentation_gis.html">Introduction to GIS</a>: vectors vs rasters, coordinate reference system (CRS), R as a GIS tool</li>
 </ul>
-<p><strong>Half day 2: Rasters</strong><br>
-- <a href="https://frbcesab.github.io/spatial-r/chapters/13_polygons.html">raster</a>: Discover what is a raster and get the elevation profile from field observation - <a href="https://frbcesab.github.io/spatial-r/chapters/22_multilayer.html">multi layer</a>: Trace back montly climate information at the field sites.</p>
 </section>
-<section id="other-tutorials" class="level3">
-<h3 class="anchored" data-anchor-id="other-tutorials">Other tutorials</h3>
+<section id="half-day-1-vectors" class="level3">
+<h3 class="anchored" data-anchor-id="half-day-1-vectors">Half day 1: Vectors</h3>
 <ul>
-<li><a href="https://frbcesab.github.io/spatial-r/chapters/31_toydata_mpl.html">Toydata</a>: how to get data from GBIF, IGN and CHELSA to create a toy dataset for the workshop?</li>
+<li><a href="https://frbcesab.github.io/spatial-r/chapters/11_points.html">Points</a>: Transform otter field observations as spatial points</li>
+<li><a href="https://frbcesab.github.io/spatial-r/chapters/12_lines.html">Lines</a>: Calculate distance from points to nearest lines (river networks)<br>
+</li>
+<li><a href="https://frbcesab.github.io/spatial-r/chapters/13_polygons.html">Polygons</a>: Characterize land cover using spatial polygons.</li>
 </ul>
-<p><strong>To be created</strong>:<br>
-- mapview - mapsf - tmap - tutoE1 : POLYGON: calculate convex hull, simplify geometries, aggregate, union, etc… spatial influence<br>
-- tutoE2 : get data from WMS or WFS<br>
-- tutoE3 : spatial autocorrelation - how to measure it, what to do about it? spatial regression model, local regression<br>
-- tutoE4 : Krigging and interpolation<br>
-- tutoE5 : remote sensing, landsat and modis<br>
-- tutoE6 : GoogleEarthEngine, what it is and how to use it (mostly out of R)</p>
+<section id="half-day-2-rasters" class="level4">
+<h4 class="anchored" data-anchor-id="half-day-2-rasters">Half day 2: Rasters</h4>
+<ul>
+<li><a href="https://frbcesab.github.io/spatial-r/chapters/13_polygons.html">raster</a>: Discover what is a raster and get the elevation profile from field observation<br>
+</li>
+<li><a href="https://frbcesab.github.io/spatial-r/chapters/22_multilayer.html">multi layer</a>: Track monthly climate information at the field sites.</li>
+</ul>
+</section>
+<section id="other-tutorials" class="level4">
+<h4 class="anchored" data-anchor-id="other-tutorials">Other tutorials</h4>
+<ul>
+<li><a href="https://frbcesab.github.io/spatial-r/chapters/31_toydata_mpl.html">Toydata</a>: how to get data from GBIF, IGN and CHELSA to create the toy dataset for the workshop.</li>
+</ul>
+<p><strong>To be created</strong>:</p>
+<ul>
+<li>mapview</li>
+<li>mapsf</li>
+<li>tmap</li>
+<li>tutoE1 : POLYGON: calculate convex hull, simplify geometries, aggregate, union, etc… spatial influence<br>
+</li>
+<li>tutoE2 : get data from WMS or WFS<br>
+</li>
+<li>tutoE3 : spatial autocorrelation - how to measure it, what to do about it? spatial regression model, local regression<br>
+</li>
+<li>tutoE4 : Krigging and interpolation<br>
+</li>
+<li>tutoE5 : remote sensing, landsat and modis<br>
+</li>
+<li>tutoE6 : GoogleEarthEngine, what it is and how to use it (mostly out of R)</li>
+</ul>
+</section>
+</section>
+<section id="r-packages" class="level3">
+<h3 class="anchored" data-anchor-id="r-packages">R packages</h3>
+<p>The tutorials rely mostly on <a href="https://rspatial.github.io/terra/index.html"><code>terra</code> R-package</a> as it was specifically developed to tackle challenges faced by ecologists, agronomists and biologists when using spatial data.<br>
+R has an exceptional diversity of users and packages, and this is especially true with the dynamic community in spatial analysis. Another popular package for handling spatial data is <code>sf</code> (and <code>stars</code>).</p>
 </section>
 <section id="other-resources" class="level3">
 <h3 class="anchored" data-anchor-id="other-resources">Other resources</h3>
