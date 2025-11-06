@@ -5,6 +5,42 @@ This is a collection of small tricks that can save you lot of time and headache,
 Naviguate on the right side to find the interesting topic for you. 
 Could also take the format of a FAQ.
 
+## Cloud optimized GeoTIFF (COG)
+
+With `terra`, when large geotiff files are stored as [Cloud optimized Geotiff](https://cogeo.org/), you don't have to download them all.
+The trick is to add `/vsicurl/` before the url and load them as a nornmal raster. For instance, with CHELSA dataset. Then you can crop or extract values without downloading the whole dataset.
+
+```{r}
+url_monthlytas <- "https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/monthly/tas/YYYY/CHELSA_tas_MM_YYYY_V.2.1.tif"
+
+# add GDAL Virtual File Systems to make use of COG
+full_url <- paste0("/vsicurl/", url_list)
+
+# is much faster with 'vsicurl' (no need to download all data)
+chelsa_tas <- terra::rast(full_url)
+# crop to the extent of intest
+crop_tas <- terra::crop(chelsa_tas, large_box)
+# export
+writeRaster(crop_tas, here::here("data", "CHELSA_monthly_tas_2015_2021.tif"))
+```
+
+
+## Clamp values
+
+
+Let's imagine we want to remove the sea and all values below 0
+
+```{r rast_NA}
+bdalti <- rast(here("data", "BDALTI_mpl50km.tif"))
+# make sure values are between 0 and 2000 m
+alti <- clamp(bdalti, 0, 2000, values = TRUE)
+# set values with elevation 0 as NA (remove the sea)
+NAflag(alti) <- 0
+plot(alti)
+# mean elevation in our study area (excluding sea)
+mean(values(alti), na.rm = TRUE)
+```
+
 
 ## Issues with `sf`
 

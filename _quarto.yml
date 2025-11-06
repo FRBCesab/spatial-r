@@ -39,6 +39,8 @@ book:
 
   reader-mode: false
   search: true
+  repo-url: https://github.com/FRBCesab/spatial-r/
+  repo-actions: [issue]
 
 bibliography: references.bib
 

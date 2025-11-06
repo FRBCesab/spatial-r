@@ -1,15 +1,15 @@
 # Lines {.unnumbered}
 
 :::{.callout-important title="Summary"}
-This tutorial explore how to handle **spatial lines** in R with `terra` package:
+This tutorial explore how to handle **spatial lines** in {{< fa brands r-project >}} with `terra` package:
 
-- read a spatial object with (`terra::vect()`)  
-- calculate length of lines with (`terra::perim()`)
-- calculate distances between points and lines with (`terra::distance()`)
+- load a spatial object with [`terra::vect()`](https://search.r-project.org/CRAN/refmans/terra/html/vect.html)
+- calculate length of lines with [`terra::perim()`](https://search.r-project.org/CRAN/refmans/terra/html/perim.html)
+- calculate distances between points and lines with [`terra::distance()`](https://search.r-project.org/CRAN/refmans/terra/html/distance.html)
 :::
 
 :::{.callout-tip title="The ecologist mind"}
-Otter lives around rivers, but how far from the rivers were they observed? 
+Otter lives along rivers, but how far from the rivers were they observed? 
 To answer this question, we will need to discover another type of vector: **lines**.
 :::
 
@@ -55,18 +55,20 @@ Lines are made of multiple points. It is possible to create lines directly from 
 
 *Note that dataset has rough resolution (BD TOPO would be more suited for real analysis), but it's perfect for our illustration and learning purpose.* 
 
-You can load all vector dataset in R with the function `sf::st_read()`. It can read many different formats. *Another function `sf::read_sf()` is also available and return a similar spatial object but with a `tibble` instead of a `data.frame` as attribute table.*
 
 ::: {.panel-tabset}
 
 ## terra
+
+You can load vector data with the function [`terra::vect()`](https://search.r-project.org/CRAN/refmans/terra/html/vect.html). 
+
 ```{r line_terra}
 river <- vect(here("data", "BDCARTO-River_mpl50km.gpkg"))
 ```
 
 ## sf
 
-In `sf`, there are [two functions](https://search.r-project.org/CRAN/refmans/sf/html/st_read.html) to read all types of vector data `sf::st_read()` and `sf::read_sf()`. The main difference lies in the format of the attribute table: `data.frame` with `st_read`, and a `tibble` with `read_sf()`. 
+In `sf`, there are [two functions](https://search.r-project.org/CRAN/refmans/sf/html/st_read.html) to read vector data `sf::st_read()` and `sf::read_sf()`. The main difference lies in the format of the attribute table: it will be stored as `data.frame` with `st_read`, and as a `tibble` with `read_sf()`. 
 
 ```{r line_sf}
 river_sf <- st_read(here("data", "BDCARTO-River_mpl50km.gpkg"))
@@ -101,13 +103,13 @@ river <- vect(
 
 ## Calculate length of lines
 
-When calculating distances and length, **be careful with projection systems**. Some are not suited to calculate distance. Prefer equidistance projections or use local projection system (less distorsion if your study area is small). 
+When calculating distances and length, **be careful with projection systems**. Some are not suited to calculate distance, prefer equidistance projections or use local projection system (less distorsion when your study area is small). Recent implementation of `terra` and `sf` calculates [spherical distances](https://en.wikipedia.org/wiki/Great-circle_distance) when using geographic coordinates (in longitude and latitude) which is recommended to account for Earth's curvature.
 
 ::: {.panel-tabset}
 
 ## terra
 
-The function [`terra::perim()`](https://search.r-project.org/CRAN/refmans/terra/html/perim.html) The package `terra` recommends the calculation of distances in lat/long to get more accurate results (considering the geodesic distance, so accounting for Earth's curvature).
+The function [`terra::perim()`](https://search.r-project.org/CRAN/refmans/terra/html/perim.html) returns the length of lines in meters.  
 
 ```{r line_length}
 # calculate the length of rivers (in km)
@@ -116,7 +118,7 @@ river$length_km <- perim(river) / 1000
 
 ## sf
 
-The function [`sf::st_length()`](https://search.r-project.org/CRAN/refmans/sf/html/geos_measures.html) calculate the length of lines. While calculating distance and length, **be careful with projection systems**. Some are not suited to calculate distance.It is recommended to use equidistant projections or use local projection system  (if your study area is small).   
+The function [`sf::st_length()`](https://search.r-project.org/CRAN/refmans/sf/html/geos_measures.html) calculate the length of lines.
 
 ```{r line_length_sf}
 # calculate the length of rivers (in km)
@@ -243,7 +245,7 @@ boxplot(nearest_distance, ylab = "distance to river (m)")
 ```
 
 :::{.callout-note title="Your turn"}
-1. Which are the rivers with most sights of otter? **answer doesn't work anymore**
+1. Which are the rivers with most sights of otter?  
 2. Make a map with the distance to river and visually check the coherence of the calculation.
 3. (Reflexion) What can be the factors explaining the few outliers with large distances (>1km)?
 :::
@@ -268,13 +270,9 @@ table(river$toponyme[nearest_river]) |>
 # add the distance to river to the spatial object
 pt_otter$dist_river <- nearest_distance
 
-# make an interactive map
+# make an interactive map which is best to check the calculation
 mapview(river) +
   mapview(pt_otter, z = "dist_river")
-
-# or static map
-plot(st_geometry(river))
-plot(pt_otter[, "dist_river"], add = TRUE, pch = 16)
 ```
 
 </details>

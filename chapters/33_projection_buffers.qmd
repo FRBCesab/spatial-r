@@ -1,0 +1,219 @@
+# Area and projections {.unnumbered}
+
+:::{.callout-important title="Summary"}
+This is a visual exploration on the effect of projections on the calculation of distances and areas with `sf` and `terra` packages.
+:::
+
+```{r setting}
+#| echo: false
+suppressPackageStartupMessages({
+  library(terra)
+  library(mapview)
+  library(here)
+  library(sf)
+  library(leaflet)
+})
+```
+
+## Define points and projection systems
+
+We will use the four points along a strong latitudinal gradient.
+
+```{r}
+# in latitude longitude
+pt_4326 <- cbind(
+  "x" = 3,
+  "y" = seq(15, 60, length.out = 4)
+) |>
+  vect(crs = "EPSG:4326")
+
+mapview(pt_4326)@map %>% setView(3, 40, zoom = 3)
+```
+
+We project the points in three commun projection systems:
+
+```{r}
+# in Lambert-93 Conformal (FR) EPSG:2154
+pt_2154 <- project(pt_4326, "EPSG:2154")
+# in Lambert Azimuthal equal-area (EU) EPSG:32632
+pt_3035 <- project(pt_4326, "EPSG:3035")
+# in UTM 32N for Europe EPSG:25832
+pt_utm <- project(pt_4326, "EPSG:25832")
+```
+
+*Note that some points lay outside the recommended bounds for the EPSG:2154*.
+
+## Buffer and areas
+
+```{r}
+# one kilometer buffer
+# in terra
+terra_buffer_4326 <- buffer(pt_4326, 1000)
+terra_buffer_2154 <- buffer(pt_2154, 1000)
+terra_buffer_3035 <- buffer(pt_3035, 1000)
+terra_buffer_utm <- buffer(pt_utm, 1000)
+
+# in sf
+sf_buffer_4326 <- st_as_sf(pt_4326) |> st_buffer(1000)
+sf_buffer_2154 <- st_as_sf(pt_2154) |> st_buffer(1000)
+sf_buffer_3035 <- st_as_sf(pt_3035) |> st_buffer(1000)
+sf_buffer_utm <- st_as_sf(pt_utm) |> st_buffer(1000)
+
+```
+
+Ideally, the area
+```{r}
+#fmt: skip
+buffer_area <- data.frame(
+  "terra_4326" = expanse(terra_buffer_4326),
+  "terra_laea_4326" = expanse(project(terra_buffer_4326, "EPSG:3035"), transform = FALSE),
+  "sf_4326" = as.numeric(st_area(sf_buffer_4326)),
+  "sf_laea_4326" = as.numeric(st_area(st_transform(sf_buffer_4326, "EPSG:3035"))),
+
+  "terra_2154" = expanse(terra_buffer_2154),
+  "terra_laea_2154" = expanse(project(terra_buffer_2154, "EPSG:3035"), transform = FALSE),
+  "sf_2154" = as.numeric(st_area(sf_buffer_2154)),
+  "sf_laea_2154" = as.numeric(st_area(st_transform(sf_buffer_2154, "EPSG:3035"))),
+
+  "terra_3035" = expanse(terra_buffer_3035),
+  "sf_3035" = as.numeric(st_area(sf_buffer_3035)),
+
+  "terra_utm" = expanse(terra_buffer_utm),
+  "terra_laea_utm" = expanse(project(terra_buffer_utm, "EPSG:3035"), transform = FALSE),
+  "sf_utm" = as.numeric(st_area(sf_buffer_utm)),
+  "sf_laea_utm" = as.numeric(st_area(st_transform(sf_buffer_utm, "EPSG:3035")))
+)
+row.names(buffer_area) <- paste0("N", crds(pt_4326)[, 2])
+round(buffer_area / 1000000, 3) |> knitr::kable()
+```
+
+
+
+#### illustration
+
+```{r}
+par(mfrow = c(2, 2))
+plot(
+  terra_buffer_4326[1],
+  main = "terra 15N",
+  lwd = 2,
+  ylim = ext(project(terra_buffer_3035[1], "EPSG:4326"))[3:4]
+)
+project(terra_buffer_2154[1], "EPSG:4326") |> plot(add = TRUE, border = "red")
+project(terra_buffer_3035[1], "EPSG:4326") |> plot(add = TRUE, border = "blue")
+project(terra_buffer_utm[1], "EPSG:4326") |> plot(add = TRUE, border = "green")
+legend(
+  "center",
+  legend = c("latlong", "2154", "3035", "UTM"),
+  lwd = c(2, 1, 1, 1),
+  col = c("black", "red", "blue", "green")
+)
+
+plot(terra_buffer_4326[4], main = "terra 60N", lwd = 2)
+project(terra_buffer_2154[4], "EPSG:4326") |> plot(add = TRUE, border = "red")
+project(terra_buffer_3035[4], "EPSG:4326") |> plot(add = TRUE, border = "blue")
+project(terra_buffer_utm[4], "EPSG:4326") |> plot(add = TRUE, border = "green")
+
+plot(
+  vect(sf_buffer_4326)[1],
+  main = "sf 15N",
+  lwd = 2,
+  ylim = ext(project(vect(sf_buffer_3035)[1], "EPSG:4326"))[3:4]
+)
+project(vect(sf_buffer_2154)[1], "EPSG:4326") |>
+  plot(add = TRUE, border = "red")
+project(vect(sf_buffer_3035)[1], "EPSG:4326") |>
+  plot(add = TRUE, border = "blue")
+project(vect(sf_buffer_utm)[1], "EPSG:4326") |>
+  plot(add = TRUE, border = "green")
+
+plot(vect(sf_buffer_4326)[4], main = "sf 60N")
+project(vect(sf_buffer_2154)[4], "EPSG:4326") |>
+  plot(add = TRUE, border = "red")
+project(vect(sf_buffer_3035)[4], "EPSG:4326") |>
+  plot(add = TRUE, border = "blue")
+project(vect(sf_buffer_utm)[4], "EPSG:4326") |>
+  plot(add = TRUE, border = "green")
+
+```
+
+Areas estimated in `terra` are geodesic areas by default (`transform = TRUE`), so not influenced on projection (the area calculated in the original projection are the same as in the lambert azimutal equal area `laea`). 
+This is not the case for `sf` where area estimates are very different. So **in `sf`, it is very important to chose a correct CRS for estimating the area**. 
+
+To make buffer of similar size (columns with `laea`), the best is EPSG 3035 or EPSG 4326 in terra or utm is not a bad choice.
+
+EPSG 3035 makes buffer that are not rounded, so best choice is 
+
+#### Conclusion
+
+1. `sf` doesn't know how to calculate buffers and areas in `EPSG:4326` (`s2` is not reliable)
+3. in `terra`, the calculation of area is indepedant of the CRS and always calculate geodesic areas
+3. making buffer in projected coordinate system is very sensitive to the projection, e.g. UTM much better than Lambert 93. While it can be spotted easily with `terra` (buffers of different sizes), it is invisible in `sf` because areas are calculated in the projected system.
+4. `sf` and `terra` makes similar buffers with good rounded geometry in projected coordinate system. For the anecdote, `sf` uses 120 coordinates to define a circle, while `terra` buffers have only 40 coordinates. 
+5. but there is a strong difference when sf use s2 with geographic coordinates (lat/long), the shape of the buffer has very rough edges (even if made by many points). 
+
+In summary, to avoid issues **use `terra` and lat/long**. 
+
+
+
+## Distances
+
+
+```{r}
+#| eval: false
+
+min01 <- function(x) {
+  x <- x[x != 0]
+  return(min(x))
+}
+
+distance(pt_4326)[c(1, 4, 6)]
+st_distance(st_as_sf(pt_4326))[cbind(1:3, 2:4)]
+apply(distance(pt_4326), 1, min01)
+apply(st_distance(st_as_sf(pt_4326)), 1, min01)
+
+apply(distance(pt_2154), 1, min01)
+apply(st_distance(st_as_sf(pt_2154)), 1, min01)
+
+apply(distance(pt_3035), 1, min01)
+apply(st_distance(st_as_sf(pt_3035)), 1, min01)
+
+apply(distance(pt_utm), 1, min01)
+apply(st_distance(st_as_sf(pt_utm)), 1, min01)
+
+short_distance <- data.frame(
+  "terra_4326" = expanse(terra_buffer_4326),
+  "terra_laea_4326" = expanse(
+    project(terra_buffer_4326, "EPSG:3035"),
+    transform = FALSE
+  ),
+  "sf_4326" = as.numeric(st_area(sf_buffer_4326)),
+  "sf_laea_4326" = as.numeric(st_area(st_transform(
+    sf_buffer_4326,
+    "EPSG:3035"
+  ))),
+
+  "terra_2154" = expanse(terra_buffer_2154),
+  "terra_laea_2154" = expanse(
+    project(terra_buffer_2154, "EPSG:3035"),
+    transform = FALSE
+  ),
+  "sf_2154" = as.numeric(st_area(sf_buffer_2154)),
+  "sf_laea_2154" = as.numeric(st_area(st_transform(
+    sf_buffer_2154,
+    "EPSG:3035"
+  ))),
+
+  "terra_3035" = expanse(terra_buffer_3035),
+  "sf_3035" = as.numeric(st_area(sf_buffer_3035)),
+
+  "terra_utm" = expanse(terra_buffer_utm),
+  "terra_laea_utm" = expanse(
+    project(terra_buffer_utm, "EPSG:3035"),
+    transform = FALSE
+  ),
+  "sf_utm" = as.numeric(st_area(sf_buffer_utm)),
+  "sf_laea_utm" = as.numeric(st_area(st_transform(sf_buffer_utm, "EPSG:3035")))
+)
+```
+

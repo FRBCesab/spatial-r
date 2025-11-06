@@ -3,9 +3,12 @@
 :::{.callout-important title="Summary"}
 This tutorial explore how to handle **spatial polygons** in R with `terra` package:
 
-- read a spatial object with (`terra::vect()`)  
-- calculate length of lines with (`terra::perim()`)
-- calculate distances between points and lines with (`terra::distance()`)
+- read a spatial object with [`terra::vect()`](https://search.r-project.org/CRAN/refmans/terra/html/vect.html)    
+- calculate the area of polygons with [`terra::expanse()`](https://search.r-project.org/CRAN/refmans/terra/html/expanse.html)    
+- extract values of polygons to points with [`terra::extract()`](https://search.r-project.org/CRAN/refmans/terra/html/extract.html)    
+- create buffers around points with [`terra::buffer()`](https://search.r-project.org/CRAN/refmans/terra/html/buffer.html)   
+- find intersection among two polygon layers with  [`terra::intersect()`](https://search.r-project.org/CRAN/refmans/terra/html/intersect.html)   
+
 :::
 
 :::{.callout-tip title="The ecologist mind"}
@@ -54,11 +57,14 @@ In this example, we will load land cover information for the area of interest fr
 
 *Note that this dataset has rough resolution (OSO or Corine land cover would be more suited for real analysis), but it's perfect for our illustration and learning purposes.* 
 
-You can load all vector dataset in R with the function [`terra::vect()`](https://search.r-project.org/CRAN/refmans/terra/html/vect.html). 
 
 ::: {.panel-tabset}
 
 ## terra
+
+You can load vector data with the function [`terra::vect()`](https://search.r-project.org/CRAN/refmans/terra/html/vect.html). 
+
+
 ```{r poly_local}
 landuse <- vect(here("data", "BDCARTO-LULC_mpl50km.shp"))
 ```
@@ -122,19 +128,20 @@ plot(pt_otter, add = TRUE, pch = 16)
 ```
 
 :::{.callout-warning}
-If you want to overlay multiple spatial object with base plot from `sf`, don't forget to use the argument `reset=FALSE`.
+When you want to overlay multiple spatial object with base plot from `sf`, don't forget to use the argument `reset=FALSE`.
 :::
 
 :::
 
 ## Calculate the area
 
-The function `expanse` calculate the area in $m^2$. When calculating areas, **be careful with projection systems**. Some are not suited to calculate areas. Prefer equalarea projections or use local projection system (if your study area is small). 
+:::{.callout-tip title="The ecologist mind"}
+What is the dominant land cover in our study area?
+:::
 
-The package `terra` recommends the calculation of areas in lat/long to get more accurate results (accounting for Earth's curvature). 
-The package `sf` handle lat/long with `s2` which is not very accurate or prone to errors. 
+The function [`terra::expanse()`](https://search.r-project.org/CRAN/refmans/terra/html/expanse.html) calculates the area in $m^2$. When calculating areas, **be careful with projection systems**. Some are not suited to calculate areas. Prefer equal-area projections or use local projection system (if your study area is small). 
 
-So it is recommended to use `terra` when dealing with geographic coordinates, or projecting the coordinates in an appropriate projection system.
+The package `terra` calculates by default the geodesic area (based on lat/long coordinates and considering Earth's curvature) which is the best estimate and avoid errors due to wrongly used projection system.  
 
 
 ::: {.panel-tabset}
@@ -150,24 +157,22 @@ landuse$area_ha <- as.numeric(area_polygons)
 
 ## sf
 
-For `sf`, it is recommended to project the dataset to a local projection, such as the Universal Transverse Mercator defined for Europe ([EPSG:25832](https://epsg.io/25832)).
+For `sf`, it is recommended to project the dataset to a equal area projection, such as the Lambert azimuthal equal-area for Europe [EPSG:3035](https://epsg.io/3035).
 
 ```{r lulc_area_sf}
-# 25832 is a commun projection for France
-landuse_25832 <- st_transform(landuse_sf, crs = 25832)
+# 3035 is a equal-area projection for Europe
+landuse_3035 <- st_transform(landuse_sf, crs = 3035)
 # calculate area of polygons
-area_polygons <- st_area(landuse_25832) * 0.0001
+area_polygons <- st_area(landuse_3035) * 0.0001
 # store as attribute in landuse
-landuse_25832$area_ha <- as.numeric(area_polygons)
+landuse_3035$area_ha <- as.numeric(area_polygons)
 ```
 
 :::
 
 
 :::{.callout-note title="Your turn"}
-1. Which is the largest land cover class in our study area? Why?
-2. Remove the Mediterranean from the land cover dataset (hint: it is the largest polygon).
-3. Calculate the percentage of terrestrial land cover in the study area.
+-. Which is the largest land cover class in our study area? Why?
 :::
 
 <details>
@@ -180,24 +185,30 @@ tapply(landuse$area_ha, landuse$nature, sum)
 
 </details>
 
-<details>
-<summary>Click to see the answer 2</summary>
+
+## Mask the sea
+
+:::{.callout-tip title="The ecologist mind"}
+Our study area is defined as the rectangular area in land. Then we have to mask the sea to consider only areas where otter can potentially inhabit.
+:::
+
+
+There can be two approaches: either (1) identify from the data itself which area to remove, or (2) use a mask from another data source (this approach will be [shown when dealing with rasters](https://frbcesab.github.io/spatial-r/chapters/21_rasters.html#mask-the-sea)). 
+
+In this case, it is easier and more trustworthy to detect directly from the data which polygons to remove. The largest polygon correspond to the Mediterranean Sea. So we just need to remove it.
 
 ```{r ex2}
 # the largest polygon correspond to the mediterranean
 landuse$nature[which.max(landuse$area_ha)]
 # remove the largest polygon
 landuse_nomed <- landuse[-which.max(landuse$area_ha), ]
-# verify the operation
+# visually verify the result
 plot(landuse_nomed, y = "nature", border = NA)
 ```
 
-</details>
+Then we can recalculate the percentage of land cover per class.
 
-<details>
-<summary>Click to see the answer 3</summary>
-
-```{r ex3}
+```{r}
 cover_ha <- tapply(landuse_nomed$area_ha, landuse_nomed$nature, sum)
 # percentage of land cover classes in the terrestrial study area
 cover_perc <- cover_ha / sum(cover_ha) * 100
@@ -205,12 +216,10 @@ cover_perc <- cover_ha / sum(cover_ha) * 100
 round(cover_perc, 2)
 ```
 
-</details>
 
+## Polygons to points
 
-## Points to polygons
-
-Before making extraction, it is recommended to plot the data (if not too big), to make sure the projection systems are the same and the extents match. Do not use `mapview` (interactive map) because it will automatically project the data.
+Before making extraction, it is recommended to plot the data (if not too big). Hence, you can verify that the projection systems and the extents match. Do not use `mapview` (interactive map) because it will automatically project the data.
 
 
 ::: {.panel-tabset}
@@ -235,7 +244,7 @@ table(pt_landcover$nature)
 ```
 
 :::{.callout-note title="Your turn"}
-- [stat] Which classes are over or under represented compare to expected? (to complex?)
+- [stat] Which classes are over or under represented compare to expected?
 :::
 
 <details>
@@ -282,8 +291,8 @@ So it is recommended to use projected coordinates with [`sf::st_buffer()`](https
 ```{r buffer_sf}
 dist_buffer <- 1000 # buffer of 1000 m
 # transform as UTM : better for area
-pt_otter_25832 <- st_as_sf(pt_otter) |> st_transform(25832)
-poly_otter_25832 <- st_buffer(pt_otter_25832, dist_buffer)
+pt_otter_3035 <- st_as_sf(pt_otter) |> st_transform(3035)
+poly_otter_3035 <- st_buffer(pt_otter_3035, dist_buffer)
 ```
 
 :::
@@ -302,11 +311,9 @@ plot(pt_otter[1], add = TRUE)
 ## sf
 
 ```{r map_buffer_sf}
-plot(st_geometry(poly_otter_25832)[1], reset = FALSE, axes = TRUE)
-plot(st_geometry(pt_otter_25832)[1], add = TRUE)
+plot(st_geometry(poly_otter_3035)[1], reset = FALSE, axes = TRUE)
+plot(st_geometry(pt_otter_3035)[1], add = TRUE)
 ```
-
-
 
 :::
 
@@ -322,10 +329,10 @@ plot(st_geometry(pt_otter_25832)[1], add = TRUE)
 # see area per land use classes of the observations
 summary(expanse(poly_otter))
 # for sf
-summary(st_area(poly_otter_25832))
+summary(st_area(poly_otter_3035))
 ```
 
-The difference with ```r pi*1000000``` is due to the way the circle is defined (in only 40 points in `terra` and 120 points in `sf`). But what is more important is that all buffers have the same area. 
+The difference with expected value (```r pi*1000000```) is due to the way the circle is defined (in only 40 points in `terra` and 120 points in `sf`). 
 </details>
 
 
@@ -351,7 +358,7 @@ plot(
 
 ## sf
 ```{r buffer_lulc_sf}
-buffer_landcover_sf <- st_intersection(poly_otter_25832, landuse_25832)
+buffer_landcover_sf <- st_intersection(poly_otter_3035, landuse_3035)
 
 # visualize the intersection (not plotted to lighten the webpage)
 # mapview(buffer_landcover, z = "nature")

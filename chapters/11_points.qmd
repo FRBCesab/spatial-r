@@ -1,15 +1,15 @@
 # Points {.unnumbered}
 
 :::{.callout-important title="Summary"}
-This tutorial explore how to handle **spatial points** in R with `terra` package:
+This tutorial explore how to handle **spatial points** in {{< fa brands r-project >}} with `terra` package:
 
-- create a spatial object from a data.frame (`terra::vect()`) and export it (`terra::writeVector()`)  
-- make interactive maps with `mapview()`
+- create a spatial object from a data.frame with [`terra::vect()`](https://search.r-project.org/CRAN/refmans/terra/html/vect.html) and export it with [`terra::writeVector()`](https://search.r-project.org/CRAN/refmans/terra/html/writeVector.html)  
+- make interactive maps with [`mapview::mapview()`](https://search.r-project.org/CRAN/refmans/mapview/html/mapView.html)
 :::
 
 
 :::{.callout-tip title="The ecologist mind"}
-From GBIF observation data, we will create a proper spatial object in R. Then we will map the observations.
+From GBIF observation data, we will create a proper spatial object in {{< fa brands r-project >}}. Then we will map the observations.
 :::
 
 ## Setup
@@ -28,7 +28,7 @@ suppressPackageStartupMessages({
 
 ## Creating spatial points from data.frame
 
-This is the most common case: you have coordinates from a file (csv or excel) and you want to get spatial information about these locations. The first step is to transform the coordinates as proper spatial object in R.
+This is the most common case: you have coordinates from a file (csv or excel) and you want to get spatial information about these locations. The first step is to transform the coordinates as proper spatial object in {{< fa brands r-project >}}.
 
 We will use a dataset from [GBIF](https://www.gbif.org/) with all occurrences of otter recorded in 2021 within a 50km buffer from Montpellier, France. This data was prepared from the [tutorial about creating a toy dataset](https://frbcesab.github.io/spatial-r/chapters/31_toydata_mpl.html) and is stored on Github.  
 
@@ -42,7 +42,6 @@ otter <- read.csv(here("data", "gbif_otter_2021_mpl50km.csv"))
 ## online
 ```{r otter}
 #| eval: false
-
 url_github <- "https://github.com/FRBCesab/spatial-r/raw/main/data/"
 pt_otter <- vect(paste0(url_github, "gbif_otter_2021_mpl50km.csv"))
 ```
@@ -55,14 +54,15 @@ dim(otter)
 names(otter)
 ```
 
-The dataset contains ```r nrow(otter)``` observations of otter (in rows), and ```r ncol(otter)``` variables (in column) such as date, coordinates, and data provider. The geographic coordinates are stored in the columns `decimalLongitude`, and `decimalLatitude`. They are expressed in decimal degrees, following the standard WGS84 datum ([EPSG:4326](https://epsg.io/4326)).  
+The dataset contains ```r nrow(otter)``` observations of otter (in rows), and ```r ncol(otter)``` variables (in column) such as date, coordinates, and data provider. The geographic coordinates are stored in the columns `decimalLongitude`, and `decimalLatitude`. They are expressed in decimal degrees, following the WGS84 coordinate reference system ([EPSG:4326](https://epsg.io/4326)).  
+
 
 :::{.callout-important}
-It is really important to **keep track of the projection system of your data**. When it is expressed in latitude-longitude and was derived from modern GPS, it is often in WGS84 ([EPSG:4326](https://epsg.io/4326)). Problems arise when coordinates are expressed in meters, then it is complicated to retrieve the projection system if not stored with the data.   
+It is really important to **keep track of the projection system of your data**. When it is expressed in latitude-longitude and was derived from modern GPS, it is often in WGS84 ([EPSG:4326](https://epsg.io/4326)). Problems arise when coordinates are expressed in meters. It can be very complicated to retrieve the projection system if not stored properly with the data.   
 :::
 
 
-We have just loaded in R the observations from GBIF, but it is stored in a simple `data.frame` object, R doesn't know that it contains spatial information yet. Let's **create a spatial object from the coordinates** so that we can easily make a map and see where these observation were made.
+We have just loaded in R the observations from GBIF, but it is stored in a simple `data.frame` object, {{< fa brands r-project >}} doesn't know that it contains spatial information yet. Let's **create a spatial object from the coordinates** so that we can easily make a map and see where these observation were made.
 
 
 ::: {.panel-tabset}
@@ -76,7 +76,7 @@ pt_terra <- vect(
   geom = c("decimalLongitude", "decimalLatitude"),
   crs = "EPSG:4326"
 )
-# summary
+# summary of the spatial object
 pt_terra
 ```
 
@@ -98,8 +98,6 @@ pt_sf
 
 All the information about the `sf` object can be retrieve individually with the functions [`sf::st_bbox()`](https://search.r-project.org/CRAN/refmans/sf/html/st_bbox.html) for the geographical extent, [`sf::st_crs()`](https://search.r-project.org/CRAN/refmans/sf/html/st_crs.html) for the projection system, and `dim()` for the dimensions (number of objects, and number of variables in the attribute table). 
 
-
-
 :::
 
 ## Map the observations
@@ -109,14 +107,15 @@ Once the data is formatted as spatial vector, it can be visualized as static map
 ::: {.panel-tabset}
 
 ## mapview
-The function [`mapview::mapview()`](https://search.r-project.org/CRAN/refmans/mapview/html/mapView.html) creates easily interactive map.
+The function [`mapview::mapview()`](https://search.r-project.org/CRAN/refmans/mapview/html/mapView.html) creates easily interactive map. If you want to fine tune your map, have a look at this [tutorial](https://r-spatial.github.io/mapview/articles/mapview_01-basics.html)
 
 ```{r mapview_0}
 mapview(pt_terra)
 ```
 
 ## terra
-
+The function [`plot()`](https://search.r-project.org/CRAN/refmans/terra/html/plot.html)
+. 
 ```{r terra_map0}
 plot(pt_terra)
 ```
@@ -140,27 +139,27 @@ Can we see a temporal pattern in the locations of the otter observations?
 
 Let's transform the date of the observation and get the Julian date of the observation. Then we can attach this new variable to the attribute table of our spatial object in order to map it.
 
-The date formatting in R is powerful but hard to grasp at start. Make sure to have a look at the documentations of [`as.Date()`](https://search.r-project.org/R/refmans/base/html/as.Date.html) and [`strptime()`](https://search.r-project.org/R/refmans/base/html/strptime.html) if you want more details.  
+The date formatting in R is powerful but hard to grasp. Make sure to have a look at the documentations of [`as.Date()`](https://search.r-project.org/R/refmans/base/html/as.Date.html) and [`strptime()`](https://search.r-project.org/R/refmans/base/html/strptime.html) if you want more details.  
 
 
 ```{r julian}
 # transform the date as Julian day
-julian <- as.Date(pt_terra$eventDate) |> format("%j")
+julian <- as.Date(pt_terra$eventDate) |> format("%j") |> as.numeric()
 ```
 
-Now we can attach the Julian day as a number in the spatial object. The attribute table can be accessed as a normal `data.frame`, and we can create a new column with `$`.
+Now we can attach the Julian day in the spatial object. The attribute table can be accessed as a normal `data.frame`, and we can create a new column with `$`.
 
 ::: {.panel-tabset}
 ## terra
 
 ```{r terra_julian}
-pt_terra$julian <- as.numeric(julian)
+pt_terra$julian <- julian
 ```
 
 ## sf
 
 ```{r sf_julian}
-pt_sf$julian <- as.numeric(julian)
+pt_sf$julian <- julian
 ```
 
 ::: 
@@ -171,13 +170,13 @@ pt_sf$julian <- as.numeric(julian)
 To map an attribute in [`mapview::mapview()`](https://search.r-project.org/CRAN/refmans/mapview/html/mapView.html), add the parameter `zcol` with the variable of interest.
 
 ```{r mapview_julian}
-mapview(pt_terra, zcol = "julian")
+mapview(pt_terra, zcol = "julian", layer.name = "Julian date")
 ```
 
 ## terra
 
 ```{r terra_map_julian}
-plot(pt_terra, "julian")
+plot(pt_terra, "julian", type = "continuous", main = "Julian date")
 ```
 
 ## sf
@@ -198,10 +197,11 @@ Visually check if there is a spatial bias in observations due to data provider (
 
 ```{r map_institution}
 #| eval: false
+# with mapview
 mapview(pt_sf, zcol = "institutionCode")
-# or
+# or in terra
 plot(pt_terra, "institutionCode")
-# or
+# or in sf
 plot(pt_sf["institutionCode"], axes = TRUE)
 ```
 
@@ -211,7 +211,7 @@ plot(pt_sf["institutionCode"], axes = TRUE)
 
 ## Export the data
 
-For vectors, it is recommended to export them as **geopackage file** (extension `.gpkg`). [Compare to traditional ESRI shapefile](https://frbcesab.github.io/spatial-slides/intro-GIS#/data-format), the geopackage format store the data in a single file and the column names are preserved. 
+For vectors, it is [recommended](https://frbcesab.github.io/spatial-slides/intro-GIS#/vector-vs-raster-file-format) to export them as **geopackage file** (extension `.gpkg`). Compare to traditional ESRI shapefile, the geopackage format stores the data in a single file and the column names are preserved. 
 
 
 ::: {.panel-tabset}
@@ -225,7 +225,7 @@ writeVector(pt_terra, here("data", "gbif_otter_2021_mpl50km.gpkg"))
 ```
 
 ## sf
-In `sf`, the function is [`sf::st_write()`](https://search.r-project.org/CRAN/refmans/sf/html/st_write.html). or write_sf().
+In `sf`, the function is [`sf::st_write()`](https://search.r-project.org/CRAN/refmans/sf/html/st_write.html).
 
 ```{r sf_export}
 #| eval: false
@@ -238,12 +238,12 @@ st_write(pt_sf, here("data", "gbif_otter_2021_mpl50km.gpkg"))
 
 ## Conversion between sf and terra 
 
-I agree that it is confusing to have two dominant packages `terra` and `sf` with similar functionalities. Luckily, the conversion between these two formats is easy.
+It is confusing to have two dominant packages `terra` and `sf` with similar functionalities. Luckily, the conversion between the two data formats is easy.
 
 ::: {.panel-tabset}
 
 ## from terra to sp
-To convert a `terra` vector into `sf`, the function is [`sf::st_as_sf()`](https://search.r-project.org/CRAN/refmans/sf/html/st_as_sf.html).
+To convert a `terra SpatVector` vector into a `sf simple feature`, the function is [`sf::st_as_sf()`](https://search.r-project.org/CRAN/refmans/sf/html/st_as_sf.html).
 
 ```{r terra_to_sf}
 #| eval: false
@@ -251,7 +251,7 @@ pt_sf <- st_as_sf(pt_terra)
 ```
 
 ## from sf to terra
-To convert a `sf` feature into `terra`, the function is [`terra::vect()`](https://search.r-project.org/CRAN/refmans/terra/html/vect.html).
+To convert a `sf simple feature` into `terra SpatVector`, the function is [`terra::vect()`](https://search.r-project.org/CRAN/refmans/terra/html/vect.html).
 
 
 ```{r sf_to_terra}
@@ -261,10 +261,9 @@ pt_terra <- vect(pt_sf)
 
 :::{.callout-warning}
 
-Non-homogeneous features (GEOMETRYCOLLECTION) can't be converted as terra `SpatVector` object. In this case, you must homogenize the type of features, and transform them into an accepted format for terra (points, lines or polygons). Check out the functions [`sf::st_cast()`](https://search.r-project.org/CRAN/refmans/sf/html/st_cast.html) and [`sf::st_collection_extract()`](https://search.r-project.org/CRAN/refmans/sf/html/st_collection_extract.html) that can help with this transformation.
+Non-homogeneous features (GEOMETRYCOLLECTION) can't be converted in `terra` as a `SpatVector` object. In this case, you must homogenize the type of features, and transform them into an accepted format (points, lines or polygons). Check out the functions [`sf::st_cast()`](https://search.r-project.org/CRAN/refmans/sf/html/st_cast.html) and [`sf::st_collection_extract()`](https://search.r-project.org/CRAN/refmans/sf/html/st_collection_extract.html) that can help with the transformation.
 
 :::
-
 
 :::
 

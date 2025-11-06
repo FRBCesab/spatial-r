@@ -1,15 +1,16 @@
 # Grid {.unnumbered}
 
 :::{.callout-important title="Summary"}
-This tutorial explore how to make a grid and transform observations into a grid with `terra` package:
+This tutorial explore how to make a create a regular grid and transform spatial informations into a grid with `terra` package:
 
-- import a multi-layer rasters with [`terra::rast()`](https://search.r-project.org/CRAN/refmans/terra/html/rast.html)   
-- extract information from rasters on points or polygons with [`terra::extract()`](https://search.r-project.org/CRAN/refmans/terra/html/extract.html)
-
+- project spatial data to a commun CRS with [`terra::project()`](https://search.r-project.org/CRAN/refmans/terra/html/project.html)   
+- transform vectors to raster with [`terra::rasterize()`](https://search.r-project.org/CRAN/refmans/terra/html/rasterize.html)
+- match different raster grids with [`terra::resample()`](https://search.r-project.org/CRAN/refmans/terra/html/resample.html)
 :::
 
+
 :::{.callout-tip title="The ecologist mind"}
-If we want to make some modeling, it can be needed to regroup observations into a grid.
+For modeling, it is often needed to get all spatial data into a commun grid. For instance, among the spatial informations that we have seen in the previous chapter, which factors explain best the number of observations of otter?
 :::
 
 
@@ -27,8 +28,6 @@ suppressPackageStartupMessages({
   library(mapview)
   library(here)
   library(terra)
-  # library(sf)
-  # library(exactextractr)
 })
 ```
 
@@ -46,43 +45,44 @@ temperature <- rast(here("data", "CHELSA_monthly_tas_2015_2021.tif"))
 
 ## Create a grid
 
-Key issue : which resolution? which projection?
-resolution depends on your dataset, extent, and ecological question
-projection depends on the dataset
+One has to decide at which resolution should the grid be defined, and with which projection system. The decision depends on your dataset, its extent, and your modeling objectives.   
 
-Let's start from our observation.
+In our case, we will create a grid of 5km around the otter observations using the Lambert-93 projection ([EPSG:2154](https://epsg.io/2154)). 
+
+The function [`terra::rast()`](https://search.r-project.org/CRAN/refmans/terra/html/rast.html) can create empty grid from the extent of a given spatial object. Here we provide the otter observation (projected in EPSG 2154) as the extent of our grid.
+
 ```{r make_grid}
 pt_2154 <- project(pt_otter, "EPSG:2154")
-res <- 5000 # 1km grid
+res <- 5000 # 5km grid
 grid <- rast(pt_2154, res = res)
 grid
 ```
 
 ## Points to grid
 
-the argument `fun=count` set that it calculate the number of points
-the argument `background=0` set that f there is no point, the vale will be 0, instead of NA by default
+The function [`terra::rasterize()`](https://search.r-project.org/CRAN/refmans/terra/html/rasterize.html) transform vectors to raster. Its argument `fun=count` defines that the values in the cells are the number of points. The argument `background=0` set that the value of the cell with no observation will be 0, instead of NA by default.  
+
 ```{r grid_nobs}
 grid_nobs <- rasterize(pt_2154, grid, fun = "count", background = 0)
 
-plot(grid_nobs)
+plot(grid_nobs, main = "Number of otter observations")
 ```
 
 ## Lines to grid   
 
-length of rivers
+To calculate the length of rivers within a grid cell, we use the function [`terra::rasterizeGeom()`](https://search.r-project.org/CRAN/refmans/terra/html/rasterizeGeom.html). Its argument `fun=length` defines that the values in the cells are the length of the rivers.
 
 ```{r grid_river}
 river_2154 <- project(river, "EPSG:2154")
 
 grid_river <- rasterizeGeom(river_2154, grid, fun = "length")
-plot(grid_river)
+plot(grid_river, main = "Length of rivers", plg = list(title = "(m)"))
 ```
 
 
 ## Polygon to grid
 
-percentage of forest
+To calculate the percentage of forest into the grid cell, we need first to consider only forest polygons. Then the function [`terra::rasterize()`](https://search.r-project.org/CRAN/refmans/terra/html/rasterize.html) with the option `cover=TRUE` calculates the percentage of forest cover per grid cell.
 
 ```{r grid_forest}
 # select only the forest
@@ -92,44 +92,80 @@ forest_2154 <- project(forest, "EPSG:2154")
 # rasterize
 grid_forest <- rasterize(forest_2154, grid, cover = TRUE, background = 0)
 
-plot(grid_forest)
+plot(grid_forest, main = "Forest cover", plg = list(title = "(%)"))
 ```
 
 ## Resample raster
 
+For rasters, we need to transform the original grid to the desired resolution and extent. This operation is done with the function [`terra::resample()`](https://search.r-project.org/CRAN/refmans/terra/html/resample.html). Be careful, this operation degrades the quality of the original raster. Each cells get the weighted average of the neighbouring cells
+
+
 ### Elevation
 
 ```{r grid_alti}
-grid_alti <- resample(bdalti, grid, "bilinear")
-plot(grid_alti)
+grid_alti <- resample(bdalti, grid, method = "bilinear")
+plot(grid_alti, main = "Elevation", plg = list(title = "(m)"))
 ```
 
 ### Temperature
 
+For CHELSA temperature rasters, we want a summary of 2021, so we will use the average temperature over the 12 months of 2021. So we will (1) select only layers that correspond to 2021 (year of the observations) (2) calculate the average, (3) project the raster, and (4) resample to the desired grid.
+
+
 ```{r grid_temp}
-#calculate the average temperature in 2021
+#1 select the layers corresponding to 2021
 in_2021 <- grep("2021", names(temperature))
 monthly_temp <- subset(temperature, in_2021)
+#2. calculate the average temperature in 2021
 annual_temp <- mean(monthly_temp, na.rm = TRUE)
-# project (that's one of the only occasion when projection of raster)
+# 3. project to EPSG 2154
 temp_2154 <- project(annual_temp, "EPSG:2154")
+# 4. resample to grid
 grid_temp <- resample(temp_2154, grid, "bilinear")
-plot(grid_temp)
+
+plot(grid_temp, main = "Av. temperature", plg = list(title = "(K)"))
 ```
+
 
 ## Merge all together
 
-Ignoring all concept of spatial bias or anything else
+In `terra`, we can group `SpatRaster` objects into a single one if they all share the same grid. We will then get one grid and multiple layers (also called band) with the different informations.
+
 ```{r merge}
 out <- c(grid_nobs, grid_river, grid_forest, grid_alti, grid_temp)
-
+# we rename the layers to keep information of units
 names(out) <- c("nobs", "river_m", "forest", "elevation_m", "temperature_K")
+
+out
 
 plot(out)
 ```
 
-```{r mask}
+:::{.callout-note title="Your turn"}
+Otters only inhabits terrestrial areas, yet our grid includes the Mediterranean Sea. Mask the created raster with the land boundary of France (as in the [Chapter Rasters](https://frbcesab.github.io/spatial-r/chapters/21_rasters.html#mask-the-sea)). 
+:::
+
+<details>
+<summary>Click to see the answer</summary>
+
+::: {.panel-tabset}
+
+## local
+```{r local_mask}
+# get the border of the country (level = 0)
+france_border <- readRDS(here("data", "gadm41_FRA_0_pk.rds"))
+```
+
+## geodata
+```{r geodata_mask}
+#| eval: false
+# get the border of the country (level = 0)
 france_border <- geodata::gadm("FRA", level = 0, path = here("data"))
+```
+
+:::
+
+```{r mask}
 # project the coast in Lambert-93
 france_2154 <- project(france_border, crs(bdalti))
 # mask (=set to NA) the pixels that are not in the polygon
@@ -137,13 +173,43 @@ out_masked <- mask(out, france_2154)
 plot(out_masked)
 ```
 
+</details>
+
+## Simple model
+
+The dataset is made of observations gathered without proper sampling schemes, and with potentially many biases. For such data, it is recommended to use species occupancy model (e.g. [`spOccupancy`](https://doi.org/10.1111/2041-210X.13897)). 
+
+Yet for our little case study we will do the simplest linear model.
+
 ```{r anova}
 df <- data.frame(out_masked)
 
+# simplest linear model
 m1 <- lm(nobs ~ river_m + forest + elevation_m + temperature_K, data = df)
-anova(m1)
+summary(m1)
+# to see how wrong the linear model is, look at:
+# plot(m1)
 ```
 
-:::{.callout-note title="Your turn"}
-Does the spatial resolution has en effect on the results? Repeat the same process with a grid of 500m, 1km, or 10km resolution and compare the results. 
+The linear model is definitely not a good fit for our data (R2 is only 0.3). Moreover, there is strong collinearity between elevation and temperature, and the residuals are not normally distributed. In generalized mixed models, it is generally recommended to use `poisson` or `quasipoisson` distribution for count data. Our main issue is the high number of 'false' zeros. 
+
+Yet to evaluate a spatial model, it is always interesting to see the predictions and the spatial distribution of the residuals.
+
+```{r}
+# set new empty grids
+out_masked$predicted <- rast(grid)
+out_masked$residuals <- rast(grid)
+# add values of prediction and residuals where there is no NA
+out_masked$predicted[!is.na(out_masked$nobs)] <- predict(m1)
+out_masked$residuals[!is.na(out_masked$nobs)] <- residuals(m1)
+# show and compare the observation, prediction and residuals
+plot(out_masked, c("nobs", "predicted", "residuals"), nc = 3)
+```
+
+
+
+:::{.callout-note title="Your turn (non-corrected)"}
+Does the spatial resolution has en effect on the results? Repeat the same process with a grid of 500m, or 10km resolution and compare the results. 
 :::
+
+

@@ -1,8 +1,8 @@
 # Introduction {.unnumbered}
 
-This is a collection of tutorials on how to handle spatial data in R. The tutorials target students and scientists in ecology with previous knowledge of the [R software](https://cran.r-project.org/).
+This is a collection of tutorials on how to handle spatial data in {{< fa brands r-project >}}. The tutorials target students and scientists in ecology with previous knowledge of the [R software](https://cran.r-project.org/).
 
-The core tutorial was developed for a two half-day workshop, but you can follow the tutorials at your own pace.
+The core tutorials were developed for a two half-day workshop, but you can follow the tutorials at your own pace.
 
 
 :::{.callout-tip title="The ecologist mind"}
@@ -12,23 +12,25 @@ In these tutorials, we characterize the habitat of otter that were observed in 2
 
 ### Workshop program
 
-- [Introduction to GIS](https://frbcesab.github.io/spatial-r/chapters/02_presentation_gis.html): vectors vs rasters, coordinate reference system (CRS), R as a GIS tool
+[Introduction to GIS](https://frbcesab.github.io/spatial-r/chapters/02_presentation_gis.html): vectors vs rasters, coordinate reference system (CRS), and R as a GIS tool
 
-### Half day 1: Vectors  
+#### Practice 1 : Vectors (2h)  
 
 - [Points](https://frbcesab.github.io/spatial-r/chapters/11_points.html): Transform otter field observations as spatial points
 - [Lines](https://frbcesab.github.io/spatial-r/chapters/12_lines.html): Calculate distance from points to nearest lines (river networks)    
-- [Polygons](https://frbcesab.github.io/spatial-r/chapters/13_polygons.html): Characterize land cover using spatial polygons.  
+- [Polygons](https://frbcesab.github.io/spatial-r/chapters/13_polygons.html): Characterize land cover around sites using spatial polygons.  
 
-#### Half day 2: Rasters  
+#### Practice 2: Rasters (2h) 
 
-- [raster](https://frbcesab.github.io/spatial-r/chapters/13_polygons.html): Discover what is a raster and get the elevation profile from field observation  
-- [multi layer](https://frbcesab.github.io/spatial-r/chapters/22_multilayer.html): Track monthly climate information at the field sites. 
+- [raster](https://frbcesab.github.io/spatial-r/chapters/13_polygons.html): Discover what is a raster and get the elevation of field observations  
+- [multi layer](https://frbcesab.github.io/spatial-r/chapters/22_multilayer.html): Trace back past monthly climate at the field sites. 
+- [grid](https://frbcesab.github.io/spatial-r/chapters/23_grid.html): Transform observations and spatial data into a commun grid format
  
 #### Other tutorials
 
-- [Toydata](https://frbcesab.github.io/spatial-r/chapters/31_toydata_mpl.html): how to get data from GBIF, IGN and CHELSA to create the toy dataset for the workshop.
+- [Toydata](https://frbcesab.github.io/spatial-r/chapters/31_toydata_mpl.html): how to get data from GBIF, IGN and CHELSA and create the toy dataset used in this workshop.
 
+<!--
 **To be created**:  
 
 - mapview
@@ -40,16 +42,16 @@ In these tutorials, we characterize the habitat of otter that were observed in 2
 - tutoE4 : Krigging and interpolation  
 - tutoE5 : remote sensing, landsat and modis  
 - tutoE6 : GoogleEarthEngine, what it is and how to use it (mostly out of R)
-
+-->
 
 ### R packages
 
-The tutorials rely mostly on [`terra` R-package](https://rspatial.github.io/terra/index.html) as it was specifically developed to tackle challenges faced by ecologists, agronomists and biologists when using spatial data.  
-R has an exceptional diversity of users and packages, and this is especially true with the dynamic community in spatial analysis. Another popular package for handling spatial data is `sf` (and `stars`).   
+The tutorials rely mostly on the R-package [`terra`](https://rspatial.github.io/terra/index.html) as it was specifically developed to tackle challenges faced by ecologists or agronomists when using spatial data.  
+R has an exceptional diversity of users and packages, and this is especially true with the dynamic community of R-users doing spatial analysis. Another very popular package for handling spatial data is `sf`.    
 
 ### Other resources
 
-These tutorials were inspired by brilliant online ressources, thanks to all of them:     
+These tutorials were inspired by brilliant online ressources:     
 
 - Hijman R. et al. [Spatial Data Science with R and “terra”](https://rspatial.org/)   
 - Pebesma and Bivand [Spatial Data Science: With Applications in R](https://r-spatial.org/book/)

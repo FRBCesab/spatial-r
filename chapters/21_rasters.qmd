@@ -1,10 +1,11 @@
 # Rasters {.unnumbered}
 
 :::{.callout-important title="Summary"}
-This tutorial explore how to handle **rasters** in R with `terra` package:
+This tutorial explore how to handle **rasters** in {{< fa brands r-project >}} with `terra` package:
 
 - import a raster file with [`terra::rast()`](https://search.r-project.org/CRAN/refmans/terra/html/rast.html)   
 - mask non relevant areas with [`terra::mask()`](https://search.r-project.org/CRAN/refmans/terra/html/mask.html)  
+- create buffers around points with [`terra::buffer()`](https://search.r-project.org/CRAN/refmans/terra/html/buffer.html)  
 - extract information from rasters on points or polygons with [`terra::extract()`](https://search.r-project.org/CRAN/refmans/terra/html/extract.html)
 
 :::
@@ -102,7 +103,7 @@ summary(values(bdalti))
 
 ## Visualization
 
-Similar to vectors, rasters can be visualized as static map with the function `plot()` or interactively with the package `mapview`.
+Similar to vectors, rasters can be visualized as static map with the function [`plot()`](https://search.r-project.org/CRAN/refmans/terra/html/plot.html) or interactively with the package `mapview`.
 
 ::: {.panel-tabset}
 
@@ -122,37 +123,31 @@ mapview(bdalti)
 ## Mask the sea
 
 :::{.callout-tip title="The ecologist mind"}
-To avoid considering the sea, it is often recommended to remove it.
+To avoid considering regions outside the habitats, it is recommended to mask areas that are not part of the habitats (such as the sea for otter). 
 :::
 
-Here this is two approaches, not sure which is better.
+
+To mask all pixels that don't fit our study area (the terrestrial environment 50km around Montpellier), we need (1) to get the borders of France from [GADM](https://gadm.org/), (2) project the border to match the elevation raster, (3) mask the area that are not in the polygon.
 
 ::: {.panel-tabset}
 
-## clamp
-
-Let's imagine we want to remove the sea and all values below 0
-
-```{r rast_NA}
-# make sure values are between 0 and 2000 m
-alti <- clamp(bdalti, 0, 2000, values = TRUE)
-# set values with elevation 0 as NA (remove the sea)
-NAflag(alti) <- 0
-plot(alti)
-# mean elevation in our study area (excluding sea)
-mean(values(alti), na.rm = TRUE)
+## local
+```{r local_mask}
+# get the border of the country
+france_border <- readRDS(here("data", "gadm41_FRA_0_pk.rds"))
 ```
 
-## mask
-
-To mask all pixels that don't fit our study area (the terrestrial environment 50km around Montpellier), we need (1) to get the borders of France, (2) project the border to match the elevation raster, (3) mask the area that are not in the polygon.
-
-**add geodata in setup if kept**
-
-```{r mask_sea}
+## geodata
+```{r geodata_mask}
+#| eval: false
 # get the border of the country (level = 0)
 france_border <- geodata::gadm("FRA", level = 0, path = here("data"))
+```
 
+:::
+
+
+```{r mask_sea}
 # project the coast in Lambert-93
 france_2154 <- project(france_border, crs(bdalti))
 
@@ -165,10 +160,9 @@ plot(alti_masked)
 summary(values(alti_masked), na.rm = TRUE)
 ```
 
-:::
 
 
-## Points to raster
+## Raster to points
 
 :::{.callout-tip title="The ecologist mind"}
 Now that we have loaded the elevation data in R, let's get the elevation at the location of the otter observations. 
@@ -176,7 +170,7 @@ Now that we have loaded the elevation data in R, let's get the elevation at the 
 
 ### Checking projections and extent   
 
-Remember that before comparing two spatial objects, it is always a good idea to map them.
+Remember that before comparing two spatial objects, it is always a good idea to map them together.
 
 ```{r plot_check}
 plot(alti_masked)
@@ -259,13 +253,13 @@ boxplot(
 </details>
 
 
-## Polygons to raster
+## Raster to polygons
 
 ### Create buffer
 
 We can create buffer with [`terra::buffer()`](https://search.r-project.org/CRAN/refmans/terra/html/buffer.html).
 
-Be aware of the projection. It is recommended to work on lat/longitude, or in an equalarea projection (which is not the case of Lambert-93). So we will to create the buffer in lat/long and project them in Lambert-93 afterward.
+Be aware of the projection. It is recommended to work on lat/longitude, or in an equal-area projection (which is not the case of Lambert-93). So we will to create the buffer in lat/long and project them in Lambert-93 afterward.
 
 ```{r buffer_terra}
 dist_buffer <- 1000 # buffer of 1000 m

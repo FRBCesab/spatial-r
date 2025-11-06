@@ -1,10 +1,11 @@
 # Create a toy dataset from GBIF and IGN data {.unnumbered}
 
 This is a small practical example on how get data from GBIF and IGN based on a geographical area.
-For this tutorial, we will need `sf`, `mapview`, `happign`, and `rgbif` packages.
+For this tutorial, we will need `sf`, `mapview`, `happign`, `geodata`, `terra` and `rgbif` packages.
 
 ```{r setting}
 suppressPackageStartupMessages({
+  library(geodata)
   library(happign)
   library(here)
   library(mapview)
@@ -103,8 +104,8 @@ mapview(b_square, alpha.regions = 0, lwd = 3) +
 
 # 2. Get the occurrences from GBIF
 
-### Number of occurences
-A good way is to start with the function 'occ_count()' to know how many records fits our criteria.
+### Number of occurrences
+We will use the package `rgbif`[@R-rgbif] which provides a good interface to access directly [GBIF](https://www.gbif.org/) data. A good way is to start with the function [`rgbif::occ_count()`](https://search.r-project.org/CRAN/refmans/rgbif/html/occ_count.html) to know how many records fits our criteria.
 You can add `;` for multiple values and `,` for a range.
 
 Let's look at how many otter, genet and badger where seen in the period 2021-2024 around Montpellier.
@@ -119,7 +120,11 @@ occ_count(
 
 
 ### Data download
-If the dataset is small (<100.000 records), then we can use the function `occ_search()`. Else we would need to use the function `occ_download()` and register in GBIF. For the sake of downloading a small toy dataset, this is not needed.
+If the dataset is small (<100.000 records), then we can use the function [`rgbif::occ_search()`](https://search.r-project.org/CRAN/refmans/rgbif/html/occ_search.html). Else we would need to use the function `rgbif::occ_download()` and register in GBIF. For the sake of downloading a small toy dataset, this is not needed.
+
+:::{.callout-important}
+For real analysis, it is recommended to use `rgbif::occ_download()`(https://search.r-project.org/CRAN/refmans/rgbif/html/occ_download.html) which will provide data with a DOI that can be directly cited in future publication.
+:::
 
 ```{r gbif_dwl}
 # download the data
@@ -182,7 +187,7 @@ mapview(df1_sf) +
 ```
 
 ### Export
-We can export the dataset as csv file
+We can export the dataset as csv file:
 
 ```{r outcsv_gbif}
 write.csv(
@@ -192,7 +197,7 @@ write.csv(
 )
 ```
 
-Or as geopackage file:
+And as geopackage file:
 
 ```{r outgpkg_gbif}
 st_write(
@@ -204,9 +209,9 @@ st_write(
 
 # 3. Get data from IGN
 
-The package `happign` provides a great interface to download [French spatial data from IGN](https://geoservices.ign.fr/catalogue) using protocols such as Web Map Service (WMS) for raster and Web Feature Service (WFS) for vectors.  
+The package `happign`[@R-happign] provides a great interface to download [French spatial data from IGN](https://geoservices.ign.fr/catalogue) using protocols such as Web Map Service (WMS) for raster and Web Feature Service (WFS) for vectors. Read the [documentation](https://paul-carteron.github.io/happign/index.html) for more details. 
 
-To make sure to have data not on the verge, it mi
+It is recommended to extend the buffer to make sure all points, and their buffer are covered with data. We will add 0.1 degree of extra margin to the original buffer.
 ```{r large_box}
 extra <- 0.1 #extra margin in degree
 large_ext <- st_bbox(df1_sf) + extra * c(rep(-1, 2), rep(1, 2))
@@ -344,7 +349,7 @@ replace_MMYYYY <- function(x, u0) {
 
 url_list <- sapply(dseq, replace_MMYYYY, url_monthlytas)
 
-# add GDAL Virtual File Systems
+# add GDAL Virtual File Systems to make use of COG
 full_url <- paste0("/vsicurl/", url_list)
 
 # is much faster with 'vsicurl' (no need to download all data)
@@ -386,3 +391,24 @@ writeRaster(crop_prec, here::here("data", "EOBS_daily_rr_2011_2024.nc"))
 
 -->
 
+# 5. Get the land border of France
+
+[GADM](https://gadm.org/), the Database of Global Administrative Areas, is a high-resolution database of country administrative areas. It can be easily accessed through the package `geodata`[@R-geodata].
+
+We will use the border of France as a mask, to remove the sea from the datasets.
+```{r get_mask}
+#| eval: false
+# get the border of the country (level = 0)
+france_border <- geodata::gadm("FRA", level = 0, path = here("data"))
+```
+
+```{r load_mask}
+#| echo: false
+france_border <- vect(here::here("data", "gadm41_FRA_0_pk.rds"))
+```
+
+```{r}
+plot(france_border)
+plot(b_square, add=TRUE)
+plot(pt_cesab, col="red", pch=16,add=TRUE)
+```
