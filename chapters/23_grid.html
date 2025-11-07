@@ -138,6 +138,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       </a>
     <div class="sidebar-title mb-0 py-0">
       <a href="../">Spatial-r: Tutorials on spatial data analysis in R</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/FRBCesab/spatial-r/" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+</div>
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -267,6 +270,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#temperature" id="toc-temperature" class="nav-link" data-scroll-target="#temperature">Temperature</a></li>
   </ul></li>
   <li><a href="#merge-all-together" id="toc-merge-all-together" class="nav-link" data-scroll-target="#merge-all-together">Merge all together</a></li>
+  <li><a href="#simple-model" id="toc-simple-model" class="nav-link" data-scroll-target="#simple-model">Simple model</a></li>
   </ul>
 </nav>
     </div>
@@ -302,11 +306,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>This tutorial explore how to make a grid and transform observations into a grid with <code>terra</code> package:</p>
+<p>This tutorial explore how to make a create a regular grid and transform spatial informations into a grid with <code>terra</code> package:</p>
 <ul>
-<li>import a multi-layer rasters with <a href="https://search.r-project.org/CRAN/refmans/terra/html/rast.html"><code>terra::rast()</code></a><br>
+<li>project spatial data to a commun CRS with <a href="https://search.r-project.org/CRAN/refmans/terra/html/project.html"><code>terra::project()</code></a><br>
 </li>
-<li>extract information from rasters on points or polygons with <a href="https://search.r-project.org/CRAN/refmans/terra/html/extract.html"><code>terra::extract()</code></a></li>
+<li>transform vectors to raster with <a href="https://search.r-project.org/CRAN/refmans/terra/html/rasterize.html"><code>terra::rasterize()</code></a></li>
+<li>match different raster grids with <a href="https://search.r-project.org/CRAN/refmans/terra/html/resample.html"><code>terra::resample()</code></a></li>
 </ul>
 </div>
 </div>
@@ -320,7 +325,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>If we want to make some modeling, it can be needed to regroup observations into a grid.</p>
+<p>For modeling, it is often needed to get all spatial data into a commun grid. For instance, among the spatial informations that we have seen in the previous chapter, which factors explain best the number of observations of otter?</p>
 </div>
 </div>
 <section id="setup" class="level2">
@@ -336,9 +341,7 @@ Follow the setup instructions if you haven’t followed previous tutorials
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(mapview)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(here)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(terra)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># library(sf)</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># library(exactextractr)</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Now load all the datasets attached to the observations of otters recorded in 2021 within a 50km buffer from Montpellier, France.</p>
 <div class="cell">
@@ -352,11 +355,12 @@ Follow the setup instructions if you haven’t followed previous tutorials
 </section>
 <section id="create-a-grid" class="level2">
 <h2 class="anchored" data-anchor-id="create-a-grid">Create a grid</h2>
-<p>Key issue : which resolution? which projection? resolution depends on your dataset, extent, and ecological question projection depends on the dataset</p>
-<p>Let’s start from our observation.</p>
+<p>One has to decide at which resolution should the grid be defined, and with which projection system. The decision depends on your dataset, its extent, and your modeling objectives.</p>
+<p>In our case, we will create a grid of 5km around the otter observations using the Lambert-93 projection (<a href="https://epsg.io/2154">EPSG:2154</a>).</p>
+<p>The function <a href="https://search.r-project.org/CRAN/refmans/terra/html/rast.html"><code>terra::rast()</code></a> can create empty grid from the extent of a given spatial object. Here we provide the otter observation (projected in EPSG 2154) as the extent of our grid.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pt_2154 <span class="ot">&lt;-</span> <span class="fu">project</span>(pt_otter, <span class="st">"EPSG:2154"</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="dv">5000</span> <span class="co"># 1km grid</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="dv">5000</span> <span class="co"># 5km grid</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>grid <span class="ot">&lt;-</span> <span class="fu">rast</span>(pt_2154, <span class="at">res =</span> res)</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>grid</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -370,11 +374,11 @@ coord. ref. : RGF93 v1 / Lambert-93 (EPSG:2154) </code></pre>
 </section>
 <section id="points-to-grid" class="level2">
 <h2 class="anchored" data-anchor-id="points-to-grid">Points to grid</h2>
-<p>the argument <code>fun=count</code> set that it calculate the number of points the argument <code>background=0</code> set that f there is no point, the vale will be 0, instead of NA by default</p>
+<p>The function <a href="https://search.r-project.org/CRAN/refmans/terra/html/rasterize.html"><code>terra::rasterize()</code></a> transform vectors to raster. Its argument <code>fun=count</code> defines that the values in the cells are the number of points. The argument <code>background=0</code> set that the value of the cell with no observation will be 0, instead of NA by default.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>grid_nobs <span class="ot">&lt;-</span> <span class="fu">rasterize</span>(pt_2154, grid, <span class="at">fun =</span> <span class="st">"count"</span>, <span class="at">background =</span> <span class="dv">0</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(grid_nobs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(grid_nobs, <span class="at">main =</span> <span class="st">"Number of otter observations"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -386,12 +390,12 @@ coord. ref. : RGF93 v1 / Lambert-93 (EPSG:2154) </code></pre>
 </section>
 <section id="lines-to-grid" class="level2">
 <h2 class="anchored" data-anchor-id="lines-to-grid">Lines to grid</h2>
-<p>length of rivers</p>
+<p>To calculate the length of rivers within a grid cell, we use the function <a href="https://search.r-project.org/CRAN/refmans/terra/html/rasterizeGeom.html"><code>terra::rasterizeGeom()</code></a>. Its argument <code>fun=length</code> defines that the values in the cells are the length of the rivers.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>river_2154 <span class="ot">&lt;-</span> <span class="fu">project</span>(river, <span class="st">"EPSG:2154"</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>grid_river <span class="ot">&lt;-</span> <span class="fu">rasterizeGeom</span>(river_2154, grid, <span class="at">fun =</span> <span class="st">"length"</span>)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(grid_river)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(grid_river, <span class="at">main =</span> <span class="st">"Length of rivers"</span>, <span class="at">plg =</span> <span class="fu">list</span>(<span class="at">title =</span> <span class="st">"(m)"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -403,7 +407,7 @@ coord. ref. : RGF93 v1 / Lambert-93 (EPSG:2154) </code></pre>
 </section>
 <section id="polygon-to-grid" class="level2">
 <h2 class="anchored" data-anchor-id="polygon-to-grid">Polygon to grid</h2>
-<p>percentage of forest</p>
+<p>To calculate the percentage of forest into the grid cell, we need first to consider only forest polygons. Then the function <a href="https://search.r-project.org/CRAN/refmans/terra/html/rasterize.html"><code>terra::rasterize()</code></a> with the option <code>cover=TRUE</code> calculates the percentage of forest cover per grid cell.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># select only the forest</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>forest <span class="ot">&lt;-</span> landuse[landuse<span class="sc">$</span>nature <span class="sc">==</span> <span class="st">"Forêt"</span>]</span>
@@ -412,7 +416,7 @@ coord. ref. : RGF93 v1 / Lambert-93 (EPSG:2154) </code></pre>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># rasterize</span></span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>grid_forest <span class="ot">&lt;-</span> <span class="fu">rasterize</span>(forest_2154, grid, <span class="at">cover =</span> <span class="cn">TRUE</span>, <span class="at">background =</span> <span class="dv">0</span>)</span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(grid_forest)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(grid_forest, <span class="at">main =</span> <span class="st">"Forest cover"</span>, <span class="at">plg =</span> <span class="fu">list</span>(<span class="at">title =</span> <span class="st">"(%)"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -424,11 +428,12 @@ coord. ref. : RGF93 v1 / Lambert-93 (EPSG:2154) </code></pre>
 </section>
 <section id="resample-raster" class="level2">
 <h2 class="anchored" data-anchor-id="resample-raster">Resample raster</h2>
+<p>For rasters, we need to transform the original grid to the desired resolution and extent. This operation is done with the function <a href="https://search.r-project.org/CRAN/refmans/terra/html/resample.html"><code>terra::resample()</code></a>. Be careful, this operation degrades the quality of the original raster. Each cells get the weighted average of the neighbouring cells</p>
 <section id="elevation" class="level3">
 <h3 class="anchored" data-anchor-id="elevation">Elevation</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>grid_alti <span class="ot">&lt;-</span> <span class="fu">resample</span>(bdalti, grid, <span class="st">"bilinear"</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(grid_alti)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>grid_alti <span class="ot">&lt;-</span> <span class="fu">resample</span>(bdalti, grid, <span class="at">method =</span> <span class="st">"bilinear"</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(grid_alti, <span class="at">main =</span> <span class="st">"Elevation"</span>, <span class="at">plg =</span> <span class="fu">list</span>(<span class="at">title =</span> <span class="st">"(m)"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -440,15 +445,19 @@ coord. ref. : RGF93 v1 / Lambert-93 (EPSG:2154) </code></pre>
 </section>
 <section id="temperature" class="level3">
 <h3 class="anchored" data-anchor-id="temperature">Temperature</h3>
+<p>For CHELSA temperature rasters, we want a summary of 2021, so we will use the average temperature over the 12 months of 2021. So we will (1) select only layers that correspond to 2021 (year of the observations) (2) calculate the average, (3) project the raster, and (4) resample to the desired grid.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate the average temperature in 2021</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#1 select the layers corresponding to 2021</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>in_2021 <span class="ot">&lt;-</span> <span class="fu">grep</span>(<span class="st">"2021"</span>, <span class="fu">names</span>(temperature))</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>monthly_temp <span class="ot">&lt;-</span> <span class="fu">subset</span>(temperature, in_2021)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>annual_temp <span class="ot">&lt;-</span> <span class="fu">mean</span>(monthly_temp, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># project (that's one of the only occasion when projection of raster)</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>temp_2154 <span class="ot">&lt;-</span> <span class="fu">project</span>(annual_temp, <span class="st">"EPSG:2154"</span>)</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>grid_temp <span class="ot">&lt;-</span> <span class="fu">resample</span>(temp_2154, grid, <span class="st">"bilinear"</span>)</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(grid_temp)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">#2. calculate the average temperature in 2021</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>annual_temp <span class="ot">&lt;-</span> <span class="fu">mean</span>(monthly_temp, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. project to EPSG 2154</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>temp_2154 <span class="ot">&lt;-</span> <span class="fu">project</span>(annual_temp, <span class="st">"EPSG:2154"</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. resample to grid</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>grid_temp <span class="ot">&lt;-</span> <span class="fu">resample</span>(temp_2154, grid, <span class="st">"bilinear"</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(grid_temp, <span class="at">main =</span> <span class="st">"Av. temperature"</span>, <span class="at">plg =</span> <span class="fu">list</span>(<span class="at">title =</span> <span class="st">"(K)"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -461,53 +470,31 @@ coord. ref. : RGF93 v1 / Lambert-93 (EPSG:2154) </code></pre>
 </section>
 <section id="merge-all-together" class="level2">
 <h2 class="anchored" data-anchor-id="merge-all-together">Merge all together</h2>
-<p>Ignoring all concept of spatial bias or anything else</p>
+<p>In <code>terra</code>, we can group <code>SpatRaster</code> objects into a single one if they all share the same grid. We will then get one grid and multiple layers (also called band) with the different informations.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">c</span>(grid_nobs, grid_river, grid_forest, grid_alti, grid_temp)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># we rename the layers to keep information of units</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(out) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"nobs"</span>, <span class="st">"river_m"</span>, <span class="st">"forest"</span>, <span class="st">"elevation_m"</span>, <span class="st">"temperature_K"</span>)</span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>out</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>class       : SpatRaster 
+size        : 17, 19, 5  (nrow, ncol, nlyr)
+resolution  : 5000, 5000  (x, y)
+extent      : 723524.6, 818524.6, 6245001, 6330001  (xmin, xmax, ymin, ymax)
+coord. ref. : RGF93 v1 / Lambert-93 (EPSG:2154) 
+source(s)   : memory
+names       : nobs,  river_m,    forest, elevation_m, temperature_K 
+min values  :    0,     0.00, 0.0000000,       0.000,      280.9530 
+max values  :    7, 56861.96, 0.9665119,    1210.254,      289.1167 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
 <p><img src="23_grid_files/figure-html/merge-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
-</div>
-</div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>france_border <span class="ot">&lt;-</span> geodata<span class="sc">::</span><span class="fu">gadm</span>(<span class="st">"FRA"</span>, <span class="at">level =</span> <span class="dv">0</span>, <span class="at">path =</span> <span class="fu">here</span>(<span class="st">"data"</span>))</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># project the coast in Lambert-93</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>france_2154 <span class="ot">&lt;-</span> <span class="fu">project</span>(france_border, <span class="fu">crs</span>(bdalti))</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># mask (=set to NA) the pixels that are not in the polygon</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>out_masked <span class="ot">&lt;-</span> <span class="fu">mask</span>(out, france_2154)</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out_masked)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="23_grid_files/figure-html/mask-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(out_masked)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(nobs <span class="sc">~</span> river_m <span class="sc">+</span> forest <span class="sc">+</span> elevation_m <span class="sc">+</span> temperature_K, <span class="at">data =</span> df)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(m1)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Analysis of Variance Table
-
-Response: nobs
-               Df  Sum Sq Mean Sq F value   Pr(&gt;F)   
-river_m         1   0.360  0.3602  0.5795 0.447163   
-forest          1   0.068  0.0682  0.1097 0.740722   
-elevation_m     1   0.623  0.6229  1.0021 0.317683   
-temperature_K   1   5.463  5.4635  8.7896 0.003294 **
-Residuals     276 171.556  0.6216                    
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled" title="Your turn">
@@ -520,7 +507,113 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Does the spatial resolution has en effect on the results? Repeat the same process with a grid of 500m, 1km, or 10km resolution and compare the results.</p>
+<p>Otters only inhabits terrestrial areas, yet our grid includes the Mediterranean Sea. Mask the created raster with the land boundary of France (as in the <a href="https://frbcesab.github.io/spatial-r/chapters/21_rasters.html#mask-the-sea">Chapter Rasters</a>).</p>
+</div>
+</div>
+<details>
+<summary>
+Click to see the answer
+</summary>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">local</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">geodata</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get the border of the country (level = 0)</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>france_border <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"gadm41_FRA_0_pk.rds"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get the border of the country (level = 0)</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>france_border <span class="ot">&lt;-</span> geodata<span class="sc">::</span><span class="fu">gadm</span>(<span class="st">"FRA"</span>, <span class="at">level =</span> <span class="dv">0</span>, <span class="at">path =</span> <span class="fu">here</span>(<span class="st">"data"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># project the coast in Lambert-93</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>france_2154 <span class="ot">&lt;-</span> <span class="fu">project</span>(france_border, <span class="fu">crs</span>(bdalti))</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># mask (=set to NA) the pixels that are not in the polygon</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>out_masked <span class="ot">&lt;-</span> <span class="fu">mask</span>(out, france_2154)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out_masked)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="23_grid_files/figure-html/mask-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</details>
+</section>
+<section id="simple-model" class="level2">
+<h2 class="anchored" data-anchor-id="simple-model">Simple model</h2>
+<p>The dataset is made of observations gathered without proper sampling schemes, and with potentially many biases. For such data, it is recommended to use species occupancy model (e.g.&nbsp;<a href="https://doi.org/10.1111/2041-210X.13897"><code>spOccupancy</code></a>).</p>
+<p>Yet for our little case study we will do the simplest linear model.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(out_masked)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># simplest linear model</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(nobs <span class="sc">~</span> river_m <span class="sc">+</span> forest <span class="sc">+</span> elevation_m <span class="sc">+</span> temperature_K, <span class="at">data =</span> df)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m1)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = nobs ~ river_m + forest + elevation_m + temperature_K, 
+    data = df)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-0.6221 -0.3503 -0.2522 -0.0324  6.5679 
+
+Coefficients:
+                Estimate Std. Error t value Pr(&gt;|t|)   
+(Intercept)    2.584e+02  8.709e+01   2.967  0.00327 **
+river_m       -6.591e-08  4.862e-06  -0.014  0.98920   
+forest        -2.689e-01  2.718e-01  -0.989  0.32331   
+elevation_m   -5.833e-03  2.081e-03  -2.803  0.00543 **
+temperature_K -8.936e-01  3.014e-01  -2.965  0.00329 **
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.7884 on 276 degrees of freedom
+Multiple R-squared:  0.03659,   Adjusted R-squared:  0.02262 
+F-statistic:  2.62 on 4 and 276 DF,  p-value: 0.03531</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># to see how wrong the linear model is, look at:</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># plot(m1)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The linear model is definitely not a good fit for our data (R2 is only 0.3). Moreover, there is strong collinearity between elevation and temperature, and the residuals are not normally distributed. In generalized mixed models, it is generally recommended to use <code>poisson</code> or <code>quasipoisson</code> distribution for count data. Our main issue is the high number of ‘false’ zeros.</p>
+<p>Yet to evaluate a spatial model, it is always interesting to see the predictions and the spatial distribution of the residuals.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set new empty grids</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>out_masked<span class="sc">$</span>predicted <span class="ot">&lt;-</span> <span class="fu">rast</span>(grid)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>out_masked<span class="sc">$</span>residuals <span class="ot">&lt;-</span> <span class="fu">rast</span>(grid)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"># add values of prediction and residuals where there is no NA</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>out_masked<span class="sc">$</span>predicted[<span class="sc">!</span><span class="fu">is.na</span>(out_masked<span class="sc">$</span>nobs)] <span class="ot">&lt;-</span> <span class="fu">predict</span>(m1)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>out_masked<span class="sc">$</span>residuals[<span class="sc">!</span><span class="fu">is.na</span>(out_masked<span class="sc">$</span>nobs)] <span class="ot">&lt;-</span> <span class="fu">residuals</span>(m1)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co"># show and compare the observation, prediction and residuals</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out_masked, <span class="fu">c</span>(<span class="st">"nobs"</span>, <span class="st">"predicted"</span>, <span class="st">"residuals"</span>), <span class="at">nc =</span> <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="23_grid_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Your turn (non-corrected)">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Your turn (non-corrected)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Does the spatial resolution has en effect on the results? Repeat the same process with a grid of 500m, or 10km resolution and compare the results.</p>
 </div>
 </div>
 
