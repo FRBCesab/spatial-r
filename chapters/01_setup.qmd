@@ -1,6 +1,6 @@
 # Setup {.unnumbered}
 
-## How to install R and set up a working environment
+## How to set up R
 
 The tutorials rely on {{< fa brands r-project >}}, so you need to have it [installed](https://cran.r-project.org/) on your computer with, ideally, an Integrated Development Environment (IDE) such as [RStudio](https://posit.co/downloads/), [Visual Studio Code](https://code.visualstudio.com/download) or [Positron](https://posit.co/products/ide/positron/).   
 

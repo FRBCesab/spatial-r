@@ -46,8 +46,8 @@ In these tutorials, we characterize the habitat of otter that were observed in 2
 
 ### R packages
 
-The tutorials rely mostly on the R-package [`terra`](https://rspatial.github.io/terra/index.html) as it was specifically developed to tackle challenges faced by ecologists or agronomists when using spatial data.  
-R has an exceptional diversity of users and packages, and this is especially true with the dynamic community of R-users doing spatial analysis. Another very popular package for handling spatial data is `sf`.    
+The tutorials rely mostly on the {{< fa brands r-project >}}-package [`terra`](https://rspatial.github.io/terra/index.html) as it was specifically developed to tackle challenges faced by ecologists or agronomists when doing spatial analysis.  
+{{< fa brands r-project >}} has an exceptional diversity of users and packages, and this is especially true with the dynamic community of {{< fa brands r-project >}}-users doing spatial analysis. Another very popular package for handling spatial data is `sf`.    
 
 ### Other resources
 
