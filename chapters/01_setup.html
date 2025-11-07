@@ -281,9 +281,9 @@ div.csl-indent {
   <ul>
   <li><a href="#how-to-set-up-r" id="toc-how-to-set-up-r" class="nav-link active" data-scroll-target="#how-to-set-up-r">How to set up R</a>
   <ul class="collapse">
-  <li><a href="#r-packages-needed-for-these-tutorials" id="toc-r-packages-needed-for-these-tutorials" class="nav-link" data-scroll-target="#r-packages-needed-for-these-tutorials">R packages needed for these tutorials</a></li>
+  <li><a href="#r-packages-needed" id="toc-r-packages-needed" class="nav-link" data-scroll-target="#r-packages-needed">R packages needed</a></li>
   </ul></li>
-  <li><a href="#download-needed-dataset" id="toc-download-needed-dataset" class="nav-link" data-scroll-target="#download-needed-dataset">Download needed dataset</a></li>
+  <li><a href="#download-toy-dataset" id="toc-download-toy-dataset" class="nav-link" data-scroll-target="#download-toy-dataset">Download toy dataset</a></li>
   </ul>
 </nav>
     </div>
@@ -313,8 +313,8 @@ div.csl-indent {
 <h2 class="anchored" data-anchor-id="how-to-set-up-r">How to set up R</h2>
 <p>The tutorials rely on <i class="fa-brands fa-r-project" aria-label="r-project"></i>, so you need to have it <a href="https://cran.r-project.org/">installed</a> on your computer with, ideally, an Integrated Development Environment (IDE) such as <a href="https://posit.co/downloads/">RStudio</a>, <a href="https://code.visualstudio.com/download">Visual Studio Code</a> or <a href="https://posit.co/products/ide/positron/">Positron</a>.</p>
 <p>Please have a look at the tutorial on how to setup a working environment for scientific computing with <i class="fa-brands fa-r-project" aria-label="r-project"></i>: <a href="https://frbcesab.github.io/rsetup/" class="uri">https://frbcesab.github.io/rsetup/</a></p>
-<section id="r-packages-needed-for-these-tutorials" class="level3">
-<h3 class="anchored" data-anchor-id="r-packages-needed-for-these-tutorials">R packages needed for these tutorials</h3>
+<section id="r-packages-needed" class="level3">
+<h3 class="anchored" data-anchor-id="r-packages-needed">R packages needed</h3>
 <p>We will use four packages: <code>terra</code><span class="citation" data-cites="R-terra">(<a href="../references.html#ref-R-terra" role="doc-biblioref">Hijmans 2025</a>)</span> and <code>sf</code><span class="citation" data-cites="R-sf">(<a href="../references.html#ref-R-sf" role="doc-biblioref">Pebesma 2018</a>)</span> for handling spatial data, <code>mapview</code><span class="citation" data-cites="R-mapview">(<a href="../references.html#ref-R-mapview" role="doc-biblioref">Appelhans et al. 2025</a>)</span> for interactive maps, and <code>here</code><span class="citation" data-cites="R-here">(<a href="../references.html#ref-R-here" role="doc-biblioref">Müller 2025</a>)</span> for locating files locally.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>needed_packages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"terra"</span>, <span class="st">"sf"</span>, <span class="st">"mapview"</span>, <span class="st">"here"</span>)</span>
@@ -329,8 +329,8 @@ div.csl-indent {
 </div>
 </section>
 </section>
-<section id="download-needed-dataset" class="level2">
-<h2 class="anchored" data-anchor-id="download-needed-dataset">Download needed dataset</h2>
+<section id="download-toy-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="download-toy-dataset">Download toy dataset</h2>
 <p>As an toy dataset, the tutorials rely on observed occurrence of otter in 2021 around Montpellier, France. These dataset were downloaded directly from <i class="fa-brands fa-r-project" aria-label="r-project"></i>, for more details see the <a href="https://frbcesab.github.io/spatial-r/chapters/31_toydata_mpl.html">tutorial on creating a toy dataset from GBIF, IGN and CHELSA</a>.</p>
 <p>You can run the following commands to download the dataset needed for the workshop (total size : 11Mb), or download <a href="https://github.com/FRBCesab/spatial-r/raw/refs/heads/main/data/spatial-r_data.zip">a zip archive</a></p>
 <div class="cell">
@@ -380,6 +380,65 @@ div.csl-indent {
 <span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>file7 <span class="ot">&lt;-</span> <span class="st">"gadm41_FRA_0_pk.rds"</span></span>
 <span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(<span class="fu">file.path</span>(url_git, file7), <span class="fu">file.path</span>(datadir, file7), <span class="at">mode =</span> <span class="st">"wb"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<!--
+
+
+
+
+::: {.cell}
+
+```{.r .cell-code}
+sessionInfo()
+```
+
+::: {.cell-output .cell-output-stdout}
+
+```
+R version 4.5.1 (2025-06-13)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 25.10
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.12.1 
+LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.12.1;  LAPACK version 3.12.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Europe/Paris
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+loaded via a namespace (and not attached):
+ [1] htmlwidgets_1.6.4 compiler_4.5.1    fastmap_1.2.0     cli_3.6.5        
+ [5] tools_4.5.1       htmltools_0.5.8.1 yaml_2.3.10       rmarkdown_2.30   
+ [9] knitr_1.50        jsonlite_2.0.0    xfun_0.54         digest_0.6.37    
+[13] rlang_1.1.6       evaluate_1.0.5   
+```
+
+
+:::
+
+```{.r .cell-code}
+# R version 4.5.1 (2025-06-13)
+# terra_1.8-70
+# sf_1.0-21
+# here_1.0.2
+# mapview_2.11.4
+```
+:::
+
+
+
+
+-->
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">

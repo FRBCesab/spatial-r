@@ -270,7 +270,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#temperature" id="toc-temperature" class="nav-link" data-scroll-target="#temperature">Temperature</a></li>
   </ul></li>
   <li><a href="#merge-all-together" id="toc-merge-all-together" class="nav-link" data-scroll-target="#merge-all-together">Merge all together</a></li>
-  <li><a href="#simple-model" id="toc-simple-model" class="nav-link" data-scroll-target="#simple-model">Simple model</a></li>
+  <li><a href="#simple-linear-model" id="toc-simple-linear-model" class="nav-link" data-scroll-target="#simple-linear-model">Simple linear model</a></li>
   </ul>
 </nav>
     </div>
@@ -547,16 +547,17 @@ Click to see the answer
 </div>
 </details>
 </section>
-<section id="simple-model" class="level2">
-<h2 class="anchored" data-anchor-id="simple-model">Simple model</h2>
-<p>The dataset is made of observations gathered without proper sampling schemes, and with potentially many biases. For such data, it is recommended to use species occupancy model (e.g.&nbsp;<a href="https://doi.org/10.1111/2041-210X.13897"><code>spOccupancy</code></a>).</p>
+<section id="simple-linear-model" class="level2">
+<h2 class="anchored" data-anchor-id="simple-linear-model">Simple linear model</h2>
+<p>The dataset is made of observations gathered without proper sampling schemes, and with potentially many biases. For such data, it is recommended to use species occupancy models (e.g.&nbsp;<a href="https://doi.org/10.1111/2041-210X.13897"><code>spOccupancy</code></a>).</p>
 <p>Yet for our little case study we will do the simplest linear model.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(out_masked)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># simplest linear model</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(nobs <span class="sc">~</span> river_m <span class="sc">+</span> forest <span class="sc">+</span> elevation_m <span class="sc">+</span> temperature_K, <span class="at">data =</span> df)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m1)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># transform the spatial raster data as data.frame</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(out_masked)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># make a simple linear model</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(nobs <span class="sc">~</span> river_m <span class="sc">+</span> forest <span class="sc">+</span> elevation_m <span class="sc">+</span> temperature_K, <span class="at">data =</span> df)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m1)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -584,8 +585,8 @@ F-statistic:  2.62 on 4 and 276 DF,  p-value: 0.03531</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># to see how wrong the linear model is, look at:</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># plot(m1)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>The linear model is definitely not a good fit for our data (R2 is only 0.3). Moreover, there is strong collinearity between elevation and temperature, and the residuals are not normally distributed. In generalized mixed models, it is generally recommended to use <code>poisson</code> or <code>quasipoisson</code> distribution for count data. Our main issue is the high number of ‘false’ zeros.</p>
-<p>Yet to evaluate a spatial model, it is always interesting to see the predictions and the spatial distribution of the residuals.</p>
+<p>The linear model is definitely not a good fit to our data (R2 is only 0.03). Moreover, there is strong collinearity between elevation and temperature, and the residuals are not normally distributed. In generalized mixed models, it is recommended to use <code>poisson</code> or <code>quasipoisson</code> distribution for count data. The main issue here is the high number of ‘false’ zeros.</p>
+<p>Additionally, it is recommended to spatially visualize the predictions and the residuals.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set new empty grids</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>out_masked<span class="sc">$</span>predicted <span class="ot">&lt;-</span> <span class="fu">rast</span>(grid)</span>
@@ -601,19 +602,6 @@ F-statistic:  2.62 on 4 and 276 DF,  p-value: 0.03531</code></pre>
 <p><img src="23_grid_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled" title="Your turn (non-corrected)">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Your turn (non-corrected)
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Does the spatial resolution has en effect on the results? Repeat the same process with a grid of 500m, or 10km resolution and compare the results.</p>
 </div>
 </div>
 
