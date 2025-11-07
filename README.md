@@ -34,7 +34,7 @@ Text and figures are licensed under Creative Commons Attribution [CC By 4.0](htt
 
 Please cite this material as:
 
-> Frelat R, (2025) Spatial data analysis with R. URL: <https://frbcesab.github.io/spatial-r/>  
+> Frelat R, (2025) Spatial data analysis with R. Introduction to GIS for ecologists. URL: <https://frbcesab.github.io/spatial-r/>
 
 
 

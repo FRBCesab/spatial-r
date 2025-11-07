@@ -22,13 +22,13 @@ In these tutorials, we characterize the habitat of otter that were observed in 2
 
 #### Practice 2: Rasters (2h) 
 
-- [raster](https://frbcesab.github.io/spatial-r/chapters/13_polygons.html): Discover what is a raster and get the elevation of field observations  
-- [multi layer](https://frbcesab.github.io/spatial-r/chapters/22_multilayer.html): Trace back past monthly climate at the field sites. 
-- [grid](https://frbcesab.github.io/spatial-r/chapters/23_grid.html): Transform observations and spatial data into a commun grid format
+- [Raster](https://frbcesab.github.io/spatial-r/chapters/13_polygons.html): Discover what is a raster and get the elevation of field observations  
+- [Multi-layer](https://frbcesab.github.io/spatial-r/chapters/22_multilayer.html): Trace back past monthly climate at the field sites. 
+- [Grid](https://frbcesab.github.io/spatial-r/chapters/23_grid.html): Transform observations and spatial data into a commun grid format
  
 #### Other tutorials
 
-- [Toydata](https://frbcesab.github.io/spatial-r/chapters/31_toydata_mpl.html): how to get data from GBIF, IGN and CHELSA and create the toy dataset used in this workshop.
+- [Toy dataset](https://frbcesab.github.io/spatial-r/chapters/31_toydata_mpl.html): how to get data from GBIF, IGN and CHELSA and create the toy dataset used in this workshop.
 
 <!--
 **To be created**:  
@@ -51,7 +51,7 @@ The tutorials rely mostly on the {{< fa brands r-project >}}-package [`terra`](h
 
 ### Other resources
 
-These tutorials were inspired by brilliant online ressources:     
+These tutorials were inspired by very valuable online ressources:     
 
 - Hijman R. et al. [Spatial Data Science with R and “terra”](https://rspatial.org/)   
 - Pebesma and Bivand [Spatial Data Science: With Applications in R](https://r-spatial.org/book/)

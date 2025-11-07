@@ -55,7 +55,7 @@ pt_otter <- vect(
 </details>
 
 
-## Load monthly climate with CHELSA
+## Load monthly climate data
 
 We will use the monthly average temperature data from [CHELSA](https://www.chelsa-climate.org/) which has a spatial resolution of 1km. To see how we created the data for our case study, have a look at [this tutorial](https://frbcesab.github.io/spatial-r/chapters/31_toydata_mpl.html#get-climate-data-from-chelsa).   
 

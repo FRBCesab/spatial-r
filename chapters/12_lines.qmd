@@ -155,7 +155,8 @@ Let's map the river and their length, as well as position of the otter observati
 
 ## interactive
 
-You can combine multiple layers in mapview with a `+`. 
+You can combine multiple layers in `mapview` with a `+`.  
+
 
 ```{r mapview_line}
 mapview(river, zcol = "length_km") +
@@ -164,8 +165,15 @@ mapview(river, zcol = "length_km") +
 
 ## terra
 
+In `terra`, use the argument `add=TRUE` or the function [`terra::points()`](https://search.r-project.org/CRAN/refmans/terra/html/lines.html) to add points to an existing 
 ```{r mapterra_line}
-plot(river, y = "length_km")
+plot(
+  river,
+  y = "length_km",
+  type = "continuous",
+  main = "River length",
+  plg = list(title = "(km)")
+)
 plot(pt_otter, add = TRUE)
 ```
 
@@ -184,7 +192,7 @@ If you want to overlay multiple spatial object with base plot from `sf`, don't f
 
 
 
-## Calculate the distance to the closest line
+## Calculate distance to the nearest line
 
 :::{.callout-tip title="The ecologist mind"}
 At which distance from a river were the otter observed?
@@ -199,7 +207,6 @@ Before comparing two spatial objects, it is recommended to plot the data (if not
 crs(river) == crs(pt_otter)
 ```
 
-### Find the closest river
 
 ::: {.panel-tabset}
 ## terra

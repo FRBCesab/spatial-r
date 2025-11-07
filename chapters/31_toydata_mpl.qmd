@@ -79,7 +79,7 @@ pt_cesab <- st_as_sf(
 )
 ```
 
-### Create a buffer from points
+### Create a buffer area
 
 We want a buffer zone of 50km around the FRB-Cesab. Because GBIF only accept rectangle buffer, we will take the square that include the circular buffer.
 
@@ -104,7 +104,7 @@ mapview(b_square, alpha.regions = 0, lwd = 3) +
 
 # 2. Get the occurrences from GBIF
 
-### Number of occurrences
+### Get the number of occurrences
 We will use the package `rgbif`[@R-rgbif] which provides a good interface to access directly [GBIF](https://www.gbif.org/) data. A good way is to start with the function [`rgbif::occ_count()`](https://search.r-project.org/CRAN/refmans/rgbif/html/occ_count.html) to know how many records fits our criteria.
 You can add `;` for multiple values and `,` for a range.
 
@@ -170,7 +170,7 @@ df1 <- df1[!duplicated(df1[, col_uid]), ]
 ```
 
 
-### Visualize the data
+### Visualization
   
 Let's create a spatial `sf` object, with coordinates
 ```{r sf_gbif}
@@ -218,9 +218,9 @@ large_ext <- st_bbox(df1_sf) + extra * c(rep(-1, 2), rep(1, 2))
 large_box <- large_ext |> st_bbox() |> st_as_sfc()
 ```
 
-### Elevation
+### Elevation from BD ALTI
 We will use the function `get_wms_raster()`. For quick testing, it is recommended to use interactive = TRUE. In our case we want `altimetrie` data from BD ALTI at 25m resolution. 
-In our case, we will download it at 250m resolution to make it smaller.
+In our case, we will download it with a resolution of 250m to make the file smaller and fasten computation.
 
 
 ```{r get_elevation}
@@ -292,12 +292,12 @@ st_write(landcover, here::here("data", "BDCARTO-LULC_mpl50km.shp"))
 
 ```{r load_landcover}
 #| echo: false
-landcover <- vect(here::here("data", "BDCARTO-LULC_mpl50km.shp"))
+landcover <- st_read(here::here("data", "BDCARTO-LULC_mpl50km.shp"))
 ```
 
 ```{r map_landcover}
 plot(landcover["nature"], reset = FALSE, border = FALSE)
-plot(st_geometry(df1_sf), add = TRUE)
+plot(st_geometry(df1_sf), add = TRUE, pch=16)
 # or interactive map:
 # mapview(landcover, zcol="nature") +
 #  mapview(df1_sf)
@@ -391,7 +391,7 @@ writeRaster(crop_prec, here::here("data", "EOBS_daily_rr_2011_2024.nc"))
 
 -->
 
-# 5. Get the land border of France
+# 5. Get the land border from GADM
 
 [GADM](https://gadm.org/), the Database of Global Administrative Areas, is a high-resolution database of country administrative areas. It can be easily accessed through the package `geodata`[@R-geodata].
 

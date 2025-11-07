@@ -8,7 +8,7 @@ Please have a look at the tutorial on how to setup a working environment for sci
 <https://frbcesab.github.io/rsetup/>
 
 
-### R packages needed for these tutorials
+### R packages needed  
 
 We will use four packages: `terra`[@R-terra] and `sf`[@R-sf] for handling spatial data, `mapview`[@R-mapview] for interactive maps, and `here`[@R-here] for locating files locally.
 
@@ -26,7 +26,7 @@ check_and_install <- function(x) {
 invisible(lapply(needed_packages, check_and_install))
 ```
 
-## Download needed dataset
+## Download toy dataset
 
 As an toy dataset, the tutorials rely on observed occurrence of otter in 2021 around Montpellier, France. These dataset were downloaded directly from {{< fa brands r-project >}}, for more details see the [tutorial on creating a toy dataset from GBIF, IGN and CHELSA](https://frbcesab.github.io/spatial-r/chapters/31_toydata_mpl.html).
 
@@ -80,3 +80,17 @@ download.file(file.path(url_git, file6), file.path(datadir, file6), mode = "wb")
 file7 <- "gadm41_FRA_0_pk.rds"
 download.file(file.path(url_git, file7), file.path(datadir, file7), mode = "wb")
 ```
+
+
+<!--
+
+```{r}
+sessionInfo()
+# R version 4.5.1 (2025-06-13)
+# terra_1.8-70
+# sf_1.0-21
+# here_1.0.2
+# mapview_2.11.4
+```
+
+-->

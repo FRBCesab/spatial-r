@@ -175,25 +175,26 @@ plot(out_masked)
 
 </details>
 
-## Simple model
+## Simple linear model
 
-The dataset is made of observations gathered without proper sampling schemes, and with potentially many biases. For such data, it is recommended to use species occupancy model (e.g. [`spOccupancy`](https://doi.org/10.1111/2041-210X.13897)). 
+The dataset is made of observations gathered without proper sampling schemes, and with potentially many biases. For such data, it is recommended to use species occupancy models (e.g. [`spOccupancy`](https://doi.org/10.1111/2041-210X.13897)). 
 
 Yet for our little case study we will do the simplest linear model.
 
 ```{r anova}
+# transform the spatial raster data as data.frame
 df <- data.frame(out_masked)
 
-# simplest linear model
+# make a simple linear model
 m1 <- lm(nobs ~ river_m + forest + elevation_m + temperature_K, data = df)
 summary(m1)
 # to see how wrong the linear model is, look at:
 # plot(m1)
 ```
 
-The linear model is definitely not a good fit for our data (R2 is only 0.3). Moreover, there is strong collinearity between elevation and temperature, and the residuals are not normally distributed. In generalized mixed models, it is generally recommended to use `poisson` or `quasipoisson` distribution for count data. Our main issue is the high number of 'false' zeros. 
+The linear model is definitely not a good fit to our data (R2 is only 0.03). Moreover, there is strong collinearity between elevation and temperature, and the residuals are not normally distributed. In generalized mixed models, it is recommended to use `poisson` or `quasipoisson` distribution for count data. The main issue here is the high number of 'false' zeros.  
 
-Yet to evaluate a spatial model, it is always interesting to see the predictions and the spatial distribution of the residuals.
+Additionally, it is recommended to spatially visualize the predictions and the residuals.
 
 ```{r}
 # set new empty grids
@@ -207,9 +208,5 @@ plot(out_masked, c("nobs", "predicted", "residuals"), nc = 3)
 ```
 
 
-
-:::{.callout-note title="Your turn (non-corrected)"}
-Does the spatial resolution has en effect on the results? Repeat the same process with a grid of 500m, or 10km resolution and compare the results. 
-:::
 
 

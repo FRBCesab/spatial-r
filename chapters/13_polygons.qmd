@@ -133,7 +133,7 @@ When you want to overlay multiple spatial object with base plot from `sf`, don't
 
 :::
 
-## Calculate the area
+## Calculate area
 
 :::{.callout-tip title="The ecologist mind"}
 What is the dominant land cover in our study area?
@@ -141,7 +141,7 @@ What is the dominant land cover in our study area?
 
 The function [`terra::expanse()`](https://search.r-project.org/CRAN/refmans/terra/html/expanse.html) calculates the area in $m^2$. When calculating areas, **be careful with projection systems**. Some are not suited to calculate areas. Prefer equal-area projections or use local projection system (if your study area is small). 
 
-The package `terra` calculates by default the geodesic area (based on lat/long coordinates and considering Earth's curvature) which is the best estimate and avoid errors due to wrongly used projection system.  
+Luckily, the package `terra` calculates by default the geodesic area (based on lat/long coordinates and considering Earth's curvature) which is the best estimate and avoid errors due to wrongly used projection system.  
 
 
 ::: {.panel-tabset}
@@ -172,7 +172,7 @@ landuse_3035$area_ha <- as.numeric(area_polygons)
 
 
 :::{.callout-note title="Your turn"}
--. Which is the largest land cover class in our study area? Why?
+- Which is the largest land cover class in our study area? Why?
 :::
 
 <details>
@@ -183,26 +183,27 @@ landuse_3035$area_ha <- as.numeric(area_polygons)
 tapply(landuse$area_ha, landuse$nature, sum)
 ```
 
+The category `Eau libre` (=running water) is the largest land cover because, as it can be seen in the previous map, large part of the Mediterranean Sea is present in the land cover data.
+
 </details>
 
 
 ## Mask the sea
 
 :::{.callout-tip title="The ecologist mind"}
-Our study area is defined as the rectangular area in land. Then we have to mask the sea to consider only areas where otter can potentially inhabit.
+Our study area was defined as a buffer around Montpellier. This area include the marine ecosystems, which is not the habitat of otters. So it is recommended to mask the sea in order to consider only areas where otter could have been potentially spotted.
 :::
 
+There can be two approaches to mask an area: either (1) identify which area to remove from the data itself , or (2) use a mask from another data source (this approach will be [shown when dealing with rasters](https://frbcesab.github.io/spatial-r/chapters/21_rasters.html#mask-the-sea)). 
 
-There can be two approaches: either (1) identify from the data itself which area to remove, or (2) use a mask from another data source (this approach will be [shown when dealing with rasters](https://frbcesab.github.io/spatial-r/chapters/21_rasters.html#mask-the-sea)). 
-
-In this case, it is easier and more trustworthy to detect directly from the data which polygons to remove. The largest polygon correspond to the Mediterranean Sea. So we just need to remove it.
+In this case, it is easier and more trustworthy to detect directly from the data which polygons to remove. In fact, the largest polygon correspond to the Mediterranean Sea. So we just need to remove it.
 
 ```{r ex2}
 # the largest polygon correspond to the mediterranean
 landuse$nature[which.max(landuse$area_ha)]
 # remove the largest polygon
 landuse_nomed <- landuse[-which.max(landuse$area_ha), ]
-# visually verify the result
+# visually verify the output
 plot(landuse_nomed, y = "nature", border = NA)
 ```
 
@@ -219,7 +220,11 @@ round(cover_perc, 2)
 
 ## Polygons to points
 
-Before making extraction, it is recommended to plot the data (if not too big). Hence, you can verify that the projection systems and the extents match. Do not use `mapview` (interactive map) because it will automatically project the data.
+:::{.callout-tip title="The ecologist mind"}
+What is the land cover class at the location of the otter observations?
+:::
+
+Before making extraction, it is recommended to plot the data (if not too big). This is a verification step ensuring that the projection systems and the extents match. Do not use `mapview` (interactive map) because it will automatically project the data.
 
 
 ::: {.panel-tabset}
@@ -244,7 +249,7 @@ table(pt_landcover$nature)
 ```
 
 :::{.callout-note title="Your turn"}
-- [stat] Which classes are over or under represented compare to expected?
+- [stat] Which classes are over- or under- represented compare to the distribution of classes over the whole study area?
 :::
 
 <details>
@@ -260,9 +265,19 @@ cover <- data.frame(
   all = as.numeric(cover_perc),
   obs = as.numeric(cover_obs_perc[m0])
 )
+# non matchin elements = 0
 cover[is.na(cover)] <- 0
+# calculate the difference between observed and expected
 cover$delta <- cover$obs - cover$all
-barplot(cover$delta, horiz = TRUE, names = cover$class, las = 1)
+# add left margin to the plot
+par(mar = c(4, 8, 4, 1))
+barplot(
+  cover$delta,
+  horiz = TRUE,
+  names = cover$class,
+  las = 1,
+  xlab = "Difference between observed and expected cover (%)"
+)
 ```
 
 
@@ -270,7 +285,11 @@ barplot(cover$delta, horiz = TRUE, names = cover$class, las = 1)
 
 ## Polygons to polygons
 
-In many cases, we want to characterize the area surrounding the observations. So we will create buffers. 
+:::{.callout-tip title="The ecologist mind"}
+What is the land cover distribution around the locations of the otter observations?
+:::
+
+To characterize the area surrounding the observations, we need to define buffers. 
 
 ### Create buffer
 
@@ -285,8 +304,12 @@ poly_otter <- buffer(pt_otter, dist_buffer)
 ```
 
 ## sf
-Same here, `sf` uses `s2` with geographic coordinates (e.g. EPSG:4326) which creates buffers with low quality (as in sf 1.0-21 on 03/11/2025).  
-So it is recommended to use projected coordinates with [`sf::st_buffer()`](https://search.r-project.org/CRAN/refmans/sf/html/geos_unary.html).
+
+:::{.callout-warning}
+`sf` uses `s2` when the coordinates are geographic (e.g. EPSG:4326) which creates buffers with low quality (in `sf 1.0-21`, tested on 03/11/2025).  
+It is recommended to use projected coordinates when using the function [`sf::st_buffer()`](https://search.r-project.org/CRAN/refmans/sf/html/geos_unary.html).
+:::
+
 
 ```{r buffer_sf}
 dist_buffer <- 1000 # buffer of 1000 m
@@ -300,22 +323,15 @@ poly_otter_3035 <- st_buffer(pt_otter_3035, dist_buffer)
 
 ### Visualize buffer
 
-::: {.panel-tabset}
+For illustration, we only show the buffer around the first observation.
 
-## terra
+The parameter `ext` limit the map to the extent of the given spatial object.  
+
 ```{r map_buffer_terra}
-plot(poly_otter[1])
-plot(pt_otter[1], add = TRUE)
+plot(landuse, y = "nature", ext = poly_otter[1])
+plot(poly_otter[1], lwd = 2, add = TRUE)
+plot(pt_otter[1], col = "red", add = TRUE)
 ```
-
-## sf
-
-```{r map_buffer_sf}
-plot(st_geometry(poly_otter_3035)[1], reset = FALSE, axes = TRUE)
-plot(st_geometry(pt_otter_3035)[1], add = TRUE)
-```
-
-:::
 
 
 :::{.callout-note title="Your turn"}
@@ -332,10 +348,8 @@ summary(expanse(poly_otter))
 summary(st_area(poly_otter_3035))
 ```
 
-The difference with expected value (```r pi*1000000```) is due to the way the circle is defined (in only 40 points in `terra` and 120 points in `sf`). 
+The difference with expected value (```r print(pi*1000000)```) is due to the way the circle is defined (in 40 points in `terra` and 120 points in `sf`). 
 </details>
-
-
 
 
 ### Intersection
@@ -368,9 +382,10 @@ buffer_landcover_sf <- st_intersection(poly_otter_3035, landuse_3035)
 
 ### Land cover per buffer 
 
-We need to recalculate the area of the intersected land cover.
+We need to update the area of the intersected land cover.
 
 ```{r perc_lulc_terra}
+# Calculate area for each polygon
 buffer_landcover$area_ha <- expanse(buffer_landcover) * 0.0001
 
 # Calculate area per buffer and nature class
@@ -381,12 +396,14 @@ class_area <- tapply(
 )
 #replace NA by 0
 class_area[is.na(class_area)] <- 0
-# calculate the overlay area
+# calculate the area of the buffer that intersect any polygon
 sum_area <- rowSums(class_area)
 # calculate the percentage per class
 perc_class <- class_area / sum_area * 100
 
-barplot(apply(perc_class, 2, mean), las = 2)
+# add margin at the bottom
+par(mar = c(7, 4, 1, 1))
+barplot(apply(perc_class, 2, mean), las = 2, ylab = "Percentage land cover")
 ```
 
 

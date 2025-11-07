@@ -123,7 +123,7 @@ mapview(bdalti)
 ## Mask the sea
 
 :::{.callout-tip title="The ecologist mind"}
-To avoid considering regions outside the habitats, it is recommended to mask areas that are not part of the habitats (such as the sea for otter). 
+To avoid considering regions outside the habitats, it is recommended to mask areas that are not part of the habitats (typically the sea for terrestrial animals). 
 :::
 
 
@@ -178,16 +178,16 @@ plot(pt_otter, add = TRUE)
 ```
 
 :::{.callout-note title="Your turn"}
-What happened? Can you see the otter observations? Why and how to fix this problem?  
+Why can't you see the otter observations? How to fix this problem?  
 :::
 
 <details>
 <summary>Click to see the answer</summary>
 
-Indeed, the otter observations doesn't have the same projections of the raster. We need to project the observations with the same CRS than the elevation data. 
+Indeed, the spatial points with the otter observations don't share the same projection than the elevation raster. We need to project the spatial points to the CRS of the elevation data. 
 
 :::{.callout-important}
-It is not recommended to project raster objects. When you have the choice, it is always better to change the projection of the vector data.
+It is not recommended to project raster objects. When you have the choice, it is always better to project vector data to the raster projection system.
 :::
 
 ```{r ex1}
@@ -199,7 +199,7 @@ pt_2154 <- project(pt_otter, crs(bdalti))
 
 # now we can check that the points overlay the elevation data
 plot(alti_masked)
-plot(pt_2154, add = TRUE, col = "red")
+plot(pt_2154, col = "red", add = TRUE)
 ```
 
 </details>
@@ -218,7 +218,7 @@ boxplot(pt_alti$elevation, ylab = "elevation (m)")
 
 :::{.callout-note title="Your turn"}
 1. Compare the extracted elevation with the elevation provided with GBIF (in the attribute table of the points). 
-2. Can we see differences in elevation depending on the time of the year in which the observations were made? 
+2. Are otters changing their elevation distribution depending on the time of the year? In other words, can we see differences in elevation depending on the time of the year in which the observations were made?
 :::
 
 <details>
@@ -255,11 +255,13 @@ boxplot(
 
 ## Raster to polygons
 
+:::{.callout-tip title="The ecologist mind"}
+What is the elevation around the locations of the otter observations?
+:::
+
 ### Create buffer
 
-We can create buffer with [`terra::buffer()`](https://search.r-project.org/CRAN/refmans/terra/html/buffer.html).
-
-Be aware of the projection. It is recommended to work on lat/longitude, or in an equal-area projection (which is not the case of Lambert-93). So we will to create the buffer in lat/long and project them in Lambert-93 afterward.
+We can create buffer with [`terra::buffer()`](https://search.r-project.org/CRAN/refmans/terra/html/buffer.html). It is recommended to work on geographic coordinates (latitude/longitude), or in an equal-area projection (which is not the case of Lambert-93). Hence, we first create the buffer in lat/long and then project them in Lambert-93.
 
 ```{r buffer_terra}
 dist_buffer <- 1000 # buffer of 1000 m
@@ -307,7 +309,7 @@ plot(
 
 
 
-### Get all values intersecting the buffer
+### Get all values within buffers
 
 To understand how the function `extract` works, it is helpful to extract all values.
 
@@ -334,7 +336,7 @@ summary(area_per_id)
 
 The buffers cover an area equivalent to 50 full pixels.  
 
-An interesting ecological variable that we can calculate with such data is the range of the elevation found within the buffer.  
+An interesting ecological variable that we can calculate with data for each pixel is the range of the elevation found within the buffer.  
 
 ```{r ext_all_range}
 drange_alti <- tapply(full_alti$elevation, full_alti$ID, function(x) {

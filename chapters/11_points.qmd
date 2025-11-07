@@ -26,7 +26,7 @@ suppressPackageStartupMessages({
 ```
 
 
-## Creating spatial points from data.frame
+## Create spatial points from data.frame
 
 This is the most common case: you have coordinates from a file (csv or excel) and you want to get spatial information about these locations. The first step is to transform the coordinates as proper spatial object in {{< fa brands r-project >}}.
 
@@ -209,7 +209,7 @@ plot(pt_sf["institutionCode"], axes = TRUE)
 
 
 
-## Export the data
+## Export data
 
 For vectors, it is [recommended](https://frbcesab.github.io/spatial-slides/intro-GIS#/vector-vs-raster-file-format) to export them as **geopackage file** (extension `.gpkg`). Compare to traditional ESRI shapefile, the geopackage format stores the data in a single file and the column names are preserved. 
 
