@@ -1,7 +1,7 @@
 # Multi-layer rasters {.unnumbered}
 
 :::{.callout-important title="Summary"}
-This tutorial explore how to handle **multi-layer rasters** in {{< fa brands r-project >}} with `terra` package:
+This tutorial explores how to handle **multi-layer rasters** in {{< fa brands r-project >}} with `terra` package:
 
 - import a multi-layer rasters with [`terra::rast()`](https://search.r-project.org/CRAN/refmans/terra/html/rast.html)   
 - extract information from rasters on points or polygons with [`terra::extract()`](https://search.r-project.org/CRAN/refmans/terra/html/extract.html)

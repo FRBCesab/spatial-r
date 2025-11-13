@@ -1,7 +1,7 @@
 # Rasters {.unnumbered}
 
 :::{.callout-important title="Summary"}
-This tutorial explore how to handle **rasters** in {{< fa brands r-project >}} with `terra` package:
+This tutorial explores how to handle **rasters** in {{< fa brands r-project >}} with `terra` package:
 
 - import a raster file with [`terra::rast()`](https://search.r-project.org/CRAN/refmans/terra/html/rast.html)   
 - mask non relevant areas with [`terra::mask()`](https://search.r-project.org/CRAN/refmans/terra/html/mask.html)  

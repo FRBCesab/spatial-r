@@ -1,7 +1,7 @@
 # Points {.unnumbered}
 
 :::{.callout-important title="Summary"}
-This tutorial explore how to handle **spatial points** in {{< fa brands r-project >}} with `terra` package:
+This tutorial explores how to handle **spatial points** in {{< fa brands r-project >}} with `terra` package:
 
 - create a spatial object from a data.frame with [`terra::vect()`](https://search.r-project.org/CRAN/refmans/terra/html/vect.html) and export it with [`terra::writeVector()`](https://search.r-project.org/CRAN/refmans/terra/html/writeVector.html)  
 - make interactive maps with [`mapview::mapview()`](https://search.r-project.org/CRAN/refmans/mapview/html/mapView.html)
@@ -9,7 +9,7 @@ This tutorial explore how to handle **spatial points** in {{< fa brands r-projec
 
 
 :::{.callout-tip title="The ecologist mind"}
-From GBIF observation data, we will create a proper spatial object in {{< fa brands r-project >}}. Then we will map the observations.
+From the otters observations of GBIF, we want to create a map. We will need to create a proper spatial object in {{< fa brands r-project >}}. 
 :::
 
 ## Setup
@@ -137,7 +137,7 @@ plot(st_geometry(pt_sf), axes = TRUE)
 Can we see a temporal pattern in the locations of the otter observations?
 :::
 
-Let's transform the date of the observation and get the Julian date of the observation. Then we can attach this new variable to the attribute table of our spatial object in order to map it.
+Let's transform the date of the observation as the Julian date. Then we will add this new variable to the attribute table of our spatial object in order to map it.
 
 The date formatting in R is powerful but hard to grasp. Make sure to have a look at the documentations of [`as.Date()`](https://search.r-project.org/R/refmans/base/html/as.Date.html) and [`strptime()`](https://search.r-project.org/R/refmans/base/html/strptime.html) if you want more details.  
 
@@ -189,7 +189,7 @@ plot(pt_sf["julian"], axes = TRUE)
 
 
 :::{.callout-note title="Your turn"}
-Visually check if there is a spatial bias in observations due to data provider (information in the column `institutionCode`). 
+Visually check if there is a bias in the spatial distributions of observations due to data provider (information in the column `institutionCode`). 
 :::
 
 <details>
@@ -217,7 +217,7 @@ For vectors, it is [recommended](https://frbcesab.github.io/spatial-slides/intro
 ::: {.panel-tabset}
 
 ## terra
-In `terra`, the function is [`terra::writeVector()`](https://search.r-project.org/CRAN/refmans/terra/html/writeVector.html).
+In `terra`, the function to export a spatial vector is [`terra::writeVector()`](https://search.r-project.org/CRAN/refmans/terra/html/writeVector.html).
 
 ```{r terra_export}
 #| eval: false
@@ -225,7 +225,7 @@ writeVector(pt_terra, here("data", "gbif_otter_2021_mpl50km.gpkg"))
 ```
 
 ## sf
-In `sf`, the function is [`sf::st_write()`](https://search.r-project.org/CRAN/refmans/sf/html/st_write.html).
+In `sf`, the function to export a spatial vector is [`sf::st_write()`](https://search.r-project.org/CRAN/refmans/sf/html/st_write.html).
 
 ```{r sf_export}
 #| eval: false

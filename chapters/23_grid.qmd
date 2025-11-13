@@ -1,7 +1,7 @@
 # Grid {.unnumbered}
 
 :::{.callout-important title="Summary"}
-This tutorial explore how to make a create a regular grid and transform spatial informations into a grid with `terra` package:
+This tutorial explores how to make a create a regular grid and transform spatial informations into a grid with `terra` package:
 
 - project spatial data to a commun CRS with [`terra::project()`](https://search.r-project.org/CRAN/refmans/terra/html/project.html)   
 - transform vectors to raster with [`terra::rasterize()`](https://search.r-project.org/CRAN/refmans/terra/html/rasterize.html)

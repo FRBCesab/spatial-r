@@ -1,7 +1,7 @@
 # Polygons {.unnumbered}
 
 :::{.callout-important title="Summary"}
-This tutorial explore how to handle **spatial polygons** in R with `terra` package:
+This tutorial explores how to handle **spatial polygons** in R with `terra` package:
 
 - read a spatial object with [`terra::vect()`](https://search.r-project.org/CRAN/refmans/terra/html/vect.html)    
 - calculate the area of polygons with [`terra::expanse()`](https://search.r-project.org/CRAN/refmans/terra/html/expanse.html)    
@@ -12,7 +12,7 @@ This tutorial explore how to handle **spatial polygons** in R with `terra` packa
 :::
 
 :::{.callout-tip title="The ecologist mind"}
-In which type of habitats were the otter observed? To answer this question, we will need to discover another type of spatial vector: **polygons**.
+In which type of habitats were the otters observed? To answer this question, we will need to discover another type of spatial vector: **polygons**.
 :::
 
 ## Setup
@@ -55,7 +55,7 @@ pt_otter <- vect(
 
 In this example, we will load land cover information for the area of interest from [IGN data BD CARTO](https://geoservices.ign.fr/bdcarto).
 
-*Note that this dataset has rough resolution (OSO or Corine land cover would be more suited for real analysis), but it's perfect for our illustration and learning purposes.* 
+*Note that this dataset has rough resolution ([OSO](https://artificialisation.developpement-durable.gouv.fr/bases-donnees/oso-theia) or [Corine land cover](https://land.copernicus.eu/en/products/clc-backbone) would be more suited for real analysis), but it's perfect for our illustration and learning purposes.* 
 
 
 ::: {.panel-tabset}
@@ -76,6 +76,9 @@ landuse_sf <- st_read(here("data", "BDCARTO-LULC_mpl50km.shp"))
 ```
 
 ## online
+
+If you don't have the data locally (and won't use it repeatedly), you can load it directly with:
+
 ```{r poly_online}
 #| eval: false
 landuse <- vect(
@@ -87,9 +90,9 @@ landuse <- vect(
 
 
 :::{.callout-note title="Your turn"}
-1. How many different polygons make the land cover of the area?
+1. How many different polygons are used in the land cover of our study area?
 2. What is the coordinate reference system (CRS) of the loaded river data?
-3. How many land cover classes are there? which class has most polygons?
+3. How many land cover classes are there? Which class has the most polygons?
 :::
 
 <details>
@@ -104,14 +107,10 @@ landuse <- vect(
 
 ## Visualization
 
+Before comparing two spatial objects (the otters observations and the land cover), it is recommended to plot them and make sure their projection systems are the same and the extents match. *Do not use the package `mapview` because it will automatically project the datasets.*
+
+
 ::: {.panel-tabset}
-
-## interactive
-
-```{r mapview_line}
-mapview(landuse, z = "nature") +
-  mapview(pt_otter, col.regions = "black")
-```
 
 ## terra
 
@@ -139,9 +138,9 @@ When you want to overlay multiple spatial object with base plot from `sf`, don't
 What is the dominant land cover in our study area?
 :::
 
-The function [`terra::expanse()`](https://search.r-project.org/CRAN/refmans/terra/html/expanse.html) calculates the area in $m^2$. When calculating areas, **be careful with projection systems**. Some are not suited to calculate areas. Prefer equal-area projections or use local projection system (if your study area is small). 
+The function [`terra::expanse()`](https://search.r-project.org/CRAN/refmans/terra/html/expanse.html) calculates the area in $m^2$. When calculating areas, **be careful with projection systems**. Some are not suited to calculate areas. Prefer equal-area projections or use local projection systems (if your study area is small). 
 
-Luckily, the package `terra` calculates by default the geodesic area (based on lat/long coordinates and considering Earth's curvature) which is the best estimate and avoid errors due to wrongly used projection system.  
+Luckily, the package `terra` calculates by default the geodesic area (based on lat/long coordinates and considering Earth's curvature) which is the most accurate estimate and avoid errors due to wrongly used projection system.  
 
 
 ::: {.panel-tabset}
@@ -157,12 +156,12 @@ landuse$area_ha <- as.numeric(area_polygons)
 
 ## sf
 
-For `sf`, it is recommended to project the dataset to a equal area projection, such as the Lambert azimuthal equal-area for Europe [EPSG:3035](https://epsg.io/3035).
+In `sf`, it is recommended to project the dataset to a equal area projection, such as the Lambert azimuthal equal-area for Europe [EPSG:3035](https://epsg.io/3035).
 
 ```{r lulc_area_sf}
-# 3035 is a equal-area projection for Europe
+# project land cover to an equal-area projection system
 landuse_3035 <- st_transform(landuse_sf, crs = 3035)
-# calculate area of polygons
+# calculate area of polygons (in hectare)
 area_polygons <- st_area(landuse_3035) * 0.0001
 # store as attribute in landuse
 landuse_3035$area_ha <- as.numeric(area_polygons)
@@ -183,7 +182,7 @@ landuse_3035$area_ha <- as.numeric(area_polygons)
 tapply(landuse$area_ha, landuse$nature, sum)
 ```
 
-The category `Eau libre` (=running water) is the largest land cover because, as it can be seen in the previous map, large part of the Mediterranean Sea is present in the land cover data.
+The category `Eau libre` (=running water) is the largest land cover because, as it can be seen in the [previous map](https://frbcesab.github.io/spatial-r/chapters/13_polygons_files/figure-html/terramap_line-1.png), large part of the Mediterranean Sea is included in the land cover data.
 
 </details>
 
@@ -191,12 +190,10 @@ The category `Eau libre` (=running water) is the largest land cover because, as 
 ## Mask the sea
 
 :::{.callout-tip title="The ecologist mind"}
-Our study area was defined as a buffer around Montpellier. This area include the marine ecosystems, which is not the habitat of otters. So it is recommended to mask the sea in order to consider only areas where otter could have been potentially spotted.
+Our study area was defined as a square buffer around Montpellier. This area include the Mediterranean Sea. It is recommended to mask the sea in order to consider only areas where otters could have been potentially spotted.
 :::
 
-There can be two approaches to mask an area: either (1) identify which area to remove from the data itself , or (2) use a mask from another data source (this approach will be [shown when dealing with rasters](https://frbcesab.github.io/spatial-r/chapters/21_rasters.html#mask-the-sea)). 
-
-In this case, it is easier and more trustworthy to detect directly from the data which polygons to remove. In fact, the largest polygon correspond to the Mediterranean Sea. So we just need to remove it.
+There are two approaches to mask an area: (1) identify which area to remove from the data itself, or (2) use a mask from another data source (this approach will be [shown when dealing with rasters](https://frbcesab.github.io/spatial-r/chapters/21_rasters.html#mask-the-sea)). In this case, it is easier and more accurate to detect directly from the data which polygons to remove. In fact, the largest polygon corresponds to the Mediterranean Sea. So we just need to remove it.
 
 ```{r ex2}
 # the largest polygon correspond to the mediterranean
@@ -221,22 +218,23 @@ round(cover_perc, 2)
 ## Polygons to points
 
 :::{.callout-tip title="The ecologist mind"}
-What is the land cover class at the location of the otter observations?
+What is the land cover class at the location of the otters observations?
 :::
-
-Before making extraction, it is recommended to plot the data (if not too big). This is a verification step ensuring that the projection systems and the extents match. Do not use `mapview` (interactive map) because it will automatically project the data.
 
 
 ::: {.panel-tabset}
 ## terra
 
-Extract the land cover class of the points with [`terra::extract()`](https://search.r-project.org/CRAN/refmans/terra/html/extract.html): 
+We can extract the land cover class of the points with [`terra::extract()`](https://search.r-project.org/CRAN/refmans/terra/html/extract.html): 
+
 ```{r lulc_otter_terra}
 pt_landcover <- extract(landuse, pt_otter)
 ```
 
 ## sf
-Extract the land cover class of the points with [`sf::st_join()`](https://search.r-project.org/CRAN/refmans/sf/html/st_join.html): 
+
+We can extract the land cover class of the points with [`sf::st_join()`](https://search.r-project.org/CRAN/refmans/sf/html/st_join.html): 
+
 ```{r lulc_otter_sf}
 pt_landcover <- st_join(st_as_sf(pt_otter), landuse_sf)
 ```
@@ -244,7 +242,7 @@ pt_landcover <- st_join(st_as_sf(pt_otter), landuse_sf)
 :::
 
 ```{r lulc_otter_table}
-# see area per land use classes of the observations
+# see the number of observations per land use classes
 table(pt_landcover$nature)
 ```
 
@@ -256,16 +254,17 @@ table(pt_landcover$nature)
 <summary>Click to see the answer</summary>
 
 ```{r ex4}
-# see area per land use classes of the observations
+# calculate the percentage of otters observations per class
 cover_obs_perc <- table(pt_landcover$nature) / nrow(pt_landcover) * 100
-# add missing classes
+# match all classes with the one from the observations
 m0 <- match(names(cover_perc), names(cover_obs_perc))
+# create a data.frame
 cover <- data.frame(
   class = names(cover_perc),
   all = as.numeric(cover_perc),
   obs = as.numeric(cover_obs_perc[m0])
 )
-# non matchin elements = 0
+# non matchin elements = 0%
 cover[is.na(cover)] <- 0
 # calculate the difference between observed and expected
 cover$delta <- cover$obs - cover$all
@@ -286,17 +285,17 @@ barplot(
 ## Polygons to polygons
 
 :::{.callout-tip title="The ecologist mind"}
-What is the land cover distribution around the locations of the otter observations?
+What is the land cover distribution around the locations of the otters observations?
 :::
 
-To characterize the area surrounding the observations, we need to define buffers. 
+To characterize the area surrounding the observations, we need to (!) create buffers, (2) calculate the intersection among the buffers and the land cover, and (3) calculate the area of the land cover classes intersecting the buffers. 
 
 ### Create buffer
 
 ::: {.panel-tabset}
 
 ## terra
-We can create buffer with [`terra::buffer()`](https://search.r-project.org/CRAN/refmans/terra/html/buffer.html).
+We can create buffer with [`terra::buffer()`](https://search.r-project.org/CRAN/refmans/terra/html/buffer.html). In our example, we will create buffers of 1km.
 
 ```{r buffer_terra}
 dist_buffer <- 1000 # buffer of 1000 m
@@ -313,7 +312,7 @@ It is recommended to use projected coordinates when using the function [`sf::st_
 
 ```{r buffer_sf}
 dist_buffer <- 1000 # buffer of 1000 m
-# transform as UTM : better for area
+# transform to an equal-area projection system: better for area
 pt_otter_3035 <- st_as_sf(pt_otter) |> st_transform(3035)
 poly_otter_3035 <- st_buffer(pt_otter_3035, dist_buffer)
 ```
@@ -328,8 +327,11 @@ For illustration, we only show the buffer around the first observation.
 The parameter `ext` limit the map to the extent of the given spatial object.  
 
 ```{r map_buffer_terra}
+# plot the land cover limited to the extent of the buffer
 plot(landuse, y = "nature", ext = poly_otter[1])
+# add the buffer as a line of width 2
 plot(poly_otter[1], lwd = 2, add = TRUE)
+# add the observation as a red dot
 plot(pt_otter[1], col = "red", add = TRUE)
 ```
 
@@ -342,17 +344,24 @@ plot(pt_otter[1], col = "red", add = TRUE)
 <summary>Click to see the answer</summary>
 
 ```{r ex5}
-# see area per land use classes of the observations
-summary(expanse(poly_otter))
-# for sf
+# calculate the area of the buffers
+buffer_area <- expanse(poly_otter)
+# see the distribution of the buffer areas
+summary(buffer_area)
+
+# distribution of the buffer areas from sf
 summary(st_area(poly_otter_3035))
 ```
 
-The difference with expected value (```r print(pi*1000000)```) is due to the way the circle is defined (in 40 points in `terra` and 120 points in `sf`). 
+The difference with expected value (```r print(pi*1000000)```) is due to the way buffers are defined (in 40 points in `terra` and 120 points in `sf`). But it is important that all buffers have the same area.  
+
 </details>
 
 
-### Intersection
+### Intersection among polygons
+
+We can now intersect the buffers with the land cover information with the function [`terra::intersect()`](https://search.r-project.org/CRAN/refmans/terra/html/intersect.html).
+
 
 ::: {.panel-tabset}
 
@@ -360,7 +369,8 @@ The difference with expected value (```r print(pi*1000000)```) is due to the way
 ```{r buffer_lulc_terra}
 buffer_landcover <- intersect(landuse, poly_otter)
 
-# visualize the intersection (not plotted to lighten the webpage)
+# visualize the intersection
+# not plotted here to lighten the webpage
 # mapview(buffer_landcover, z = "nature")
 
 # show a zoom on the land cover of the first buffer
@@ -380,9 +390,9 @@ buffer_landcover_sf <- st_intersection(poly_otter_3035, landuse_3035)
 
 :::
 
-### Land cover per buffer 
+### Land cover area per buffer 
 
-We need to update the area of the intersected land cover.
+We need to update the area of the land cover intersecting the buffers.
 
 ```{r perc_lulc_terra}
 # Calculate area for each polygon
@@ -396,7 +406,7 @@ class_area <- tapply(
 )
 #replace NA by 0
 class_area[is.na(class_area)] <- 0
-# calculate the area of the buffer that intersect any polygon
+# calculate the area of the buffer
 sum_area <- rowSums(class_area)
 # calculate the percentage per class
 perc_class <- class_area / sum_area * 100
@@ -405,5 +415,4 @@ perc_class <- class_area / sum_area * 100
 par(mar = c(7, 4, 1, 1))
 barplot(apply(perc_class, 2, mean), las = 2, ylab = "Percentage land cover")
 ```
-
 

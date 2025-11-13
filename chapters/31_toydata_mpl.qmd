@@ -25,13 +25,13 @@ For this example, we will focus on an area around FRB-CESAB in Montpellier. So w
 
 ### Get coordinates from an address
 
-This task is called geocoding. Among other resource, we recommend the package `rgeoservices` (if in France, based on french IGN services) or the package `tidygeocoder` using Open Street Map data.
+This task is called geocoding. Among other resources, we recommend the package `rgeoservices` (if in France, based on french IGN services) or the package `tidygeocoder` using Open Street Map data.
 
 ::: {.panel-tabset}
 ## rgeoservices
 ```{r rgeoservices}
 #| eval: false
-#|
+
 cesab <- rgeoservices::gs_get_coordinates(
   query = "5 rue de l’École de médecine, 34000 MONTPELLIER",
   index = "address"
@@ -41,7 +41,7 @@ cesab <- rgeoservices::gs_get_coordinates(
 ## tidygeocoder
 ```{r tidygeocoder}
 #| eval: false
-#|
+
 cesab <- tidygeocoder::geocode(
   data.frame(x = "5 rue de l’École de médecine, 34000 MONTPELLIER"),
   address = "x",
@@ -84,7 +84,7 @@ pt_cesab <- st_as_sf(
 We want a buffer zone of 50km around the FRB-Cesab. Because GBIF only accept rectangle buffer, we will take the square that include the circular buffer.
 
 ```{r buffer}
-buffer_size <- 50000 # in m because data are in EPSG 4326
+buffer_size <- 50000 # in m
 
 # create a round buffer zone
 b_circle <- st_buffer(pt_cesab, buffer_size)
@@ -105,7 +105,7 @@ mapview(b_square, alpha.regions = 0, lwd = 3) +
 # 2. Get the occurrences from GBIF
 
 ### Get the number of occurrences
-We will use the package `rgbif`[@R-rgbif] which provides a good interface to access directly [GBIF](https://www.gbif.org/) data. A good way is to start with the function [`rgbif::occ_count()`](https://search.r-project.org/CRAN/refmans/rgbif/html/occ_count.html) to know how many records fits our criteria.
+We will use the package `rgbif`[@R-rgbif] which provides a good interface to access directly [GBIF](https://www.gbif.org/) data. It is recommended to start with the function [`rgbif::occ_count()`](https://search.r-project.org/CRAN/refmans/rgbif/html/occ_count.html) to know how many records fits the search criteria.
 You can add `;` for multiple values and `,` for a range.
 
 Let's look at how many otter, genet and badger where seen in the period 2021-2024 around Montpellier.
@@ -120,7 +120,7 @@ occ_count(
 
 
 ### Data download
-If the dataset is small (<100.000 records), then we can use the function [`rgbif::occ_search()`](https://search.r-project.org/CRAN/refmans/rgbif/html/occ_search.html). Else we would need to use the function `rgbif::occ_download()` and register in GBIF. For the sake of downloading a small toy dataset, this is not needed.
+If the dataset is small (<100.000 records), then you can use the function [`rgbif::occ_search()`](https://search.r-project.org/CRAN/refmans/rgbif/html/occ_search.html). Else you need to use the function [`rgbif::occ_download()`](https://search.r-project.org/CRAN/refmans/rgbif/html/occ_download.html) and register in GBIF. For the sake of downloading a small toy dataset, this registration step is not needed.
 
 :::{.callout-important}
 For real analysis, it is recommended to use `rgbif::occ_download()`(https://search.r-project.org/CRAN/refmans/rgbif/html/occ_download.html) which will provide data with a DOI that can be directly cited in future publication.

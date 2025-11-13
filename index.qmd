@@ -6,7 +6,7 @@ The core tutorials were developed for a two half-day workshop, but you can follo
 
 
 :::{.callout-tip title="The ecologist mind"}
-In these tutorials, we characterize the habitat of otter that were observed in 2021 around Montpellier, France. This small toy case study is not relevant ecologically but provides a good opportunity to tackle multiple challenges with handling and collecting spatial data. 
+In these tutorials, we characterize the habitat of otters that were observed in 2021 around Montpellier, France. This small toy case study is not relevant ecologically but provides a good opportunity to tackle multiple challenges with handling and collecting spatial data. 
 :::
 
 
@@ -16,23 +16,22 @@ In these tutorials, we characterize the habitat of otter that were observed in 2
 
 #### Practice 1 : Vectors (2h)  
 
-- [Points](https://frbcesab.github.io/spatial-r/chapters/11_points.html): Transform otter field observations as spatial points
+- [Points](https://frbcesab.github.io/spatial-r/chapters/11_points.html): Transform otters field observations as spatial points
 - [Lines](https://frbcesab.github.io/spatial-r/chapters/12_lines.html): Calculate distance from points to nearest lines (river networks)    
-- [Polygons](https://frbcesab.github.io/spatial-r/chapters/13_polygons.html): Characterize land cover around sites using spatial polygons.  
+- [Polygons](https://frbcesab.github.io/spatial-r/chapters/13_polygons.html): Characterize land cover around sites using spatial polygons  
 
 #### Practice 2: Rasters (2h) 
 
 - [Raster](https://frbcesab.github.io/spatial-r/chapters/13_polygons.html): Discover what is a raster and get the elevation of field observations  
-- [Multi-layer](https://frbcesab.github.io/spatial-r/chapters/22_multilayer.html): Trace back past monthly climate at the field sites. 
-- [Grid](https://frbcesab.github.io/spatial-r/chapters/23_grid.html): Transform observations and spatial data into a commun grid format
+- [Multi-layer](https://frbcesab.github.io/spatial-r/chapters/22_multilayer.html): Trace back past monthly climate at the field sites 
+- [Grid](https://frbcesab.github.io/spatial-r/chapters/23_grid.html): Transform observations and spatial data into a commun grid
  
 #### Other tutorials
 
-- [Toy dataset](https://frbcesab.github.io/spatial-r/chapters/31_toydata_mpl.html): how to get data from GBIF, IGN and CHELSA and create the toy dataset used in this workshop.
+- [Toy dataset](https://frbcesab.github.io/spatial-r/chapters/31_toydata_mpl.html): Get data from GBIF, IGN and CHELSA and create the toy dataset used in this workshop.
 
 <!--
 **To be created**:  
-
 - mapview
 - mapsf
 - tmap
@@ -47,18 +46,19 @@ In these tutorials, we characterize the habitat of otter that were observed in 2
 ### R packages
 
 The tutorials rely mostly on the {{< fa brands r-project >}}-package [`terra`](https://rspatial.github.io/terra/index.html) as it was specifically developed to tackle challenges faced by ecologists or agronomists when doing spatial analysis.  
-{{< fa brands r-project >}} has an exceptional diversity of users and packages, and this is especially true with the dynamic community of {{< fa brands r-project >}}-users doing spatial analysis. Another very popular package for handling spatial data is `sf`.    
+{{< fa brands r-project >}} has an exceptional diversity of users and packages, and this is especially true with the dynamic community of {{< fa brands r-project >}}-users doing spatial analysis. Another very popular package for handling spatial vector data is [`sf`](https://search.r-project.org/CRAN/refmans/sf/html/00Index.html). The correspondance among `terra` and `sf` functions are presented in the vector tutorials.
+
 
 ### Other resources
 
 These tutorials were inspired by very valuable online ressources:     
 
-- Hijman R. et al. [Spatial Data Science with R and “terra”](https://rspatial.org/)   
-- Pebesma and Bivand [Spatial Data Science: With Applications in R](https://r-spatial.org/book/)
-- Moraga P. (2023)[Spatial Statistics for Data Science: Theory and Practice with R](https://www.paulamoraga.com/book-spatial/)
-- Lovelace, Nowosad, and Muenchow (2025) [Geocomputation with R](https://r.geocompx.org/)  
+- Hijman R. [Spatial Data Science with R and “terra”](https://rspatial.org/)   
+- Pebesma E. and Bivand R. [Spatial Data Science: With Applications in R](https://r-spatial.org/book/)
+- Moraga P. (2023) [Spatial Statistics for Data Science: Theory and Practice with R](https://www.paulamoraga.com/book-spatial/)
+- Lovelace R., Nowosad J., and Muenchow J. (2025) [Geocomputation with R](https://r.geocompx.org/)  
 - Gimond M. (2025) [Intro to GIS and Spatial Analysis](https://mgimond.github.io/Spatial/index.html)  
 - Slingsby J. (2025) [A minimal introduction to GIS in R](https://www.ecologi.st/spatial-r/)
-- Giraud, T. et Pecout, H. (2025). [Géomatique et cartographie avec R](https://rgeocarto.github.io/) [fr]
+- Giraud, T. et Pecout, H. (2025) [Géomatique et cartographie avec R](https://rgeocarto.github.io/) [fr]
 
 

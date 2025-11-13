@@ -10,7 +10,7 @@ Please have a look at the tutorial on how to setup a working environment for sci
 
 ### R packages needed  
 
-We will use four packages: `terra`[@R-terra] and `sf`[@R-sf] for handling spatial data, `mapview`[@R-mapview] for interactive maps, and `here`[@R-here] for locating files locally.
+We will use four packages: `terra`[@R-terra] and `sf`[@R-sf] for handling spatial data, `mapview`[@R-mapview] for interactive maps, and `here`[@R-here] for locating files locally. Make sure these four packages are installed locally by running the following script:  
 
 ```{r}
 #| eval: false
@@ -28,7 +28,7 @@ invisible(lapply(needed_packages, check_and_install))
 
 ## Download toy dataset
 
-As an toy dataset, the tutorials rely on observed occurrence of otter in 2021 around Montpellier, France. These dataset were downloaded directly from {{< fa brands r-project >}}, for more details see the [tutorial on creating a toy dataset from GBIF, IGN and CHELSA](https://frbcesab.github.io/spatial-r/chapters/31_toydata_mpl.html).
+As a toy dataset, the tutorials rely on observed occurrences of otters in 2021 around Montpellier, France. These datasets were downloaded directly from {{< fa brands r-project >}}, for more details see the [tutorial on creating a toy dataset from GBIF, IGN and CHELSA](https://frbcesab.github.io/spatial-r/chapters/31_toydata_mpl.html).
 
 You can run the following commands to download the dataset needed for the workshop (total size : 11Mb), or download [a zip archive](https://github.com/FRBCesab/spatial-r/raw/refs/heads/main/data/spatial-r_data.zip)
 
@@ -82,15 +82,25 @@ download.file(file.path(url_git, file7), file.path(datadir, file7), mode = "wb")
 ```
 
 
-<!--
 
-```{r}
-sessionInfo()
+## Session information
+
+For reproducibility, the tutorials were last compiled on ```r format(Sys.Date(), "%d %B %Y")``` with the following libraries:  
+
+```{r session}
+#| echo: false
+
+suppressPackageStartupMessages({
+  library(mapview)
+  library(here)
+  library(terra)
+  library(sf)
+})
+
+print(sessionInfo(), locale = FALSE, tzone = FALSE)
 # R version 4.5.1 (2025-06-13)
 # terra_1.8-70
 # sf_1.0-21
 # here_1.0.2
 # mapview_2.11.4
 ```
-
--->
