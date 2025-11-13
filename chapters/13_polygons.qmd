@@ -353,7 +353,7 @@ summary(buffer_area)
 summary(st_area(poly_otter_3035))
 ```
 
-The difference with expected value (```r print(pi*1000000)```) is due to the way buffers are defined (in 40 points in `terra` and 120 points in `sf`). But it is important that all buffers have the same area.  
+The difference with expected value of $3141593$ is due to the way buffers are defined (in 40 points in `terra` and 120 points in `sf`). But it is important that all buffers have the same area.  
 
 </details>
 

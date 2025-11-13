@@ -5,13 +5,12 @@ This tutorial explores how to handle **rasters** in {{< fa brands r-project >}} 
 
 - import a raster file with [`terra::rast()`](https://search.r-project.org/CRAN/refmans/terra/html/rast.html)   
 - mask non relevant areas with [`terra::mask()`](https://search.r-project.org/CRAN/refmans/terra/html/mask.html)  
-- create buffers around points with [`terra::buffer()`](https://search.r-project.org/CRAN/refmans/terra/html/buffer.html)  
 - extract information from rasters on points or polygons with [`terra::extract()`](https://search.r-project.org/CRAN/refmans/terra/html/extract.html)
 
 :::
 
 :::{.callout-tip title="The ecologist mind"}
-Elevation is a key geographical variable that strongly define habitats. At which elevation were the otter observed?
+Elevation is a key geographical variable that strongly define habitats. At which elevation were the otters observed?
 To answer this question, we will need to discover another type of spatial data: **rasters**.
 :::
 
@@ -29,8 +28,6 @@ suppressPackageStartupMessages({
   library(mapview)
   library(here)
   library(terra)
-  # library(sf)
-  # library(exactextractr)
 })
 ```
 
@@ -56,7 +53,7 @@ pt_otter <- vect(paste0(url_github, "gbif_otter_2021_mpl50km.gpkg"))
 ## Load raster from a geotiff file
 
 We will use the elevation data from [IGN data BD ALTI](https://geoservices.ign.fr/bdalti) which was aggregated at 250m resolution (instead of its original resolution of 25m). *Note that the rough resolution of this dataset is perfect for our learning purpose. Yet for real analyses, you might consider finer spatial data.* 
-The function to read [most kind of raster file] is [`terra::rast()`](https://search.r-project.org/CRAN/refmans/terra/html/rast.html)
+The function to read raster file is [`terra::rast()`](https://search.r-project.org/CRAN/refmans/terra/html/rast.html)
 
 ::: {.panel-tabset}
 
@@ -66,6 +63,9 @@ bdalti <- rast(here("data", "BDALTI_mpl50km.tif"))
 ```
 
 ## online
+
+If you don't have the data locally (and won't use it repeatedly), you can load it directly with:
+
 ```{r rast_online}
 #| eval: false
 bdalti <- rast(
@@ -81,7 +81,7 @@ bdalti <- rast(
 bdalti
 ```
 
-The loaded raster is projected in ```r crs(bdalti, describe = TRUE)$name``` (EPSG ```r crs(bdalti, describe = TRUE)$code```). It is a matrix with ```r nrow(bdalti)``` rows, ```r ncol(bdalti)``` columns, and a spatial resolution of ```r res(bdalti)[1]```m (on x and y). All the information about `terra::SpatRaster` can be accessed individually. Use [`terra::crs()`](https://search.r-project.org/CRAN/refmans/terra/html/ext.html) for the projection system, [`terra::ext()`](https://search.r-project.org/CRAN/refmans/terra/html/ext.html) for the geographical extent, [`terra::res()`](https://search.r-project.org/CRAN/refmans/terra/html/dimensions.html) for the resolution, and `dim()` for the dimensions (number of rows, number of columns and number of layers). 
+The loaded raster is projected in ```r crs(bdalti, describe = TRUE)$name``` (EPSG ```r crs(bdalti, describe = TRUE)$code```). It is a matrix with ```r nrow(bdalti)``` rows, ```r ncol(bdalti)``` columns, and a spatial resolution of ```r res(bdalti)[1]```m (on x and y). All the information about `terra::SpatRaster` can be accessed individually. Use [`terra::crs()`](https://search.r-project.org/CRAN/refmans/terra/html/ext.html) for information on the projection system, [`terra::ext()`](https://search.r-project.org/CRAN/refmans/terra/html/ext.html) for the geographical extent, [`terra::res()`](https://search.r-project.org/CRAN/refmans/terra/html/dimensions.html) for the resolution, and `dim()` for the dimensions (number of rows, number of columns and number of layers). 
 
 ```{r rast_name}
 # get the name of the layer
@@ -90,13 +90,14 @@ names(bdalti)
 names(bdalti) <- "elevation"
 ```
 
-We can access all values of the raster with the function [`terra::values()`]((https://search.r-project.org/CRAN/refmans/terra/html/values.html)). This operation is often not needed and it is not recommended if you have large rasters. But it is the only way to get the distribution of all values.
+We can access all values of the raster with the function [`terra::values()`]((https://search.r-project.org/CRAN/refmans/terra/html/values.html)). This operation is often not needed and not recommended if you have large rasters. But it is the only way to get the distribution of all values.
 
 ```{r rast_values}
 # get all the values : values()
 # use only for small raster
 # else it takes large amount of time and memory
 boxplot(values(bdalti), ylab = "elevation (m)")
+
 # mean elevation in our study area
 summary(values(bdalti))
 ```
@@ -123,11 +124,11 @@ mapview(bdalti)
 ## Mask the sea
 
 :::{.callout-tip title="The ecologist mind"}
-To avoid considering regions outside the habitats, it is recommended to mask areas that are not part of the habitats (typically the sea for terrestrial animals). 
+Our study area was defined as a square buffer around Montpellier. This area include the Mediterranean Sea. It is recommended to mask the sea in order to consider only areas where otters could have been potentially spotted.
 :::
 
 
-To mask all pixels that don't fit our study area (the terrestrial environment 50km around Montpellier), we need (1) to get the borders of France from [GADM](https://gadm.org/), (2) project the border to match the elevation raster, (3) mask the area that are not in the polygon.
+To mask all pixels that don't fit our study area (the terrestrial environment 50km around Montpellier), we need (1) to get the borders of France from [GADM](https://gadm.org/), (2) project the border to match the elevation raster, and (3) mask the area that are not in the country polygon with the function [`terra::mask()`](https://search.r-project.org/CRAN/refmans/terra/html/mask.html).
 
 ::: {.panel-tabset}
 
@@ -154,6 +155,7 @@ france_2154 <- project(france_border, crs(bdalti))
 # mask (=set to NA) the pixels that are not in the polygon
 alti_masked <- mask(bdalti, france_2154)
 
+# visualize the new raster without the Mediterranean Sea
 plot(alti_masked)
 
 # mean elevation in our study area (excluding sea)
@@ -165,7 +167,7 @@ summary(values(alti_masked), na.rm = TRUE)
 ## Raster to points
 
 :::{.callout-tip title="The ecologist mind"}
-Now that we have loaded the elevation data in R, let's get the elevation at the location of the otter observations. 
+Now that we have loaded the elevation data, let's get the elevation at the location of otters observations. 
 :::
 
 ### Checking projections and extent   
@@ -178,23 +180,23 @@ plot(pt_otter, add = TRUE)
 ```
 
 :::{.callout-note title="Your turn"}
-Why can't you see the otter observations? How to fix this problem?  
+Why can't you see the otters observations? How to fix this problem?  
 :::
 
 <details>
 <summary>Click to see the answer</summary>
 
-Indeed, the spatial points with the otter observations don't share the same projection than the elevation raster. We need to project the spatial points to the CRS of the elevation data. 
+Indeed, the spatial points with the otters observations don't share the same projection than the elevation raster. We need to project the spatial points to the CRS of the elevation data. 
 
 :::{.callout-important}
-It is not recommended to project raster objects. When you have the choice, it is always better to project vector data to the raster projection system.
+It is not recommended to project raster objects. When you have the choice, it is always better to project vector data to the CRS of the raster.
 :::
 
 ```{r ex1}
 # the projection systems are not matching
 crs(bdalti) == crs(pt_otter)
 
-# so we need to to project the otter observations to the raster's CRS
+# let's project the otter observations to the raster's CRS
 pt_2154 <- project(pt_otter, crs(bdalti))
 
 # now we can check that the points overlay the elevation data
@@ -204,7 +206,7 @@ plot(pt_2154, col = "red", add = TRUE)
 
 </details>
 
-### Extraction of values
+### Extraction of elevation values
 
 Now we can use the function [`terra::extract()`](https://search.r-project.org/CRAN/refmans/terra/html/extract.html) to get the elevation of the observations.
 
@@ -245,8 +247,8 @@ abline(a = 0, b = 1)
 ```{r ex3}
 boxplot(
   pt_alti$elevation ~ pt_otter$month,
-  xlab = "elevation (m)",
-  ylab = "Month of observation"
+  xlab = "Month of observation",
+  ylab = "elevation (m)"
 )
 ```
 
@@ -256,12 +258,12 @@ boxplot(
 ## Raster to polygons
 
 :::{.callout-tip title="The ecologist mind"}
-What is the elevation around the locations of the otter observations?
+What is the elevation around the locations of the otters observations?
 :::
 
 ### Create buffer
 
-We can create buffer with [`terra::buffer()`](https://search.r-project.org/CRAN/refmans/terra/html/buffer.html). It is recommended to work on geographic coordinates (latitude/longitude), or in an equal-area projection (which is not the case of Lambert-93). Hence, we first create the buffer in lat/long and then project them in Lambert-93.
+We can create buffer with [`terra::buffer()`](https://search.r-project.org/CRAN/refmans/terra/html/buffer.html). It is recommended to work on geographic coordinates (latitude/longitude), or in an equal-area projection (which is not the case of Lambert-93). Hence, we will first create the buffer in lat/long and then project them in Lambert-93.
 
 ```{r buffer_terra}
 dist_buffer <- 1000 # buffer of 1000 m
@@ -294,7 +296,7 @@ sd(expanse(poly_2154))
 
 The function [`terra::extract()`](https://search.r-project.org/CRAN/refmans/terra/html/extract.html) can summarize the information per polygon with the parameter `fun`. If no function is provided, it will extract all values that intersect the polygons.   
 
-It is recommended to use the parameter `exact=TRUE` to get the weighted mean based on the fraction of each cell that is covered (but that slows the computation).  
+It is recommended to use the parameter `exact=TRUE` to get the weighted mean based on the fraction of each cell that is covered (but  computation is slower).  
 
 ```{r ext_poly_rast_mean}
 mean_alti <- extract(alti_masked, poly_2154, fun = mean, exact = TRUE)
@@ -303,7 +305,7 @@ plot(
   mean_alti$elevation,
   pt_otter$elevation,
   xlab = "mean elevation in buffer (m)",
-  ylab = "elevation at the location of the observation (m)"
+  ylab = "elevation at the observation (m)"
 )
 ```
 
@@ -324,7 +326,7 @@ We can calculate the number of different pixels that intersects the polygon.
 
 ```{r ext_all_npixels}
 npixels <- table(full_alti$ID)
-table(npixels) # it overlap between 63 and 69 pixels
+table(npixels)
 ```
 
 The polygons intersect between 63 and 69 pixels, but some are partially intersecting. Let's now calculate the surface (in number of pixels) covered by the buffer

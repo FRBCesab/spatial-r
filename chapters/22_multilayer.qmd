@@ -9,7 +9,7 @@ This tutorial explores how to handle **multi-layer rasters** in {{< fa brands r-
 :::
 
 :::{.callout-tip title="The ecologist mind"}
-How are otters influenced by climate? We need to get the climatic conditions **where and when** the otter have been observed. To get such data, we need to discover another type of spatial data: **multi-layer rasters**.
+How are otters influenced by climate? We need to get the climatic conditions **where and when** the otters were observed. To get such data, we need to discover another type of spatial data: **multi-layer rasters**.
 :::
 
 
@@ -28,8 +28,6 @@ suppressPackageStartupMessages({
   library(mapview)
   library(here)
   library(terra)
-  # library(sf)
-  # library(exactextractr)
 })
 ```
 
@@ -128,24 +126,13 @@ The temperature are expressed in Kelvin, as indicated in the [documentation of C
 <details>
 <summary>Click to see the answer 2</summary>
 
-::: {.panel-tabset}
-
-## local
-```{r local_mask}
-# get the border of the country (level = 0)
-france_border <- readRDS(here("data", "gadm41_FRA_0_pk.rds"))
-```
-
-## geodata
-```{r geodata_mask}
-#| eval: false
-# get the border of the country (level = 0)
-france_border <- geodata::gadm("FRA", level = 0, path = here("data"))
-```
-
-:::
 
 ```{r mask}
+# get the border of the country (level = 0)
+france_border <- readRDS(here("data", "gadm41_FRA_0_pk.rds"))
+# or directly from geodata
+# france_border <- geodata::gadm("FRA", level = 0, path = here("data"))
+
 # mask (=set to NA) the pixels that are not in the polygon
 temperature <- mask(temperature, france_border)
 
@@ -166,8 +153,9 @@ We can make algebra operations in rasters. For instance, we can transform Kelvin
 
 ```{r rast_transform}
 temp_C <- temperature - 273.15
-# improve the plot with 2021 temperature layers
+# calculate the range of temperature values
 range_T <- range(values(temp_C))
+# add otters observations in each layer with `fun`
 plot(
   temp_C,
   in_2021,
@@ -180,7 +168,7 @@ plot(
 
 ## Extract information on points
 
-Similar as with a simple raster, the function [`terra::extract()`](https://search.r-project.org/CRAN/refmans/terra/html/extract.html) will get the temperature values of all months at the location of the observations.
+Similar to simple raster, the function [`terra::extract()`](https://search.r-project.org/CRAN/refmans/terra/html/extract.html) will get the temperature values of all months (= all layers) at the location of the observations.
 
 ```{r extract_pt}
 pt_temp <- extract(temp_C, pt_otter, ID = FALSE)
@@ -188,7 +176,7 @@ dim(pt_temp)
 summary(unlist(pt_temp))
 ```
 
-The extracted temperature (in `pt_temp`) are stored in a data.frame with rows corresponding to otter observations, and columns corresponding to  months.
+The extracted temperature (in `pt_temp`) are stored in a data.frame with rows corresponding to otters observations, and columns corresponding to  months.
 
 We can visualize the seasonal variation of the temperature with a simple `boxplot()`
 
@@ -200,7 +188,7 @@ boxplot(pt_temp, las = 2, ylab = "Temperature (*C)")
 ### Average temperature
 
 :::{.callout-tip title="The ecologist mind"}
-Having one temperature variable per month is not informative, because these variables are highly correlated. So we need to summarize the information in term of average temperature level or level of seasonal variation. 
+Having one temperature variable per month is not informative, because these variables are highly correlated. So we need to summarize the information in term of average temperature or seasonal variation. 
 :::
 
 With these monthly temperature values, we can calculate the average of monthly temperature for the period 2015-2021. 
@@ -256,7 +244,7 @@ Observations made closer to the sea have warmer climate and lower seasonal varia
 ### Temperature at the time of observation
 
 :::{.callout-tip title="The ecologist mind"}
-Instead of climate in the time period, the otter observations might also be affected by the weather at the time of observation.
+Instead of the average climate in the time period 2015-2021, otters observations might also be affected by the weather at the time of observation (here approximated by the month of the observation).
 :::
 
 We need to identify which temperature layer correspond to the time of the observations. For this we will use the date formatting in {{< fa brands r-project >}}. If you want more details, have a look at the documentations of [`as.Date()`](https://search.r-project.org/R/refmans/base/html/as.Date.html) and [`strptime()`](https://search.r-project.org/R/refmans/base/html/strptime.html) . 
@@ -267,7 +255,7 @@ pt_otter$time <- as.Date(pt_otter$eventDate) |> format("%m_%Y")
 table(pt_otter$time)
 ```
 
-Now that we have the same format for the name of the temperature layer and the time of the observations, we can get the temperature value at the time of observation.
+We now have the same format for the name of the temperature layer and the time of the observations, so we can get the temperature value at the time of observation.
 
 ```{r match_temp}
 # identify the matching layer corresponding to the time of observation
@@ -293,7 +281,7 @@ plot(france_border, add = TRUE)
 
 
 :::{.callout-note title="Your turn"}
-2. Extract the average temperature values for 1km buffer around the observations. Use the buffers as explained in the [Chapter Rasters](https://frbcesab.github.io/spatial-r/chapters/21_rasters.html#create-buffer).
+2. Extract the average temperature in 2015-2021 for 1km buffers around the observations. Use buffers as explained in the [Chapter Rasters](https://frbcesab.github.io/spatial-r/chapters/21_rasters.html#create-buffer).
 1. (advanced) Calculate the range of monthly temperature within the 12 months before the observations, and make a map.
 :::
 

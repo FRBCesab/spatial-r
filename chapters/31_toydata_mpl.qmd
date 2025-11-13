@@ -123,7 +123,7 @@ occ_count(
 If the dataset is small (<100.000 records), then you can use the function [`rgbif::occ_search()`](https://search.r-project.org/CRAN/refmans/rgbif/html/occ_search.html). Else you need to use the function [`rgbif::occ_download()`](https://search.r-project.org/CRAN/refmans/rgbif/html/occ_download.html) and register in GBIF. For the sake of downloading a small toy dataset, this registration step is not needed.
 
 :::{.callout-important}
-For real analysis, it is recommended to use `rgbif::occ_download()`(https://search.r-project.org/CRAN/refmans/rgbif/html/occ_download.html) which will provide data with a DOI that can be directly cited in future publication.
+For real analysis, it is recommended to use `rgbif::occ_download()` which will provide data with a DOI that can be directly cited in future publications.
 :::
 
 ```{r gbif_dwl}
@@ -190,6 +190,7 @@ mapview(df1_sf) +
 We can export the dataset as csv file:
 
 ```{r outcsv_gbif}
+#| eval: false
 write.csv(
   df1,
   file = here("data", "gbif_otter_2021_mpl50km.csv"),
@@ -200,6 +201,7 @@ write.csv(
 And as geopackage file:
 
 ```{r outgpkg_gbif}
+#| eval: false
 st_write(
   df1_sf,
   here("data", "gbif_otter_2021_mpl50km.gpkg"),
@@ -211,7 +213,7 @@ st_write(
 
 The package `happign`[@R-happign] provides a great interface to download [French spatial data from IGN](https://geoservices.ign.fr/catalogue) using protocols such as Web Map Service (WMS) for raster and Web Feature Service (WFS) for vectors. Read the [documentation](https://paul-carteron.github.io/happign/index.html) for more details. 
 
-It is recommended to extend the buffer to make sure all points, and their buffer are covered with data. We will add 0.1 degree of extra margin to the original buffer.
+It is recommended to extend the buffer to make sure all points and their buffers are covered with data. We will add 0.1 degree of extra margin to the original buffer.
 ```{r large_box}
 extra <- 0.1 #extra margin in degree
 large_ext <- st_bbox(df1_sf) + extra * c(rep(-1, 2), rep(1, 2))
@@ -219,8 +221,7 @@ large_box <- large_ext |> st_bbox() |> st_as_sfc()
 ```
 
 ### Elevation from BD ALTI
-We will use the function `get_wms_raster()`. For quick testing, it is recommended to use interactive = TRUE. In our case we want `altimetrie` data from BD ALTI at 25m resolution. 
-In our case, we will download it with a resolution of 250m to make the file smaller and fasten computation.
+We will use the function `get_wms_raster()`. For quick testing, it is recommended to use interactive = TRUE. In our case we want `altimetrie` data from [BD ALTI](https://geoservices.ign.fr/bdalti) at 25m resolution. For the sake of the example, we will download the dataset with a resolution of 250m to make the file smaller and fasten computation.
 
 
 ```{r get_elevation}
