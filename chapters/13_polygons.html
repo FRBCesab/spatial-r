@@ -464,7 +464,8 @@ Click to see the answer
 </section>
 <section id="visualization" class="level2">
 <h2 class="anchored" data-anchor-id="visualization">Visualization</h2>
-<p>Before comparing two spatial objects (the otters observations and the land cover), it is recommended to plot them and make sure their projection systems are the same and the extents match. <em>Do not use the package <code>mapview</code> because it will automatically project the datasets.</em></p>
+<p>Before comparing two spatial objects (the otters observations and the land cover), it is recommended to plot them and make sure their projection systems are the same and the extents match.<br>
+<em>Do not use the package <code>mapview</code> because it will automatically project the datasets.</em></p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true" href="">terra</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false" href="">sf</a></li></ul>
 <div class="tab-content">
@@ -562,7 +563,7 @@ Warning
 </div>
 <div class="callout-body-container callout-body">
 <ul>
-<li>Which is the largest land cover class in our study area? Why?</li>
+<li>Which are the largest land cover classes in our study area? Why?</li>
 </ul>
 </div>
 </div>
@@ -572,17 +573,18 @@ Click to see the answer
 </summary>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># see area per land use classes</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(landuse<span class="sc">$</span>area_ha, landuse<span class="sc">$</span>nature, sum)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>area_landuse <span class="ot">&lt;-</span> <span class="fu">tapply</span>(landuse<span class="sc">$</span>area_ha, landuse<span class="sc">$</span>nature, sum)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span>(area_landuse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>              Bâti       Broussailles Carrière, décharge          Eau libre 
-       55654.39730        97923.34835         1916.22618       272561.76875 
-             Forêt      Marais salant  Marais, tourbière            Prairie 
-      278134.18692         3455.79520        29467.47117       206833.73332 
-   Rocher, éboulis     Sable, gravier      Vigne, verger   Zone d'activités 
-          37.78454         2353.14638       206514.68518        15224.16350 </code></pre>
+<pre><code>   Rocher, éboulis Carrière, décharge     Sable, gravier      Marais salant 
+          37.78454         1916.22618         2353.14638         3455.79520 
+  Zone d'activités  Marais, tourbière               Bâti       Broussailles 
+       15224.16350        29467.47117        55654.39730        97923.34835 
+     Vigne, verger            Prairie          Eau libre              Forêt 
+      206514.68518       206833.73332       272561.76875       278134.18692 </code></pre>
 </div>
 </div>
-<p>The category <code>Eau libre</code> (=running water) is the largest land cover because, as it can be seen in the <a href="https://frbcesab.github.io/spatial-r/chapters/13_polygons_files/figure-html/terramap_line-1.png">previous map</a>, large part of the Mediterranean Sea is included in the land cover data.</p>
+<p>The categories <code>Forêt</code> (=forest) and <code>Eau libre</code> (=running water) are the largest land covers. As it can be seen in the <a href="https://frbcesab.github.io/spatial-r/chapters/13_polygons_files/figure-html/terramap_line-1.png">previous map</a>, large part of the Mediterranean Sea is included in the land cover data.</p>
 </details>
 </section>
 <section id="mask-the-sea" class="level2">
@@ -839,7 +841,7 @@ Click to see the answer
 3140157 3140157 3140157 3140157 3140157 3140157 </code></pre>
 </div>
 </div>
-<p>The difference with expected value of <span class="math inline">\(3141593\)</span> is due to the way buffers are defined (in 40 points in <code>terra</code> and 120 points in <code>sf</code>). But it is important that all buffers have the same area.</p>
+<p>The difference with expected value of <span class="math inline">\(3141593\)</span> is due to the way buffers are defined (by default, in 40 points in <code>terra</code> and 120 points in <code>sf</code>). If you want more precise buffers, you can change the parameter <code>quadsegs</code> from the <code>terra::buffer()</code> function. The roundness of the buffers is not important for most cases. It is much more important that all buffers have the same area.</p>
 </details>
 </section>
 <section id="intersection-among-polygons" class="level3">

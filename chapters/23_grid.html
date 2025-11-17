@@ -535,8 +535,8 @@ Click to see the answer
 </section>
 <section id="simple-linear-model" class="level2">
 <h2 class="anchored" data-anchor-id="simple-linear-model">Simple linear model</h2>
-<p>The dataset is made of observations gathered without proper sampling schemes, and with potentially many biases. For such data, it is recommended to use species occupancy models (e.g.&nbsp;<a href="https://doi.org/10.1111/2041-210X.13897"><code>spOccupancy</code></a>).</p>
-<p>Yet for our little case study we will do a simple linear model.</p>
+<p>The dataset is made of observations gathered without proper sampling schemes, and with potentially many biases. For such data (opportunistic presence-only data), it is recommended to use species occupancy models.</p>
+<p>Yet, for our little case study we will do a simple linear model.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># transform the spatial raster data as data.frame</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(out_masked)</span>
@@ -568,20 +568,19 @@ Residual standard error: 0.7884 on 276 degrees of freedom
 Multiple R-squared:  0.03659,   Adjusted R-squared:  0.02262 
 F-statistic:  2.62 on 4 and 276 DF,  p-value: 0.03531</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># to see how wrong the linear model is, look at:</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># plot(m1)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>The linear model is definitely not a good fit to our data (R2 is only 0.03). Moreover, there is strong collinearity between elevation and temperature, and the residuals are not normally distributed. It might help if we use generalized mixed models with <code>poisson</code> or <code>quasipoisson</code> distribution for count data. Yet, the main issue here is the high number of ‘false’ zeros (opportunistic observations, presence-only information).</p>
-<p>Additionally, it is always recommended to spatially visualize the predictions and the residuals.</p>
+<p>The linear model is definitely not a good fit to our data (R2 is only 0.03). Moreover, there is strong collinearity between elevation and temperature, and the residuals are not normally distributed (to see how wrong is our model, try <code>plot(m1)</code>).<br>
+It might help if we use generalized mixed models. For zero-inflated datasets, one option is to make two separate models: (1) model the presence-absence as a <code>binomial</code> variable, and (2) model the number of observations with <code>poisson</code> distribution. Yet, in our case the main issue here is the high number of ‘false’ zeros (opportunistic observations, presence-only information) which can only be resolved with species occupancy models (e.g.&nbsp;<a href="https://doi.org/10.1111/2041-210X.13897"><code>spOccupancy</code></a>).</p>
+<p>However, it is always recommended to spatially visualize the predictions and the residuals.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set new empty grids</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>out_masked<span class="sc">$</span>predicted <span class="ot">&lt;-</span> <span class="fu">rast</span>(grid)</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>out_masked<span class="sc">$</span>residuals <span class="ot">&lt;-</span> <span class="fu">rast</span>(grid)</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># add values of prediction and residuals where there is no NA</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>out_masked<span class="sc">$</span>predicted[<span class="sc">!</span><span class="fu">is.na</span>(out_masked<span class="sc">$</span>nobs)] <span class="ot">&lt;-</span> <span class="fu">predict</span>(m1)</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>out_masked<span class="sc">$</span>residuals[<span class="sc">!</span><span class="fu">is.na</span>(out_masked<span class="sc">$</span>nobs)] <span class="ot">&lt;-</span> <span class="fu">residuals</span>(m1)</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># show and compare the observation, prediction and residuals</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out_masked, <span class="fu">c</span>(<span class="st">"nobs"</span>, <span class="st">"predicted"</span>, <span class="st">"residuals"</span>), <span class="at">nc =</span> <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set new empty grids</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>out_masked<span class="sc">$</span>predicted <span class="ot">&lt;-</span> <span class="fu">rast</span>(grid)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>out_masked<span class="sc">$</span>residuals <span class="ot">&lt;-</span> <span class="fu">rast</span>(grid)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># add values of prediction and residuals where there is no NA</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>out_masked<span class="sc">$</span>predicted[<span class="sc">!</span><span class="fu">is.na</span>(out_masked<span class="sc">$</span>nobs)] <span class="ot">&lt;-</span> <span class="fu">predict</span>(m1)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>out_masked<span class="sc">$</span>residuals[<span class="sc">!</span><span class="fu">is.na</span>(out_masked<span class="sc">$</span>nobs)] <span class="ot">&lt;-</span> <span class="fu">residuals</span>(m1)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co"># show and compare the observation, prediction and residuals</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out_masked, <span class="fu">c</span>(<span class="st">"nobs"</span>, <span class="st">"predicted"</span>, <span class="st">"residuals"</span>), <span class="at">nc =</span> <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
