@@ -107,7 +107,8 @@ landuse <- vect(
 
 ## Visualization
 
-Before comparing two spatial objects (the otters observations and the land cover), it is recommended to plot them and make sure their projection systems are the same and the extents match. *Do not use the package `mapview` because it will automatically project the datasets.*
+Before comparing two spatial objects (the otters observations and the land cover), it is recommended to plot them and make sure their projection systems are the same and the extents match.   
+*Do not use the package `mapview` because it will automatically project the datasets.*
 
 
 ::: {.panel-tabset}
@@ -171,7 +172,7 @@ landuse_3035$area_ha <- as.numeric(area_polygons)
 
 
 :::{.callout-note title="Your turn"}
-- Which is the largest land cover class in our study area? Why?
+- Which are the largest land cover classes in our study area? Why?
 :::
 
 <details>
@@ -179,10 +180,11 @@ landuse_3035$area_ha <- as.numeric(area_polygons)
 
 ```{r ex1}
 # see area per land use classes
-tapply(landuse$area_ha, landuse$nature, sum)
+area_landuse <- tapply(landuse$area_ha, landuse$nature, sum)
+sort(area_landuse)
 ```
 
-The category `Eau libre` (=running water) is the largest land cover because, as it can be seen in the [previous map](https://frbcesab.github.io/spatial-r/chapters/13_polygons_files/figure-html/terramap_line-1.png), large part of the Mediterranean Sea is included in the land cover data.
+The categories `Forêt` (=forest) and `Eau libre` (=running water) are the largest land covers. As it can be seen in the [previous map](https://frbcesab.github.io/spatial-r/chapters/13_polygons_files/figure-html/terramap_line-1.png), large part of the Mediterranean Sea is included in the land cover data.
 
 </details>
 
@@ -353,7 +355,8 @@ summary(buffer_area)
 summary(st_area(poly_otter_3035))
 ```
 
-The difference with expected value of $3141593$ is due to the way buffers are defined (in 40 points in `terra` and 120 points in `sf`). But it is important that all buffers have the same area.  
+The difference with expected value of $3141593$ is due to the way buffers are defined (by default, in 40 points in `terra` and 120 points in `sf`). If you want more precise buffers, you can change the parameter `quadsegs` from the `terra::buffer()` function. The roundness of the buffers is not important for most cases. It is much more important that all buffers have the same area.
+
 
 </details>
 

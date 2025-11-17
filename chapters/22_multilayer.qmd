@@ -154,7 +154,7 @@ We can make algebra operations in rasters. For instance, we can transform Kelvin
 ```{r rast_transform}
 temp_C <- temperature - 273.15
 # calculate the range of temperature values
-range_T <- range(values(temp_C))
+range_T <- range(values(temp_C), na.rm = TRUE)
 # add otters observations in each layer with `fun`
 plot(
   temp_C,
@@ -281,9 +281,14 @@ plot(france_border, add = TRUE)
 
 
 :::{.callout-note title="Your turn"}
-2. Extract the average temperature in 2015-2021 for 1km buffers around the observations. Use buffers as explained in the [Chapter Rasters](https://frbcesab.github.io/spatial-r/chapters/21_rasters.html#create-buffer).
-1. (advanced) Calculate the range of monthly temperature within the 12 months before the observations, and make a map.
+1. Extract the average temperature in 2015-2021 for 1km buffers around the observations. Use buffers as explained in the [Chapter Rasters](https://frbcesab.github.io/spatial-r/chapters/21_rasters.html#create-buffer).
+2. (advanced) Make monthly temperature maps with corresponding observations overlaid
+3. (advanced) Calculate the range of monthly temperature within the 12 months before the observations, and make a map.
 :::
+
+
+
+
 
 <details>
 <summary>Click to see the answer 1 </summary>
@@ -308,6 +313,36 @@ boxplot(mean_buffer_temp, las = 2, ylab = "Temperature (*C)")
 <details>
 <summary>Click to see the answer 2 </summary>
 
+```{r map_months_for}
+#| eval: false
+# option with a for loop:
+par(mfrow = c(3, 4), mar = c(4, 4, 4, 1))
+for (i in grep("2021", time_chelsa, value = TRUE)) {
+  plot(temp_C, i, range = range_T, plg = list(title = "(°C)"), main = i)
+  points(pt_otter[pt_otter$time == i, ])
+}
+```
+
+
+```{r map_months_plot}
+# option in a single line using plot()
+plot(
+  temp_C,
+  in_2021,
+  range = range_T,
+  plg = list(title = "(°C)"),
+  fun = function(i) {
+    points(pt_otter[pt_otter$time == names(temp_C)[in_2021][i], ])
+  }
+)
+```
+
+</details>
+
+
+
+<details>
+<summary>Click to see the answer 3 </summary>
 
 ```{r extract_12m}
 # we start from the matching time

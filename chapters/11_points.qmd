@@ -42,8 +42,9 @@ otter <- read.csv(here("data", "gbif_otter_2021_mpl50km.csv"))
 ## online
 ```{r otter}
 #| eval: false
-url_github <- "https://github.com/FRBCesab/spatial-r/raw/main/data/"
-pt_otter <- vect(paste0(url_github, "gbif_otter_2021_mpl50km.csv"))
+otter <- read.csv(
+  "https://github.com/FRBCesab/spatial-r/raw/main/data/gbif_otter_2021_mpl50km.csv"
+)
 ```
 
 :::
@@ -71,13 +72,13 @@ We have just loaded in R the observations from GBIF, but it is stored in a simpl
 In `terra`, the key function for vectors is [`terra::vect()`](https://search.r-project.org/CRAN/refmans/terra/html/vect.html).
 
 ```{r terra_otter}
-pt_terra <- vect(
+pt_otter <- vect(
   otter,
   geom = c("decimalLongitude", "decimalLatitude"),
   crs = "EPSG:4326"
 )
 # summary of the spatial object
-pt_terra
+pt_otter
 ```
 
 All the information about the `terra::SpatVector` object can be retrieve individually with the functions [`terra::ext()`](https://search.r-project.org/CRAN/refmans/terra/html/ext.html) for the geographical extent, [`terra::crs()`](https://search.r-project.org/CRAN/refmans/terra/html/crs.html) for the projection system, and `dim()` for the dimensions (number of objects, and number of variables in the attribute table). 
@@ -107,20 +108,20 @@ Once the data is formatted as spatial vector, it can be visualized as static map
 ::: {.panel-tabset}
 
 ## mapview
-The function [`mapview::mapview()`](https://search.r-project.org/CRAN/refmans/mapview/html/mapView.html) creates easily interactive map. If you want to fine tune your map, have a look at this [tutorial](https://r-spatial.github.io/mapview/articles/mapview_01-basics.html)
+The function [`mapview::mapview()`](https://search.r-project.org/CRAN/refmans/mapview/html/mapView.html) creates easily interactive map. If you want to fine tune your map, have a look at this [tutorial](https://r-spatial.github.io/mapview/articles/mapview_01-basics.html). The function `mapview::mapview()` works well with objects loaded from `terra` or `sf`.
 
 ```{r mapview_0}
-mapview(pt_terra)
+mapview(pt_otter) # mapview(pt_sf) works fine as well
 ```
 
 ## terra
 The function [`plot()`](https://search.r-project.org/CRAN/refmans/terra/html/plot.html)
 . 
 ```{r terra_map0}
-plot(pt_terra)
+plot(pt_otter)
 ```
 
-## sf
+## sf 
 
 In `sf`, the function `plot()` visualize the attributes of the vectors by default. If you want a simple map with only the geometry, use [`st_geometry()`](https://search.r-project.org/CRAN/refmans/sf/html/st_geometry.html).  
 
@@ -144,7 +145,7 @@ The date formatting in R is powerful but hard to grasp. Make sure to have a look
 
 ```{r julian}
 # transform the date as Julian day
-julian <- as.Date(pt_terra$eventDate) |> format("%j") |> as.numeric()
+julian <- as.Date(pt_otter$eventDate) |> format("%j") |> as.numeric()
 ```
 
 Now we can attach the Julian day in the spatial object. The attribute table can be accessed as a normal `data.frame`, and we can create a new column with `$`.
@@ -153,7 +154,7 @@ Now we can attach the Julian day in the spatial object. The attribute table can 
 ## terra
 
 ```{r terra_julian}
-pt_terra$julian <- julian
+pt_otter$julian <- julian
 ```
 
 ## sf
@@ -170,13 +171,13 @@ pt_sf$julian <- julian
 To map an attribute in [`mapview::mapview()`](https://search.r-project.org/CRAN/refmans/mapview/html/mapView.html), add the parameter `zcol` with the variable of interest.
 
 ```{r mapview_julian}
-mapview(pt_terra, zcol = "julian", layer.name = "Julian date")
+mapview(pt_otter, zcol = "julian", layer.name = "Julian date")
 ```
 
 ## terra
 
 ```{r terra_map_julian}
-plot(pt_terra, "julian", type = "continuous", main = "Julian date")
+plot(pt_otter, "julian", type = "continuous", main = "Julian date")
 ```
 
 ## sf
@@ -200,7 +201,7 @@ Visually check if there is a bias in the spatial distributions of observations d
 # with mapview
 mapview(pt_sf, zcol = "institutionCode")
 # or in terra
-plot(pt_terra, "institutionCode")
+plot(pt_otter, "institutionCode")
 # or in sf
 plot(pt_sf["institutionCode"], axes = TRUE)
 ```
@@ -221,17 +222,25 @@ In `terra`, the function to export a spatial vector is [`terra::writeVector()`](
 
 ```{r terra_export}
 #| eval: false
-writeVector(pt_terra, here("data", "gbif_otter_2021_mpl50km.gpkg"))
+writeVector(pt_otter, here("data", "gbif_otter_2021_mpl.gpkg"))
 ```
+
+:::{.callout-warning}
+If you want to overwrite an existing file, use the argument `overwrite = TRUE`. 
+:::
+
 
 ## sf
 In `sf`, the function to export a spatial vector is [`sf::st_write()`](https://search.r-project.org/CRAN/refmans/sf/html/st_write.html).
 
 ```{r sf_export}
 #| eval: false
-st_write(pt_sf, here("data", "gbif_otter_2021_mpl50km.gpkg"))
+st_write(pt_sf, here("data", "gbif_otter_2021_mpl.gpkg"))
 ```
 
+:::{.callout-warning}
+If you want to overwrite an existing file, use the argument `append = FALSE`. 
+:::
 
 :::
 
@@ -242,12 +251,12 @@ It is confusing to have two dominant packages `terra` and `sf` with similar func
 
 ::: {.panel-tabset}
 
-## from terra to sp
+## from terra to sf
 To convert a `terra SpatVector` vector into a `sf simple feature`, the function is [`sf::st_as_sf()`](https://search.r-project.org/CRAN/refmans/sf/html/st_as_sf.html).
 
 ```{r terra_to_sf}
 #| eval: false
-pt_sf <- st_as_sf(pt_terra)
+pt_sf <- st_as_sf(pt_otter)
 ```
 
 ## from sf to terra

@@ -165,9 +165,9 @@ plot(out_masked)
 
 ## Simple linear model
 
-The dataset is made of observations gathered without proper sampling schemes, and with potentially many biases. For such data, it is recommended to use species occupancy models (e.g. [`spOccupancy`](https://doi.org/10.1111/2041-210X.13897)). 
+The dataset is made of observations gathered without proper sampling schemes, and with potentially many biases. For such data (opportunistic presence-only data), it is recommended to use species occupancy models.  
 
-Yet for our little case study we will do a simple linear model.
+Yet, for our little case study we will do a simple linear model.
 
 ```{r anova}
 # transform the spatial raster data as data.frame
@@ -176,14 +176,12 @@ df <- data.frame(out_masked)
 # make a simple linear model
 m1 <- lm(nobs ~ river_m + forest + elevation_m + temperature_K, data = df)
 summary(m1)
-# to see how wrong the linear model is, look at:
-# plot(m1)
 ```
 
-The linear model is definitely not a good fit to our data (R2 is only 0.03). Moreover, there is strong collinearity between elevation and temperature, and the residuals are not normally distributed. 
-It might help if we use generalized mixed models with `poisson` or `quasipoisson` distribution for count data. Yet, the main issue here is the high number of 'false' zeros (opportunistic observations, presence-only information).  
+The linear model is definitely not a good fit to our data (R2 is only 0.03). Moreover, there is strong collinearity between elevation and temperature, and the residuals are not normally distributed (to see how wrong is our model, try `plot(m1)`).   
+It might help if we use generalized mixed models. For zero-inflated datasets, one option is to make two separate models: (1) model the presence-absence as a `binomial` variable, and (2) model the number of observations with `poisson` distribution. Yet, in our case the main issue here is the high number of 'false' zeros (opportunistic observations, presence-only information) which can only be resolved with species occupancy models (e.g. [`spOccupancy`](https://doi.org/10.1111/2041-210X.13897)). 
 
-Additionally, it is always recommended to spatially visualize the predictions and the residuals.
+However, it is always recommended to spatially visualize the predictions and the residuals.
 
 ```{r}
 # set new empty grids

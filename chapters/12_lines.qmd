@@ -262,9 +262,8 @@ boxplot(nearest_distance, ylab = "distance to river (m)")
 
 :::{.callout-note title="Your turn"}
 1. Which are the rivers with most sights of otters?  
-2. Were otters observed close to small or large rivers? 
-3. Make a map with the distance to river and visually check the coherence of the calculation.  
-4. (Reflexion) What can be the factors explaining the few outliers with large distances (>1km)?
+2. Make a map with the distance to river and visually check the coherence of the calculation.  
+3. (Reflexion) What can be the factors explaining the few outliers with large distances (>1km)?
 :::
 
 <details>
@@ -274,33 +273,15 @@ boxplot(nearest_distance, ylab = "distance to river (m)")
 table(river$toponyme[nearest_river]) |>
   sort(decreasing = TRUE) |>
   head(5)
-
-
 ```
 
 </details>
+
 
 <details>
 <summary>Click to see the answer 2</summary>
 
 ```{r ex3}
-# add an attribute whether an otter was observed near the river in 2021
-river$otter_sight <- ifelse(1:nrow(river) %in% nearest_river, "yes", "no")
-# compare the distribution of river lengths
-boxplot(
-  river$length_km ~ river$otter_sight,
-  xlab = "Otter sighting",
-  ylab = "River length (km)"
-)
-```
-
-</details>
-
-
-<details>
-<summary>Click to see the answer 3</summary>
-
-```{r ex4}
 #| eval: false
 
 # add the distance to river to the spatial object
@@ -312,3 +293,21 @@ mapview(river) +
 ```
 
 </details>
+
+
+<!--
+Were otters observed close to small or large rivers? 
+What is the length of the nearest rivers?
+```{r exE}
+# eval: false
+# add an attribute whether an otter was observed near the river in 2021
+river$otter_sight <- ifelse(1:nrow(river) %in% nearest_river, "yes", "no")
+# compare the distribution of river lengths
+boxplot(
+  river$length_km ~ river$otter_sight,
+  xlab = "Otter sighting",
+  ylab = "River length (km)"
+)
+```
+
+-->
